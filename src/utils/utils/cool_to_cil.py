@@ -423,7 +423,26 @@ class BaseCOOLToCILVisitor:
         
     def add_basic_methods(self):
         self.add_arith_methods()
+        
         ## initializing main types
+        self.add_function_init("Object")
+        self.add_function_abort()
+        self.add_function_type_name()
+        self.add_function_copy()
+
+        self.add_function_init("IO")
+        self.add_function_out_string()
+        self.add_function_out_int()
+        self.add_function_in_string()
+        self.add_function_in_int()
+        
+        self.add_function_init("String")
+        self.add_function_length()
+        self.add_function_concat()
+        self.add_function_substr()
+        
+        self.add_function_init("Bool")
+        self.add_function_init("Int")
         
             
     def add_main_funct(self): ###
@@ -463,19 +482,55 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.add_basic_types()    
         self.add_basic_methods()  
         self.add_main_funct()
-        1 # stopvalue for debuging
         
-    
+        for i, class_ in enumerate(node.class_list):
+            self.visit(class_, scope.children[i])
+
+        self.add_main_funct()
+
+        return cil.ProgramNode(self.dottypes, self.dotdata, self.dotcode)
+            
     @visitor.when(cool.ClassDecNode)
     def visit(self, node: cool.ClassDecNode, scope):
-        pass
+        scope = node.scope
+        self.current_type = self.context.get_type(node.name)
+
+        type_node = self.register_type(self.current_type.name, self.current_type.parent.name)
+
+        attrs = [data_ for data_ in node.data if isinstance(data_, cool.AttributeDecNode)]
+        meths = [data_ for data_ in node.data if isinstance(data_, cool.MethodDecNode)]
+
+        for attr, _ in self.current_type.all_attributes():
+            self.visit(attr, scope)
+            type_node.attributes.append(attr.name)
+
+        for method, t in methods_declaration_order(self.current_type):
+            type_node.methods.append((method.name, self.to_function_name(method.name, t.name)))
+
+        i_ = len([attr for attr in attrs if attr.expr is not None])
+        for i, method in enumerate(meths, start=i_):
+            self.visit(method, scope.children[i])
                 
     @visitor.when(cool.MethodDecNode)
     def visit(self, node: cool.MethodDecNode, scope):
-        pass
+        scope = node.scope
+        self.current_method, owner_type = self.current_type.get_method(
+            node.id, get_owner=True
+        )
+        function_name = self.to_function_name(self.current_method.name, owner_type.name)
+        self.current_function = self.register_function(function_name)
+
+        self.current_function.params = [cil.ParamNode("self")] + [
+            cil.ParamNode(param_name) for param_name, _ in node.params
+        ]
+
+        source, _ = self.visit(node.body, scope)
+
+        self.register_instruction(cil.ReturnNode(source))
 
     @visitor.when(cool.AttributeDecNode)
     def visit(self, node: cool.AttributeDecNode, scope):
+        scope = node.scope
         pass
 
 
@@ -485,54 +540,67 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
     @visitor.when(cool.ParamNode)
     def visit(self, node: cool.ParamNode, scope):
+        scope = node.scope
         pass
 
     @visitor.when(cool.WhileNode)
     def visit(self, node: cool.WhileNode, scope):
+        scope = node.scope
         pass
     
     @visitor.when(cool.LetNode)
     def visit(self, node: cool.BooleanNode, scope):
+        scope = node.scope
         pass
     
     @visitor.when(cool.CaseNode)
     def visit(self, node: cool.CaseNode, scope):
+        scope = node.scope
         pass
 
     @visitor.when(cool.AssignNode)
     def visit(self, node: cool.AssignNode, scope):
+        scope = node.scope
         pass
 
     @visitor.when(cool.ExprParNode)
     def visit(self, node: cool.ExprParNode, scope):
+        scope = node.scope
         pass
     
     @visitor.when(cool.BlockNode)
     def visit(self, node: cool.BlockNode, scope):
+        scope = node.scope
         pass
     
     @visitor.when(cool.ConditionalNode)
     def visit(self, node: cool.ConditionalNode, scope):
+        scope = node.scope
         pass
   
     @visitor.when(cool.IsVoidNode)
     def visit(self, node: cool.IsVoidNode, scope):
+        scope = node.scope
         pass
 
     @visitor.when(cool.MethodCallNode)
     def visit(self, node: cool.MethodCallNode, scope):
+        scope = node.scope
         pass
 
     @visitor.when(cool.NewNode)
     def visit(self, node: cool.NewNode, scope):
+        scope = node.scope
         pass
         
     @visitor.when(cool.VariableNode)
     def visit(self, node: cool.VariableNode, scope):
+        scope = node.scope
         pass
 
     @visitor.when(cool.NewNode)
     def visit(self, node: cool.NewNode, scope):
+        scope = node.scope
         pass
 
 
@@ -542,27 +610,33 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
     @visitor.when(cool.PlusNode)
     def visit(self, node: cool.PlusNode, scope):
-        pass
+        scope = node.scope
+        return self.visit_arith_node(node, scope, "add_funct", "Int")  
 
     @visitor.when(cool.MinusNode)
     def visit(self, node: cool.MinusNode, scope):
-        pass
-
+        scope = node.scope
+        return self.visit_arith_node(node, scope, "minus_funct", "Int") 
+    
     @visitor.when(cool.TimesNode)
     def visit(self, node: cool.TimesNode, scope):
-        pass
+        scope = node.scope
+        return self.visit_arith_node(node, scope, "times_funct", "Int") 
 
     @visitor.when(cool.DivNode)
     def visit(self, node: cool.DivNode, scope):
-        pass
+        scope = node.scope
+        return self.visit_arith_node(node, scope, "div_funct", "Int") 
     
     @visitor.when(cool.LessEqualNode)
     def visit(self, node: cool.LessEqualNode, scope):
-        pass
+        scope = node.scope
+        return self.visit_arith_node(node, scope, "lesseq_funct", "Int") 
     
     @visitor.when(cool.LessNode)
     def visit(self, node: cool.LessNode, scope):
-        pass
+        scope = node.scope
+        return self.visit_arith_node(node, scope, "lessthan_funct", "Int") 
 
 
     ##########
