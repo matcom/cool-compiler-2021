@@ -283,9 +283,27 @@ class ReadNode(InstructionNode):
     def __init__(self, dest):
         self.dest = dest
 
+class ReadStringNode(InstructionNode):
+    def __init__(self, dest):
+        self.dest = dest
+
+class ReadIntNode(InstructionNode):
+    def __init__(self, dest):
+        self.dest = dest
+
 class PrintNode(InstructionNode):
     def __init__(self, str_addr):
         self.str_addr = str_addr
+
+class PrintStringNode(InstructionNode):
+    def __init__(self, str_addr):
+        self.str_addr = str_addr
+
+
+class PrintIntNode(InstructionNode):
+    def __init__(self, int_source):
+        self.int_source = int_source
+
 
 class AllocateNullNode(InstructionNode):
     def __init__(self, dest):
@@ -317,6 +335,20 @@ class EqualStrNode(InstructionNode):
         self.right: str = right
         self.dest: str = dest        
         
+class TypeNameNode(InstructionNode):
+    def __init__(self, dest, source):
+        self.dest = dest
+        self.source = source
+
+
+class HaltNode(InstructionNode):
+    def __init__(self):
+        pass
+
+class CopyNode(InstructionNode):
+    def __init__(self, dest: str, source: str) -> None:
+        self.dest: str = dest
+        self.source: str = source
 
 def get_formatter():
 

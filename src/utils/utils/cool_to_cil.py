@@ -190,6 +190,7 @@ class BaseCOOLToCILVisitor:
         type_a_equals_int = self.define_internal_local()
         type_a_equals_bool = self.define_internal_local()
         type_a_equals_string = self.define_internal_local()
+        self.register_EOL()
         
         self.register_instruction(cil.AllocateBoolNode(result, "0"))
         self.register_instruction(cil.AllocateNullNode(constant_null))
@@ -249,6 +250,7 @@ class BaseCOOLToCILVisitor:
         type_bool = self.define_internal_local("Type Bool")
         type_source_equals_int = self.define_internal_local("Type of source equals int")
         type_source_equals_bool = self.define_internal_local("Type of source equals bool")
+        self.register_EOL()
        
         ## null ptr
         self.register_instruction(cil.AllocateNullNode(null_ptr))
@@ -290,11 +292,140 @@ class BaseCOOLToCILVisitor:
     def add_function_init(self, type_name: str):
         self.current_function = self.register_function(self.to_function_name("_init_", type_name))
         self.current_function.params.append(cil.ParamNode("self"))
-        self.register_instruction(cil.ReturnNode("self"))    
+        self.register_instruction(cil.ReturnNode("self")) 
+        self.register_EOL()   
+    
+    def add_function_abort(self):
+        self.current_function = self.register_function(self.to_function_name("abort", "Object"))
+        self.current_function.params.append(cil.ParamNode("self"))
+        msg1 = self.define_internal_local()
+        msg2 = self.define_internal_local()
+        msg = self.define_internal_local()
+        endl = self.define_internal_local()
+        method_index = self.define_internal_local()
+        method_address = self.define_internal_local()
+        self.register_EOL()
+        
+        self.register_instruction(cil.AllocateStringNode(msg1, "\"Abort called from class \""))
+        self.register_instruction(cil.AllocateStringNode(endl, "\"\\n\""))
+        
+        all_methods = methods_declaration_order(self.context.get_type("String"))
+        i = [m.name for m, _ in all_methods].index("type_name")
+        self.register_instruction(cil.AllocateIntNode(method_index, f"{i}"))
+        self.register_instruction(cil.GetMethodNode(method_address, "self", method_index, "type_name", "String"))
+
+        self.register_instruction(cil.ArgNode("self", 0, 1))
+        self.register_instruction(cil.DynamicCallNode("String", method_address, msg2, 1))
+       
+        
+        all_methods = methods_declaration_order(self.context.get_type("String"))
+        i = [m.name for m, _ in all_methods].index("concat")
+        self.register_instruction(cil.AllocateIntNode(method_index, f"{i}"))
+        self.register_instruction(cil.GetMethodNode(method_address, "self", method_index, "concat", "String"))
+
+        self.register_instruction(cil.ArgNode(msg1, 0, 2))
+        self.register_instruction(cil.ArgNode(msg2, 1, 2)) 
+        self.register_instruction(cil.DynamicCallNode("String", method_address, msg, 2))
+
+        all_methods = methods_declaration_order(self.context.get_type("String"))
+        i = [m.name for m, _ in all_methods].index("concat")
+        self.register_instruction(cil.AllocateIntNode(method_index, f"{i}"))
+        self.register_instruction(cil.GetMethodNode(method_address, "self", method_index, "concat", "String"))
+
+        self.register_instruction(cil.ArgNode(msg, 0, 2))
+        self.register_instruction(cil.ArgNode(endl, 1, 2)) 
+        self.register_instruction(cil.DynamicCallNode("String", method_address, msg, 2))
+
+        self.register_instruction(cil.PrintStringNode(msg))
+        self.register_instruction(cil.HaltNode())
+        self.register_instruction(cil.ReturnNode("self"))
+
+    def add_function_copy(self):
+        self.current_function = self.register_function(self.to_function_name("copy", "Object"))
+        self.current_function.params.append(cil.ParamNode("self"))
+        local_copy = self.define_internal_local()
+        self.register_instruction(cil.CopyNode(local_copy, "self"))
+        self.register_instruction(cil.ReturnNode(local_copy))
+        self.register_EOL()
+
+    def add_function_type_name(self):
+        self.current_function = self.register_function(self.to_function_name("type_name", "Object"))
+        self.current_function.params.append(cil.ParamNode("self"))
+        #type_name
+        type_name = self.define_internal_local()
+        self.register_instruction(cil.TypeNameNode(type_name, "self"))
+        self.register_instruction(cil.ReturnNode(type_name))
+        self.register_EOL()
+
+
+    def add_function_out_string(self):
+        self.current_function = self.register_function(self.to_function_name("out_string", "IO"))
+        self.current_function.params.append(cil.ParamNode("self"))
+        self.current_function.params.append(cil.ParamNode("x"))
+        self.register_instruction(cil.PrintStringNode("x"))
+        self.register_instruction(cil.ReturnNode("self"))
+        self.register_EOL()
+
+    def add_function_out_int(self):
+        self.current_function = self.register_function(self.to_function_name("out_int", "IO"))
+        self.current_function.params.append(cil.ParamNode("self"))
+        self.current_function.params.append(cil.ParamNode("x"))
+        self.register_instruction(cil.PrintIntNode("x"))
+        self.register_instruction(cil.ReturnNode("self"))
+        self.register_EOL()
+    
+    def add_function_in_string(self):
+        self.current_function = self.register_function(self.to_function_name("in_string", "IO"))
+        self.current_function.params.append(cil.ParamNode("self"))
+        local_str = self.define_internal_local()
+        self.register_instruction(cil.ReadStringNode(local_str))
+        self.register_instruction(cil.ReturnNode(local_str))
+        self.register_EOL()
+    
+    def add_function_in_int(self):
+        self.current_function = self.register_function(self.to_function_name("in_int", "IO"))
+        self.current_function.params.append(cil.ParamNode("self"))
+        local_str = self.define_internal_local()
+        self.register_instruction(cil.AllocateIntNode(local_str, "0"))
+        self.register_instruction(cil.ReadIntNode(local_str))
+        self.register_instruction(cil.ReturnNode(local_str))
+        self.register_EOL()
+
+    def add_function_length(self):
+        self.current_function = self.register_function(self.to_function_name("length", "String"))
+        self.current_function.params.append(cil.ParamNode("self"))
+        len_local =  self.define_internal_local()
+        self.register_instruction(cil.AllocateIntNode(len_local, "0"))
+        self.register_instruction(cil.LengthNode(len_local, "self"))
+        self.register_instruction(cil.ReturnNode(len_local))
+        self.register_EOL()
+
+    def add_function_concat(self):
+        self.current_function = self.register_function(self.to_function_name("concat", "String"))
+        self.current_function.params.append(cil.ParamNode("self"))
+        self.current_function.params.append(cil.ParamNode("s"))
+        new_str =  self.define_internal_local()
+        self.register_instruction(cil.ConcatNode(new_str, "self", "s"))
+        self.register_instruction(cil.ReturnNode(new_str))
+        self.register_EOL()
+
+    def add_function_substr(self):
+        self.current_function = self.register_function(self.to_function_name("substr", "String"))
+        self.current_function.params.append(cil.ParamNode("self"))
+        self.current_function.params.append(cil.ParamNode("i"))
+        self.current_function.params.append(cil.ParamNode("l"))
+        substr =  self.define_internal_local()
+        self.register_instruction(cil.SubstringNode(substr, "self", "i", "l"))            
+        self.register_instruction(cil.ReturnNode(substr))
+        self.register_EOL()
+
+
         
     def add_basic_methods(self):
         self.add_arith_methods()
-    
+        ## initializing main types
+        
+            
     def add_main_funct(self): ###
         self.current_function = self.register_function("main")
         local_main = self.define_internal_local()
@@ -315,6 +446,8 @@ class BaseCOOLToCILVisitor:
         self.register_instruction(cil.ArgNode(local_main, 0, 1))
         self.register_instruction(cil.DynamicCallNode("Main", method_address, local_result, 1))
         self.register_EOL()
+        
+        self.register_instruction(cil.HaltNode())
     
     
 
@@ -325,66 +458,24 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     
     @visitor.when(cool.ProgramNode)
     def visit(self, node: cool.ProgramNode, scope):
-        ######################################################
-        # node.declarations -> [ ClassDeclarationNode ... ]
-        ######################################################
         scope = node.scope
         
         self.add_basic_types()    
-        
         self.add_basic_methods()  
-        1 
+        self.add_main_funct()
+        1 # stopvalue for debuging
         
     
     @visitor.when(cool.ClassDecNode)
     def visit(self, node: cool.ClassDecNode, scope):
-        ####################################################################
-        # node.name -> str
-        # node.parent -> str
-        # node.data -> [ FuncDeclarationNode/AttrDeclarationNode ... ]
-        ####################################################################
         pass
                 
     @visitor.when(cool.MethodDecNode)
     def visit(self, node: cool.MethodDecNode, scope):
-        ###############################
-        # node.name -> str
-        # node.params -> [ (str, str) ... ]
-        # node.type -> str
-        # node.expr -> [ ExpressionNode ... ]
-        ###############################
-        
-        # self.current_method = self.current_type.get_method(node.name)
-        
-        # # Your code here!!! (Handle PARAMS)
-        # #registro la funcion, devuelve un funcNode del ast de CIL
-        # function_name = self.to_function_name(self.current_method.name)
-        # current_method_cil = self.register_function(function_name)
-
-        # # anado al FuncNode del ast de CIL un paramNode con el nombre de los parametros del metodo en el ast de COOL
-        # #el primer parametro es self
-        # current_method_cil.params.append(cil.ParamNode("self"))
-        # for param in self.current_method.params_name:
-        #     current_method_cil.params.append(cil.ParamNode(param))
-            
-        # # Your code here!!! (Handle RETURN)
-        # scope = node.scope
-        # value = self.visit(self.current_method.expr, scope)
-    
-        # # if value is None:
-        # #     value = 0
-        # self.register_instruction(cil.ReturnNode(value))
-
-        # self.current_method = None
         pass
 
     @visitor.when(cool.AttributeDecNode)
     def visit(self, node: cool.AttributeDecNode, scope):
-        ###############################
-        # node.name -> str
-        # node.type -> str
-        # node.expr -> ExpressionNode
-        ###############################
         pass
 
 
@@ -410,15 +501,6 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
     @visitor.when(cool.AssignNode)
     def visit(self, node: cool.AssignNode, scope):
-        ###############################
-        # node.idx -> str
-        # node.expr -> ExpressionNode
-        ###############################
-        
-        # #var_ = scope.find_variable(node.idx)
-        # right = self.visit(node.expr,scope)
-        # self.register_instruction(cil.AssignNode(node.idx,right))
-        # return right
         pass
 
     @visitor.when(cool.ExprParNode)
@@ -439,23 +521,6 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
     @visitor.when(cool.MethodCallNode)
     def visit(self, node: cool.MethodCallNode, scope):
-        ###############################
-        # node.atom -> AtomicNode
-        # node.idx -> str
-        # node.exprlist -> [ ExpressionNode ... ]
-        ###############################
-        
-        # args = [self.visit(node.atom)]#self
-        # for param in node.exprlist:
-        #     args.append(self.visit(param, scope))
-            
-        # for arg in args:
-        #     self.register_instruction(cil.ArgNode(arg))
-        
-        # result = self.define_internal_local()
-        # function_name = self.to_function_name(node.idx,node.type.name)
-        # self.register_instruction(cil.DynamicCallNode(node.type.name,function_name,result))
-        # return result
         pass
 
     @visitor.when(cool.NewNode)
@@ -464,34 +529,10 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         
     @visitor.when(cool.VariableNode)
     def visit(self, node: cool.VariableNode, scope):
-        ###############################
-        # node.lex -> str
-        ###############################
-        
-        # name = ""
-        # for local_var in self.localvars:
-        #     if local_var.name == node.lex:
-        #         return local_var.name
         pass
 
     @visitor.when(cool.NewNode)
     def visit(self, node: cool.NewNode, scope):
-        ###############################
-        # node.type -> str
-        ###################
-
-        # instance = self.define_internal_local()
-        # self.register_instruction(cil.AllocateNode(node.type, instance))
-        # type_name = node.type
-        # list_attr = self.dict_attr[type_name]
-        # for attr in list_attr:
-        #     #att-> .name,.expr,._type
-        #     if attr.expr is not None:
-        #         source = self.visit(attr.expr,scope)
-        #         self.register_instruction(cil. SetAttribNode(instance,attr.name,source))
-        #     else:
-        #          self.register_instruction(cil.AllocateNullNode(attr.name))
-        # return instance
         pass
 
 
@@ -501,58 +542,18 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
     @visitor.when(cool.PlusNode)
     def visit(self, node: cool.PlusNode, scope):
-        ###############################
-        # node.left -> ExpressionNode
-        # node.right -> ExpressionNode
-        ###############################
-        
-        # result = self.define_internal_local()
-        # left = self.visit(node.left,scope)
-        # right = self.visit(node.right,scope)
-        # self.register_instruction(cil.PlusNode(result,left,right))
-        # return result
         pass
 
     @visitor.when(cool.MinusNode)
     def visit(self, node: cool.MinusNode, scope):
-        ###############################
-        # node.left -> ExpressionNode
-        # node.right -> ExpressionNode
-        ###############################
-        
-        # result = self.define_internal_local()
-        # left = self.visit(node.left,scope)
-        # right = self.visit(node.right,scope)
-        # self.register_instruction(cil.MinusNode(result,left,right))
-        # return result
         pass
 
     @visitor.when(cool.TimesNode)
     def visit(self, node: cool.TimesNode, scope):
-        ###############################
-        # node.left -> ExpressionNode
-        # node.right -> ExpressionNode
-        ###############################
-        
-        # result = self.define_internal_local()
-        # left = self.visit(node.left,scope)
-        # right = self.visit(node.right,scope)
-        # self.register_instruction(cil.StarNode(result,left,right))
-        # return result
         pass
 
     @visitor.when(cool.DivNode)
     def visit(self, node: cool.DivNode, scope):
-        ###############################
-        # node.left -> ExpressionNode
-        # node.right -> ExpressionNode
-        ###############################
-        
-        # result = self.define_internal_local()
-        # left = self.visit(node.left,scope)
-        # right = self.visit(node.right,scope)
-        # self.register_instruction(cil.DivNode(result,left,right))
-        # return result
         pass
     
     @visitor.when(cool.LessEqualNode)
@@ -570,11 +571,6 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
     @visitor.when(cool.StringNode)
     def visit(self, node: cool.StringNode, scope):
-        ###############################
-        # node.lex -> str
-        ###############################
-        
-        # Your code here!!!
         pass
 
     @visitor.when(cool.BooleanNode)
@@ -583,9 +579,4 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     
     @visitor.when(cool.NumberNode)
     def visit(self, node: cool.NumberNode, scope):
-        ###############################
-        # node.lex -> str
-        ###############################
-        
-        # return self.define_internal_local()
         pass
