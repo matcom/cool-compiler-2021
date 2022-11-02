@@ -46,6 +46,11 @@ class AssignNode(InstructionNode):
         self.dest = dest
         self.source = source
 
+class AssignIntNode(InstructionNode):
+    def __init__(self, dest: str, source: str):
+        self.dest: str = dest
+        self.source: str = source
+        
 class ParentNode(InstructionNode):
     def __init__(self, dest, source):
         self.source = source
@@ -285,6 +290,33 @@ class PrintNode(InstructionNode):
 class AllocateNullNode(InstructionNode):
     def __init__(self, dest):
         self.dest = dest
+        
+        
+class EqualAddressNode(InstructionNode):
+    def __init__(self, dest: str, left: str, right: str):
+        self.left: str = left
+        self.right: str = right
+        self.dest: str = dest
+
+
+class TypeAddressNode(InstructionNode):
+    def __init__(self, dest: str, name: str):
+        self.name: str = name
+        self.dest: str = dest
+
+class EqualIntNode(InstructionNode):
+    def __init__(self, dest: str, left: str, right: str):
+        self.left: str = left
+        self.right: str = right
+        self.dest: str = dest
+
+
+class EqualStrNode(InstructionNode):
+    def __init__(self, dest: str, left: str, right: str):
+        self.left: str = left
+        self.right: str = right
+        self.dest: str = dest        
+        
 
 def get_formatter():
 

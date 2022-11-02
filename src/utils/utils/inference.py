@@ -399,7 +399,7 @@ class InferenceTypeChecker:
         return 'base', self.context.get_type('Object')
 
     @visitor.when(ast.ExprParNode)
-    def visit(self, node: ast.NewNode, scope: Scope):    
+    def visit(self, node: ast.ExprParNode, scope: Scope):    
         node.scope = scope
         
         return self.visit(node.expr, scope)

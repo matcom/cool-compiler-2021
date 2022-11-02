@@ -231,8 +231,9 @@ def print_list(list):
         print(item)
 
 def ast_null(ast, context, errors, program, scope):
-    COOLwithNULL(context).visit(ast)
-    COOLwithNULL_Type(context, errors, program).visit(ast, scope)
+    new_ast = COOLwithNULL(context).visit(ast)
+    COOLwithNULL_Type(context, errors, program).visit(new_ast, scope)
+    return new_ast
     
     
 ###########################
@@ -322,8 +323,10 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
         #######################
         
         # Modificando el ast para que soporte los tipos vacios (null)
-        ast_null(ast, context, errors, program, scope)
-
+        new_ast = ast_null(ast, context, errors, program, scope)
+        
+        cil_ast = COOLToCILVisitor(context, [], []).visit(new_ast, scope)
+        1
         # dict_attr, dict_method = {}, {}
         # CollectDeclarationsDict(dict_attr, dict_method, context).visit(ast)
         # get_declarations_dict(dict_attr, dict_method)

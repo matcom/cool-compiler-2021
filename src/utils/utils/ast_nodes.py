@@ -75,7 +75,6 @@ class LetNode(ExprNode):
         self.dec_names_pos = []
         self.dec_types_pos = []
 
-
 class CaseNode(ExprNode):
     def __init__(self, expr, params):
         self.expr = expr

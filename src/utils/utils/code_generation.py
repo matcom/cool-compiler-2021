@@ -48,8 +48,8 @@ class COOLwithNULL:
 
         for type_ in ["Object", "IO",  "String", "Int", "Bool"]:
             t = self.context.get_type(type_)
-            t.define_method("__init__", [], [], t)
-            t.methods.move_to_end("__init__", last=False)
+            t.define_method("_init_", [], [], t)
+            t.methods.move_to_end("_init_", last=False)
 
         for class_dec in node.class_list:
             self.class_declarations[class_dec.name] = class_dec
@@ -81,11 +81,11 @@ class COOLwithNULL:
 
         body = cool.BlockNode(expressions)
         constructor = cool.MethodDecNode(
-            "__init__", [], self.current_type.name, body
+            "_init_", self.current_type.name, body, []
         )
 
-        self.current_type.define_method("__init__", [], [], self.current_type)
-        self.current_type.methods.move_to_end("__init__", last=False)
+        self.current_type.define_method("_init_", [], [], self.current_type)
+        self.current_type.methods.move_to_end("_init_", last=False)
 
         attrs = [
             attrib
@@ -218,7 +218,7 @@ class COOLwithNULL_Type:
                     self.errors.append('(0, 0) - TypeError: "SELF_TYPE" cannot be a static type of a parameter.')
                     scope.define_variable(param_name, ErrorType())
         
-        try:
+        try:#### ERRRRROOOOORRRR
             ret_type = (self.context.get_type(node.type) if node.type != "SELF_TYPE" else self.current_type)
         except SemanticError:
             ret_type = ErrorType()
