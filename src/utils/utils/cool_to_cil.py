@@ -6,6 +6,7 @@ from . import ast_nodes_cil as cil
 from . import ast_nodes as cool
 from . import visitor
 from typing import Optional
+from code_generation import NullNode, NullType
 
 def methods_declaration_order(t: Type):
     method_decl = []
@@ -467,13 +468,24 @@ class BaseCOOLToCILVisitor:
         self.register_EOL()
         
         self.register_instruction(cil.HaltNode())
-    
-    
+
+    def visit_arith_node(self, node: cool.BinaryNode, scope: Scope, operation_function: str, return_type_name: str = "Int"):
+        left, _ = self.visit(node.left, scope)
+        right, _ = self.visit(node.right, scope)
+        dest = self.define_internal_local()
+        self.register_EOL()
+        self.register_instruction(cil.ArgNode(left, 0, 2))
+        self.register_instruction(cil.ArgNode(right, 1, 2))
+        self.register_instruction(cil.StaticCallNode(operation_function, dest, 2))
+        return dest, self.context.get_type(return_type_name)
+ 
 
 class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.on('node')
     def visit(self, node):
         pass
+    
+    # MAIN FLOW almost done
     
     @visitor.when(cool.ProgramNode)
     def visit(self, node: cool.ProgramNode, scope):
@@ -561,7 +573,23 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(cool.AssignNode)
     def visit(self, node: cool.AssignNode, scope):
         scope = node.scope
-        pass
+        variable = scope.find_variable(node.idx)
+        variables = scope.find_all_variables_with_name(node.idx)
+        source, _ = self.visit(node.expr, scope)
+
+        self.register_empty_instruction()
+        is_attribute = (self.current_type.contains_attribute(node.idx) and len(variables) == 1)
+
+        if is_attribute:
+            attr_names = [attr.name for attr, _ in self.current_type.all_attributes()]
+            self.register_instruction(cil.SetAttribNode("self", variable.name, source, attr_names.index(variable.name)))
+            return source, variable.type
+        else:
+            self.register_instruction(cil.ArgNode(variable.name, 0, 2))
+            self.register_instruction(cil.ArgNode(source, 1, 2))
+            self.register_instruction(cil.StaticCallNode("assign_funct", variable.name, 2))
+
+            return variable.name, variable.type
 
     @visitor.when(cool.ExprParNode)
     def visit(self, node: cool.ExprParNode, scope):
@@ -581,12 +609,47 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(cool.IsVoidNode)
     def visit(self, node: cool.IsVoidNode, scope):
         scope = node.scope
+        
+        # funct
         pass
 
     @visitor.when(cool.MethodCallNode)
     def visit(self, node: cool.MethodCallNode, scope):
         scope = node.scope
-        pass
+        
+        obj_source, obj_type = self.visit(node.atom, scope)
+        if obj_type.name == "SELF_TYPE":
+            obj_type = self.current_type
+
+        ancestor_call = False
+        if node.type is not None:
+            ancestor_call = True
+            obj_type = self.context.get_type(node.type)
+
+        expr_srcs = []
+        for expr in node.exprlist:
+            ep_source, _ = self.visit(expr, scope)
+            expr_srcs.append(ep_source)
+
+        all_methods = methods_declaration_order(obj_type)
+        i = [m.name for m, _ in all_methods].index(node.idx)
+        method = obj_type.get_method(node.idx)
+
+        call_dest = self.define_internal_local()
+        i_method = self.define_internal_local()
+        method_address = self.define_internal_local()
+        self.register_instruction(cil.AllocateIntNode(i_method, f"{i}"))
+        self.register_instruction(cil.GetMethodNode(method_address, obj_source, i_method, method.name, obj_type.name))
+
+        self.register_instruction(cil.ArgNode(obj_source, 0, len(expr_srcs) + 1))
+        for index, arg_source in enumerate(expr_srcs, start=1):
+            self.register_instruction(cil.ArgNode(arg_source, index, len(expr_srcs) + 1))
+
+        if ancestor_call:
+            self.register_instruction(cil.StaticCallNode(self.to_function_name(method.name, obj_type.name), call_dest, len(expr_srcs) + 1))
+        else:
+            self.register_instruction(cil.DynamicCallNode(obj_type.name, method_address, call_dest, len(expr_srcs) + 1))
+        return call_dest, method.return_type
 
     @visitor.when(cool.NewNode)
     def visit(self, node: cool.NewNode, scope):
@@ -598,15 +661,12 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         scope = node.scope
         pass
 
-    @visitor.when(cool.NewNode)
-    def visit(self, node: cool.NewNode, scope):
-        scope = node.scope
-        pass
-
 
     ###############
     # ARITHMETICS #
     ###############
+
+    ## basic arith funct
 
     @visitor.when(cool.PlusNode)
     def visit(self, node: cool.PlusNode, scope):
@@ -638,19 +698,76 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         scope = node.scope
         return self.visit_arith_node(node, scope, "lessthan_funct", "Int") 
 
+    ## other arith funct
+
+    @visitor.when(cool.ComplementNode)
+    def visit(self, node: cool.ComplementNode, scope):
+        scope = node.scope
+        source, _ = self.visit(node.expr, scope)
+        local_int_0 = self.define_internal_local()
+        local_int_1 = self.define_internal_local()
+        result = self.define_internal_local()
+        
+        self.register_instruction(cil.AllocateIntNode(local_int_0, "1"))
+        self.register_instruction(cil.AllocateIntNode(local_int_1, str(2**32 - 1)))
+        self.register_instruction(cil.AllocateIntNode(result, "0"))
+        
+        self.register_instruction(cil.ArgNode(source, 0, 2))
+        self.register_instruction(cil.ArgNode(local_int_1, 1, 2))
+        self.register_instruction(cil.StaticCallNode("xor_funct", result, 2))
+        
+        self.register_instruction(cil.ArgNode(result, 0, 2))
+        self.register_instruction(cil.ArgNode(local_int_0, 1, 2))
+        self.register_instruction(cil.StaticCallNode("add_funct", result, 2))
+        return result, self.context.get_type("Int")
+    
+    @visitor.when(cool.NegationNode)
+    def visit(self, node: cool.NegationNode, scope):
+        scope = node.scope
+        source, _ = self.visit(node.expr, scope)
+        local_int = self.define_internal_local()
+        result = self.define_internal_local()
+        self.register_instruction(cil.AllocateIntNode(local_int, "1"))
+        self.register_instruction(cil.AllocateBoolNode(result, "0"))
+        
+        self.register_instruction(cil.ArgNode(source, 0, 2))
+        self.register_instruction(cil.ArgNode(local_int, 1, 2))
+        self.register_instruction(cil.StaticCallNode("xor_funct", result, 2))
+        
+        return result, self.context.get_type("Bool")
 
     ##########
-    # ATOMIC #
+    # ATOMIC #   ## almost done!
     ##########
 
     @visitor.when(cool.StringNode)
     def visit(self, node: cool.StringNode, scope):
-        pass
-
+        scope = node.scope
+        local_str_var = self.define_internal_local()
+        self.register_instruction(cil.AllocateStringNode(local_str_var, node.lex))
+        return local_str_var, self.context.get_type("String")
+        
+    
     @visitor.when(cool.BooleanNode)
     def visit(self, node: cool.BooleanNode, scope):
-        pass
+        scope = node.scope
+        local_bool_var = self.define_internal_local(f"Boolean {node.lex}")
+        self.register_instruction(cil.AllocateBoolNode(local_bool_var, ("1" if node.lex.lower() == "true" else "0")))
+        return local_bool_var, self.context.get_type("Bool")
+    
     
     @visitor.when(cool.NumberNode)
     def visit(self, node: cool.NumberNode, scope):
-        pass
+        scope = node.scope
+        local_int = self.define_internal_local()
+        self.register_instruction(cil.AllocateIntNode(local_int, node.lex))
+        return local_int, self.context.get_type("Int")
+   
+    @visitor.when(NullNode)
+    def visit(self, node: NullNode, scope):
+        scope = node.scope
+        local_null_var = self.define_internal_local()
+        self.register_instruction(cil.AllocateNullNode(local_null_var))
+        return local_null_var, NullType
+
+
