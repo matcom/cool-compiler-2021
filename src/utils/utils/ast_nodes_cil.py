@@ -272,7 +272,11 @@ class PrefixNode(InstructionNode):
     pass
 
 class SubstringNode(InstructionNode):
-    pass
+    def __init__(self, dest, str_address, start, length):
+        self.dest= dest
+        self.str_address= str_address
+        self.start= start
+        self.length= length
 
 class ToStrNode(InstructionNode):
     def __init__(self, dest, ivalue):

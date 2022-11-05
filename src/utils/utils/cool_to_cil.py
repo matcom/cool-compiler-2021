@@ -6,7 +6,7 @@ from . import ast_nodes_cil as cil
 from . import ast_nodes as cool
 from . import visitor
 from typing import Optional
-from code_generation import NullNode, NullType
+from .code_generation import NullNode, NullType
 
 def methods_declaration_order(t: Type):
     method_decl = []
@@ -244,13 +244,13 @@ class BaseCOOLToCILVisitor:
         self.current_function.params.append(cil.ParamNode("dest"))
         self.current_function.params.append(cil.ParamNode("source"))
         
-        null_ptr = self.define_internal_local("Null Pointer")
-        is_null = self.define_internal_local("One of params is null")
-        type_source = self.define_internal_local("Type of source")
-        type_int = self.define_internal_local("Type Int")
-        type_bool = self.define_internal_local("Type Bool")
-        type_source_equals_int = self.define_internal_local("Type of source equals int")
-        type_source_equals_bool = self.define_internal_local("Type of source equals bool")
+        null_ptr = self.define_internal_local()
+        is_null = self.define_internal_local()
+        type_source = self.define_internal_local()
+        type_int = self.define_internal_local()
+        type_bool = self.define_internal_local()
+        type_source_equals_int = self.define_internal_local()
+        type_source_equals_bool = self.define_internal_local()
         self.register_EOL()
        
         ## null ptr
@@ -526,17 +526,13 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(cool.MethodDecNode)
     def visit(self, node: cool.MethodDecNode, scope):
         scope = node.scope
-        self.current_method, owner_type = self.current_type.get_method(
-            node.id, get_owner=True
-        )
+        self.current_method, owner_type = self.current_type.get_method(node.name, owner=True)
         function_name = self.to_function_name(self.current_method.name, owner_type.name)
         self.current_function = self.register_function(function_name)
+        1 #forcing breakpoint
+        self.current_function.params = [cil.ParamNode("self")] + [cil.ParamNode(item.name) for item in node.params]
 
-        self.current_function.params = [cil.ParamNode("self")] + [
-            cil.ParamNode(param_name) for param_name, _ in node.params
-        ]
-
-        source, _ = self.visit(node.body, scope)
+        source, _ = self.visit(node.expr, scope)
 
         self.register_instruction(cil.ReturnNode(source))
 
@@ -553,6 +549,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(cool.ParamNode)
     def visit(self, node: cool.ParamNode, scope):
         scope = node.scope
+        # case solved
         pass
 
     @visitor.when(cool.WhileNode)
@@ -591,7 +588,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         scope = node.scope
         source, inst_type = None, None
         
-        for expr in node.expressions:
+        for expr in node.expr:
             source, inst_type = self.visit(expr, scope)
             
         return source, inst_type
@@ -631,14 +628,54 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         return result_address, then_type.join(else_type)
     
     @visitor.when(cool.LetNode)
-    def visit(self, node: cool.BooleanNode, scope):
+    def visit(self, node: cool.LetNode, scope):
         scope = node.scope
-        pass
+        # x = " ".join([f"{name}: {type_name}" for name, type_name, _ in node.declaration])
+        self.register_comment("let expr")
+        
+        i = 0
+        for name, type, expr in node.declarations:
+            self.register_local(name)
+
+            if expr:
+                # self.register_EOL()
+                source, _ = self.visit(expr, scope.children[i])
+                self.register_instruction(cil.ArgNode(name, 0, 2))
+                self.register_instruction(cil.ArgNode(source, 1, 2))
+                self.register_instruction(cil.StaticCallNode("assign_funct", name, 2))        
+                i += 1
+            else:
+                if type == "String":
+                    self.register_instruction(cil.AllocateStringNode(name, "\"\""))
+                elif type == "Int":
+                    self.register_instruction(cil.AllocateIntNode(name, "0"))
+                elif type == "Bool":
+                    self.register_instruction(cil.AllocateBoolNode(name, "0"))
+                else:
+                    self.register_instruction(cil.AllocateNullNode(name))
+
+        return self.visit(node.expr, scope.children[i])
     
     @visitor.when(cool.CaseNode)
     def visit(self, node: cool.CaseNode, scope):
         scope = node.scope
-        pass
+        
+        node_id = hash(node)
+        case_expression, _ = self.visit(node.expr, scope)
+
+        zero_int = self.define_internal_local()
+        one_int = self.define_internal_local()
+        len_types_int = self.define_internal_local()
+        null_ptr = self.define_internal_local()
+        
+        self.register_instruction(cil.AllocateIntNode(zero_int, "0"))
+        self.register_instruction(cil.AllocateIntNode(one_int, "1"))
+        self.register_instruction(cil.AllocateIntNode(len_types_int, str(len(node.params))))
+        self.register_instruction(cil.AllocateNullNode(null_ptr))
+        self.register_EOL()
+        
+        # make algorithm
+        
 
     @visitor.when(cool.AssignNode)
     def visit(self, node: cool.AssignNode, scope):
@@ -665,9 +702,19 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(cool.IsVoidNode)
     def visit(self, node: cool.IsVoidNode, scope):
         scope = node.scope
-        # funct
-        pass
+        
+        source, _ = self.visit(node.expr, scope)
+        null_ptr = self.define_internal_local()
+        result = self.define_internal_local()
+        self.register_instruction(cil.AllocateBoolNode(result, "0"))
+        self.register_instruction(cil.AllocateNullNode(null_ptr))
 
+        self.register_instruction(cil.ArgNode(source, 0, 2))
+        self.register_instruction(cil.ArgNode(null_ptr, 1, 2))
+        self.register_instruction(cil.StaticCallNode("equal_funct", result, 2))
+        
+        return result, self.context.get_type("Bool")
+    
     @visitor.when(cool.MethodCallNode)
     def visit(self, node: cool.MethodCallNode, scope):
         scope = node.scope
@@ -710,7 +757,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     def visit(self, node: cool.NewNode, scope):
         scope = node.scope
         
-        local = self.define_internal_local(f"Store an instance of the class {node.lex}")
+        local = self.define_internal_local()
         self.register_instruction(cil.AllocateNode(node.lex, local))
         self.register_instruction(cil.ArgNode(local, 0, 1))
         self.register_instruction(cil.StaticCallNode(self.to_function_name("_init_", node.lex), local, 1).set_comment("Call the constructor"))
@@ -821,7 +868,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(cool.BooleanNode)
     def visit(self, node: cool.BooleanNode, scope):
         scope = node.scope
-        local_bool_var = self.define_internal_local(f"Boolean {node.lex}")
+        local_bool_var = self.define_internal_local()
         self.register_instruction(cil.AllocateBoolNode(local_bool_var, ("1" if node.lex.lower() == "true" else "0")))
         return local_bool_var, self.context.get_type("Bool")
     

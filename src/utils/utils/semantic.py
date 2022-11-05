@@ -309,7 +309,7 @@ class Scope:
         vars = []
         scope = self
         while scope is not None:
-            if var_name in scope.locals:
+            if var_name in scope.local_variable:
                 vars.append(scope.locals[var_name])
 
             scope = scope.parent
