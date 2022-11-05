@@ -171,6 +171,8 @@ class Type:
             return [self]
         return [self] + self.parent.get_ancestors()
 
+    def contains_attribute(self, name: str):
+        return (name in self.attributes or self.parent is not None and self.parent.contains_attribute(name))
 
 
 class ErrorType(Type):
@@ -302,3 +304,15 @@ class Scope:
                 s += v.name + '\n'
             scope = scope.parent if scope.parent is not None else None
         return s
+    
+    def find_all_variables_with_name(self, var_name):
+        vars = []
+        scope = self
+        while scope is not None:
+            if var_name in scope.locals:
+                vars.append(scope.locals[var_name])
+
+            scope = scope.parent
+
+        return vars
+    

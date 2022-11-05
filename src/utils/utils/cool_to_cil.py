@@ -558,7 +558,77 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(cool.WhileNode)
     def visit(self, node: cool.WhileNode, scope):
         scope = node.scope
-        pass
+        node_id = hash(node)
+        result_addres = self.define_internal_local()
+        
+        #self.register_EOL()
+        self.register_comment(f"while")
+
+        self.register_instruction(cil.AllocateNullNode(result_addres))
+        self.register_instruction(cil.LabelNode(f"while_start_{node_id}"))
+
+        conditional_source, _ = self.visit(node.condition, scope)
+        self.register_instruction(cil.GotoIfNode(conditional_source, f"while_body_{node_id}"))
+        self.register_instruction(cil.GotoNode(f"while_end_{node_id}"))
+
+        self.register_instruction(cil.EmptyInstructionNode())
+        self.register_instruction(cil.LabelNode(f"while_body_{node_id}"))
+        self.visit(node.body, scope)
+        self.register_instruction(cil.GotoNode(f"while_start_{node_id}"))
+
+        self.register_instruction(cil.EmptyInstructionNode())
+        self.register_instruction(cil.LabelNode(f"while_end_{node_id}"))
+
+        return result_addres, self.context.get_type("Object")
+    
+    @visitor.when(cool.ExprParNode)
+    def visit(self, node: cool.ExprParNode, scope):
+        scope = node.scope
+        return self.visit(node.expr, scope)
+    
+    @visitor.when(cool.BlockNode)
+    def visit(self, node: cool.BlockNode, scope):
+        scope = node.scope
+        source, inst_type = None, None
+        
+        for expr in node.expressions:
+            source, inst_type = self.visit(expr, scope)
+            
+        return source, inst_type
+    
+    @visitor.when(cool.ConditionalNode)
+    def visit(self, node: cool.ConditionalNode, scope):
+        scope = node.scope
+        self.register_instruction(cil.CommentNode("cond"))
+
+        node_id = hash(node)
+        result_address = self.define_internal_local()
+        conditional_address = self.define_internal_local()
+
+        self.register_instruction(cil.AllocateBoolNode(conditional_address, "0"))
+
+        source, _ = self.visit(node.if_expr, scope)
+
+        self.register_instruction(cil.AssignNode(conditional_address, source))
+        self.register_instruction(cil.GotoIfNode(conditional_address, f"then_{node_id}"))
+        self.register_instruction(cil.GotoNode(f"else_{node_id}"))
+
+        self.register_instruction(cil.EmptyInstructionNode())
+        self.register_instruction(cil.LabelNode(f"then_{node_id}"))
+        then_source, then_type = self.visit(node.then_expr, scope)
+        self.register_instruction(cil.AssignNode(result_address, then_source))
+        self.register_instruction(cil.GotoNode(f"endif_{node_id}"))
+
+        self.register_instruction(cil.EmptyInstructionNode())
+        self.register_instruction(cil.LabelNode(f"else_{node_id}"))
+        else_source, else_type = self.visit(node.else_expr, scope)
+        self.register_instruction(cil.AssignNode(result_address, else_source))
+        self.register_instruction(cil.GotoNode(f"endif_{node_id}"))
+
+        self.register_instruction(cil.EmptyInstructionNode())
+        self.register_instruction(cil.LabelNode(f"endif_{node_id}"))
+
+        return result_address, then_type.join(else_type)
     
     @visitor.when(cool.LetNode)
     def visit(self, node: cool.BooleanNode, scope):
@@ -577,7 +647,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         variables = scope.find_all_variables_with_name(node.idx)
         source, _ = self.visit(node.expr, scope)
 
-        self.register_empty_instruction()
+        # self.register_EOL()
         is_attribute = (self.current_type.contains_attribute(node.idx) and len(variables) == 1)
 
         if is_attribute:
@@ -591,25 +661,10 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
 
             return variable.name, variable.type
 
-    @visitor.when(cool.ExprParNode)
-    def visit(self, node: cool.ExprParNode, scope):
-        scope = node.scope
-        pass
-    
-    @visitor.when(cool.BlockNode)
-    def visit(self, node: cool.BlockNode, scope):
-        scope = node.scope
-        pass
-    
-    @visitor.when(cool.ConditionalNode)
-    def visit(self, node: cool.ConditionalNode, scope):
-        scope = node.scope
-        pass
   
     @visitor.when(cool.IsVoidNode)
     def visit(self, node: cool.IsVoidNode, scope):
         scope = node.scope
-        
         # funct
         pass
 
@@ -654,14 +709,14 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(cool.NewNode)
     def visit(self, node: cool.NewNode, scope):
         scope = node.scope
-        pass
         
-    @visitor.when(cool.VariableNode)
-    def visit(self, node: cool.VariableNode, scope):
-        scope = node.scope
-        pass
-
-
+        local = self.define_internal_local(f"Store an instance of the class {node.lex}")
+        self.register_instruction(cil.AllocateNode(node.lex, local))
+        self.register_instruction(cil.ArgNode(local, 0, 1))
+        self.register_instruction(cil.StaticCallNode(self.to_function_name("_init_", node.lex), local, 1).set_comment("Call the constructor"))
+        
+        return local, self.context.get_type(node.lex)
+     
     ###############
     # ARITHMETICS #
     ###############
@@ -740,6 +795,21 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     # ATOMIC #   ## almost done!
     ##########
 
+    @visitor.when(cool.VariableNode)
+    def visit(self, node: cool.VariableNode, scope):
+        scope = node.scope
+        variable = scope.find_variable(node.lex)
+        all_variables = scope.find_all_variables_with_name(node.lex)
+
+        is_attribute = (self.current_type.contains_attribute(node.lex) and len(all_variables) == 1)
+
+        if is_attribute:
+            dest = self.define_internal_local()
+            attr_names = [a.name for a, _ in self.current_type.all_attributes()]
+            self.register_instruction(cil.GetAttribNode(dest, "self", variable.name, attr_names.index(variable.name)))
+            return dest, variable.type
+        return variable.name, variable.type
+
     @visitor.when(cool.StringNode)
     def visit(self, node: cool.StringNode, scope):
         scope = node.scope
@@ -769,5 +839,4 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         local_null_var = self.define_internal_local()
         self.register_instruction(cil.AllocateNullNode(local_null_var))
         return local_null_var, NullType
-
 

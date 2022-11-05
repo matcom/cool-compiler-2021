@@ -346,9 +346,13 @@ class HaltNode(InstructionNode):
         pass
 
 class CopyNode(InstructionNode):
-    def __init__(self, dest: str, source: str) -> None:
-        self.dest: str = dest
-        self.source: str = source
+    def __init__(self, dest, source):
+        self.dest = dest
+        self.source = source
+
+class EmptyInstructionNode(InstructionNode):
+    def __init__(self):
+        pass
 
 def get_formatter():
 
