@@ -50,14 +50,15 @@ class BaseCOOLToCILVisitor:
         return self.current_function.instructions
     
     def register_local(self, vinfo):
-        vinfo.name = f'local_{self.current_function.name[9:]}_{vinfo.name}_{len(self.localvars)}'
-        local_node = cil.LocalNode(vinfo.name)
+        local_name = (f"local_{self.current_function.name[9:]}_{vinfo}_{len(self.localvars)}")
+        local_name = vinfo
+        local_node = cil.LocalNode(local_name)
         self.localvars.append(local_node)
-        return vinfo.name
+        return local_name
 
     def define_internal_local(self):
-        vinfo = VariableInfo('internal', None)
-        return self.register_local(vinfo)
+        # vinfo = VariableInfo('internal', None)
+        return self.register_local(f"internal_{len(self.localvars)}")
 
     def register_instruction(self, instruction):
         self.instructions.append(instruction)
@@ -564,13 +565,13 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(cil.AllocateNullNode(result_addres))
         self.register_instruction(cil.LabelNode(f"while_start_{node_id}"))
 
-        conditional_source, _ = self.visit(node.condition, scope)
+        conditional_source, _ = self.visit(node.cond, scope)
         self.register_instruction(cil.GotoIfNode(conditional_source, f"while_body_{node_id}"))
         self.register_instruction(cil.GotoNode(f"while_end_{node_id}"))
 
         self.register_instruction(cil.EmptyInstructionNode())
         self.register_instruction(cil.LabelNode(f"while_body_{node_id}"))
-        self.visit(node.body, scope)
+        self.visit(node.data, scope)
         self.register_instruction(cil.GotoNode(f"while_start_{node_id}"))
 
         self.register_instruction(cil.EmptyInstructionNode())
@@ -634,7 +635,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_comment("let expr")
         
         i = 0
-        for name, type, expr in node.declarations:
+        for name, type, expr in node.declaration:
             self.register_local(name)
 
             if expr:
@@ -758,11 +759,11 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         scope = node.scope
         
         local = self.define_internal_local()
-        self.register_instruction(cil.AllocateNode(node.lex, local))
+        self.register_instruction(cil.AllocateNode(node.type, local))
         self.register_instruction(cil.ArgNode(local, 0, 1))
-        self.register_instruction(cil.StaticCallNode(self.to_function_name("_init_", node.lex), local, 1).set_comment("Call the constructor"))
+        self.register_instruction(cil.StaticCallNode(self.to_function_name("_init_", node.type), local, 1))
         
-        return local, self.context.get_type(node.lex)
+        return local, self.context.get_type(node.type)
      
     ###############
     # ARITHMETICS #
@@ -799,6 +800,11 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     def visit(self, node: cool.LessNode, scope):
         scope = node.scope
         return self.visit_arith_node(node, scope, "lessthan_funct", "Int") 
+
+    @visitor.when(cool.EqualNode)
+    def visit(self, node: cool.EqualNode, scope):
+        scope = node.scope
+        return self.visit_arith_node(node, scope, "equal_funct", "Int") 
 
     ## other arith funct
 
