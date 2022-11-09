@@ -45,6 +45,14 @@ class BaseCILToMIPSVisitor:
         self.dotdata.append(data)
         return data
     
+    def register_instantiation(self, size) -> mips.InstructionNode:
+        self.register_instruction(mips.LoadInmediateNode("$v0", "9"))
+        if isinstance(size, int):
+            self.register_instruction(mips.AddiNode("$a0", "$zero", f"{size}"))
+        if isinstance(size, str):
+            self.register_instruction(mips.MoveNode("$a0", size))
+        self.register_instruction(mips.SystemCallNode())
+
     
     
         
@@ -69,7 +77,16 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
     @visitor.when(cil.TypeNode)
     def visit(self, node: cil.TypeNode):
         #por cada atributo reservo una palabra
-        pass
+        size = 4 * (len(node.attributes) + len(node.methods))
+
+        self.register_word(f"type_{node.name}", str(size))
+        self.register_word(self.to_data_type("inherits_from", node.name), f"type_{node.parent}" if node.parent != "null" else "0")
+        self.register_word(self.to_data_type("name_address", node.name), f"type_{node.name}_name_size")
+        
+        for method, function in node.methods:
+            self.register_word(self.to_data_type(method, node.name), function)
+        
+        self.register_empty_data()
 
     @visitor.when(cil.DataNode)
     def visit(self, node: cil.DataNode):
@@ -77,7 +94,16 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
 
     @visitor.when(cil.FunctionNode)
     def visit(self, node: cil.FunctionNode):
-        pass
+        self.current_function = node
+        self.register_instruction(mips.LabelNode(node.name))
+
+        param_names = [x.name for x in self.current_function.params]
+        local_names = [x.name for x in self.current_function.local_vars]
+        self.current_function_stack = ["$ra"] + param_names + local_names
+
+        locals_size = 4 * len(self.current_function.local_vars)
+        stack_size = 4 * len(self.current_function_stack)
+        
 
     @visitor.when(cil.ParamNode)
     def visit(self, node: cil.ParamNode):
@@ -89,11 +115,30 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
 
     @visitor.when(cil.AssignNode)
     def visit(self, node: cil.AssignNode):
-        pass 
+        self.register_comment(f"{node.dest} = {node.source}")
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.source)}($sp)"))
+        self.register_instruction(mips.StoreWordNode("$t0", f"{self.offset_of(node.dest)}($sp)"))
     
     @visitor.when(cil.AssignIntNode)
     def visit(self, node: cil.AssignIntNode):
-        pass 
+        self.register_comment(f"{node.dest} = {node.source} where {node.source} is an integer")
+        self.register_instantiation(12)
+        
+        # puntero para node.source
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.source)}($sp)"))
+        # $t1 = type of node.source
+        self.register_instruction(mips.LoadWordNode("$t1", "0($t0)"))
+        # $t2 = value of node.source
+        self.register_instruction(mips.LoadWordNode("$t2", "8($t0)"))
+    
+        # Save type of node.dest
+        self.register_instruction(mips.StoreWordNode("$t1", "0($v0)"))
+        # Save size of node.dest
+        self.register_instruction(mips.StoreWordNode("$a0", "4($v0)"))
+        # Save value of node.dest
+        self.register_instruction(mips.StoreWordNode("$t2", "8($v0)"))
+
+        self.register_instruction(mips.StoreWordNode("$v0", f"{self.offset_of(node.dest)}($sp)"))
 
     @visitor.when(cil.ParentNode)
     def visit(self, node: cil.ParentNode):
@@ -221,7 +266,19 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
 
     @visitor.when(cil.ArgNode)
     def visit(self, node: cil.ArgNode):
-        pass
+        if node.arg_index == 0:
+            self.register_comment("Passing function arguments")
+            ## reservando espacio para los argumentos
+            self.register_instruction(mips.AddiNode("$sp", "$sp", f"-{4 * node.total_args + 4}"))
+            ## funcion de retorno (espacio)
+            self.register_instruction(mips.StoreWordNode("$ra", f"{4 * (node.total_args)}($sp)"))
+            self.register_empty_instruction()
+        
+        self.register_comment(f"Argument {node.name}")
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.name) +  4 * node.total_args + 4}($sp)"))
+        # guardando el node.name
+        self.register_instruction(mips.StoreWordNode("$t0", f"{4 * (node.total_args - node.arg_index - 1)}($sp)"))
+
 
     @visitor.when(cil.ReturnNode)
     def visit(self, node: cil.ReturnNode):
