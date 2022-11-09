@@ -150,35 +150,192 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
 
     @visitor.when(cil.PlusNode)
     def visit(self, node: cil.PlusNode):
-        pass
+        self.register_comment("ADD")
+        ## procesando binary op
+        # $t0 left op addr 
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.left)}($sp)"))
+        # $t0 left op value
+        self.register_instruction(mips.LoadWordNode("$t0", "8($t0)"))
+        # $t1 right op addr
+        self.register_instruction(mips.LoadWordNode("$t1", f"{self.offset_of(node.right)}($sp)"))
+        # $t1 right op value
+        self.register_instruction(mips.LoadWordNode("$t1", "8($t1)"))
+        
+        # $t2 = $t0 + $t1
+        self.register_instruction(mips.AddNode("$t2", "$t0", "$t1"))
+        
+        # procesando op binaria de tipo Int
+        self.register_empty_instruction()
+        # $t0 = node.dest
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.dest)}($sp)"))
+        # asignando el valor en la 3era word del objeto
+        self.register_instruction(mips.StoreWordNode("$t2", "8($t0)"))
+
 
     @visitor.when(cil.MinusNode)
     def visit(self, node: cil.MinusNode):
-        pass
+        self.register_comment("MINUS")
+        ## procesando binary op
+        # $t0 left op addr 
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.left)}($sp)"))
+        # $t0 left op value
+        self.register_instruction(mips.LoadWordNode("$t0", "8($t0)"))
+        # $t1 right op addr
+        self.register_instruction(mips.LoadWordNode("$t1", f"{self.offset_of(node.right)}($sp)"))
+        # $t1 right op value
+        self.register_instruction(mips.LoadWordNode("$t1", "8($t1)"))
+        
+        # $t2 = $t0 - $t1
+        self.register_instruction(mips.SubNode("$t2", "$t0", "$t1"))
+        
+        # procesando op binaria de tipo Int
+        self.register_empty_instruction()
+        # $t0 = node.dest
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.dest)}($sp)"))
+        # asignando el valor en la 3era word del objeto
+        self.register_instruction(mips.StoreWordNode("$t2", "8($t0)"))
 
     @visitor.when(cil.StarNode)
     def visit(self, node: cil.StarNode):
-        pass
+        self.register_comment("MULT")        
+        
+        ## procesando binary op
+        # $t0 left op addr 
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.left)}($sp)"))
+        # $t0 left op value
+        self.register_instruction(mips.LoadWordNode("$t0", "8($t0)"))
+        # $t1 right op addr
+        self.register_instruction(mips.LoadWordNode("$t1", f"{self.offset_of(node.right)}($sp)"))
+        # $t1 right op value
+        self.register_instruction(mips.LoadWordNode("$t1", "8($t1)"))
+        
+        # $t2 = $t0 * $t1
+        self.register_instruction(mips.MultNode("$t0", "$t1"))
+        # mode from LOW
+        self.register_instruction(mips.MoveFromLowNode("$t2"))
+        
+        # procesando op binaria de tipo Int
+        self.register_empty_instruction()
+        # $t0 = node.dest
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.dest)}($sp)"))
+        # asignando el valor en la 3era word del objeto
+        self.register_instruction(mips.StoreWordNode("$t2", "8($t0)"))
 
     @visitor.when(cil.DivNode)
     def visit(self, node: cil.DivNode):
-        pass
+        self.register_comment("DIV")
+        
+        ## procesando binary op
+        # $t0 left op addr 
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.left)}($sp)"))
+        # $t0 left op value
+        self.register_instruction(mips.LoadWordNode("$t0", "8($t0)"))
+        # $t1 right op addr
+        self.register_instruction(mips.LoadWordNode("$t1", f"{self.offset_of(node.right)}($sp)"))
+        # $t1 right op value
+        self.register_instruction(mips.LoadWordNode("$t1", "8($t1)"))
+        
+        # $t2 = $t0 / $t1
+        self.register_instruction(mips.DivNode("$t0", "$t1"))
+        # move from low
+        self.register_instruction(mips.MoveFromLowNode("$t2"))
+
+        # procesando op binaria de tipo Int
+        self.register_empty_instruction()
+        # $t0 = node.dest
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.dest)}($sp)"))
+        # asignando el valor en la 3era word del objeto
+        self.register_instruction(mips.StoreWordNode("$t2", "8($t0)"))
     
     @visitor.when(cil.EqualNode)
     def visit(self, node: cil.EqualNode):
-        pass
+        self.register_comment("EQUAL")
+        
+        # $t0 para el left
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.left)}($sp)"))
+        # $t1 para el right
+        self.register_instruction(mips.LoadWordNode("$t1", f"{self.offset_of(node.right)}($sp)"))
+        # t2 = $t0 == $t1
+        self.register_instruction(mips.SeqNode("$t2", "$t0", "$t1"))
+
+        # $t0 = node.dest
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.dest)}($sp)"))
+        # asignando el valor en la 3era word del objeto
+        self.register_instruction(mips.StoreWordNode("$t2", "8($t0)"))
+    
+
 
     @visitor.when(cil.XorNode)
     def visit(self, node: cil.XorNode):
-        pass
+        self.register_comment("XOR")
+        
+        ## procesando binary op
+        # $t0 left op addr 
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.left)}($sp)"))
+        # $t0 left op value
+        self.register_instruction(mips.LoadWordNode("$t0", "8($t0)"))
+        # $t1 right op addr
+        self.register_instruction(mips.LoadWordNode("$t1", f"{self.offset_of(node.right)}($sp)"))
+        # $t1 right op value
+        self.register_instruction(mips.LoadWordNode("$t1", "8($t1)"))
+        
+        # $t0 = $t0 ^ $t1
+        self.register_instruction(mips.XorNode("$t2", "$t0", "$t1"))
+        
+        # procesando op binaria de tipo Int
+        self.register_empty_instruction()
+        # $t0 = node.dest
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.dest)}($sp)"))
+        # asignando el valor en la 3era word del objeto
+        self.register_instruction(mips.StoreWordNode("$t2", "8($t0)"))
+        
     
     @visitor.when(cil.LessEqualNode)
     def visit(self, node: cil.LessEqualNode):
-        pass
+        self.register_comment("LESS EQUAL")
+        
+        ## procesando binary op
+        # $t0 left op addr 
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.left)}($sp)"))
+        # $t0 left op value
+        self.register_instruction(mips.LoadWordNode("$t0", "8($t0)"))
+        # $t1 right op addr
+        self.register_instruction(mips.LoadWordNode("$t1", f"{self.offset_of(node.right)}($sp)"))
+        # $t1 right op value
+        self.register_instruction(mips.LoadWordNode("$t1", "8($t1)"))
+        
+        # $t2 = $t0 <= $t1
+        self.register_instruction(mips.SleNode("$t2", "$t0", "$t1"))
+        
+        # procesando op binaria de tipo Int
+        self.register_empty_instruction()
+        # $t0 = node.dest
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.dest)}($sp)"))
+        # asignando el valor en la 3era word del objeto
+        self.register_instruction(mips.StoreWordNode("$t2", "8($t0)"))
     
     @visitor.when(cil.LessThanNode)
     def visit(self, node: cil.LessThanNode):
-        pass
+        self.register_comment("LESS THAN")
+        ## procesando binary op
+        # $t0 left op addr 
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.left)}($sp)"))
+        # $t0 left op value
+        self.register_instruction(mips.LoadWordNode("$t0", "8($t0)"))
+        # $t1 right op addr
+        self.register_instruction(mips.LoadWordNode("$t1", f"{self.offset_of(node.right)}($sp)"))
+        # $t1 right op value
+        self.register_instruction(mips.LoadWordNode("$t1", "8($t1)"))
+        
+        #  $t2 = $t0 < $t1
+        self.register_instruction(mips.SltNode("$t2", "$t0", "$t1"))
+        
+        # procesando op binaria de tipo Int
+        self.register_empty_instruction()
+        # $t0 = node.dest
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.dest)}($sp)"))
+        # asignando el valor en la 3era word del objeto
+        self.register_instruction(mips.StoreWordNode("$t2", "8($t0)"))
     
     @visitor.when(cil.CommentNode)
     def visit(self, node: cil.CommentNode):
