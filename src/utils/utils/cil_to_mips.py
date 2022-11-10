@@ -119,14 +119,14 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
 
     @visitor.when(cil.AssignNode)
     def visit(self, node: cil.AssignNode):
-        self.register_comment(f"{node.dest} = {node.source}")
+        self.register_comment(f"{node.dest} <- {node.source}")
         
         self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.source)}($sp)"))
         self.register_instruction(mips.StoreWordNode("$t0", f"{self.offset_of(node.dest)}($sp)"))
     
     @visitor.when(cil.AssignIntNode)
     def visit(self, node: cil.AssignIntNode):
-        self.register_comment(f"{node.dest} = {node.source} where {node.source} is an integer")
+        self.register_comment(f"{node.dest} <- {node.source} WHERE {node.source} IS INT")
         self.register_instantiation(12)
         
         # puntero para node.source
@@ -147,7 +147,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
 
     @visitor.when(cil.ParentNode)
     def visit(self, node: cil.ParentNode):
-        self.register_comment(f"{node.dest} is Parent of {node.source}")
+        self.register_comment(f"{node.dest} PARENT OF: {node.source}")
         
         self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.source)}($sp)"))
         self.register_instruction(mips.LoadWordNode("$t0", "4($t0)"))
@@ -405,9 +405,9 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         self.register_instruction(mips.AddiNode("$a0", "$zero", "12"))
         self.register_instruction(mips.SystemCallNode())
         
-        self.register_instruction(mips.LoadInmediateNode("$v0", "9"))
-        self.register_instruction(mips.LoadWordNode("$a0", f"type_{node.type}"))
-        self.register_instruction(mips.SystemCallNode())
+        # self.register_instruction(mips.LoadInmediateNode("$v0", "9"))
+        # self.register_instruction(mips.LoadWordNode("$a0", f"type_{node.type}"))
+        # self.register_instruction(mips.SystemCallNode())
         
         # $t0 = tipo de direccion
         self.register_instruction(mips.LoadAddressNode("$t0", f"type_{node.type}"))
@@ -481,35 +481,70 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
     
     @visitor.when(cil.TypeOfNode)
     def visit(self, node: cil.TypeOfNode):
-        pass
+        self.register_comment(f"{node.dest} STORE <- TYPEOF {node.source}")
+        
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.source)}($sp)"))
+        self.register_instruction(mips.LoadWordNode("$t0", "0($t0)"))
+        
+        self.register_instruction(mips.StoreWordNode("$t0", f"{self.offset_of(node.dest)}($sp)"))
+
 
     @visitor.when(cil.GotoNode)
     def visit(self, node: cil.GotoNode):
-        pass
+        self.register_comment(f"GO TO {node.address}")
+        
+        self.register_instruction(mips.JumpNode(node.address))
 
     @visitor.when(cil.GotoIfNode)
     def visit(self, node: cil.GotoIfNode):
-        pass
+        self.register_comment(f"IF {node.condition} IS TRUE -> GO TO {node.address}")
+        
+        # addr de la condicion
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.condition)}($sp)"))
+        # cargando valor y comparandolo con 1
+        self.register_instruction(mips.LoadWordNode("$t0", f"8($t0)"))
+        self.register_instruction(mips.AddiNode("$t1", "$zero", "1"))
+        self.register_instruction(mips.BeqNode("$t0", "$t1", node.address))
 
     @visitor.when(cil.StaticCallNode)
     def visit(self, node: cil.StaticCallNode):
-        pass
+        self.register_comment(f"STATIC FUNCT CALL {node.function}")
+        
+        self.register_instruction(mips.JumpAndLinkNode(node.function))
+        self.register_instruction(mips.LoadWordNode("$ra", f"{4 * node.total_args}($sp)"))
+        
+        # guardar funct en destino
+        self.register_instruction(mips.StoreWordNode("$v1", f"{self.offset_of(node.dest) + 4 * node.total_args + 4}($sp)"))
+        
+        # espacio para args
+        self.register_instruction(mips.AddiNode("$sp", "$sp", f"{4 * node.total_args + 4}"))
+
 
     @visitor.when(cil.DynamicCallNode)
     def visit(self, node: cil.DynamicCallNode):
-        pass
+        self.register_comment(f"DYNAMIC FUNCT CALL {node.method_address}")
+        
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.method_address) + 4 * node.total_args + 4}($sp)"))
+        self.register_instruction(mips.JumpAndLinkRegisterNode("$t0"))
+        self.register_instruction(mips.LoadWordNode("$ra", f"{4 * node.total_args}($sp)"))
+        
+        # guardar funct en destino
+        self.register_instruction(mips.StoreWordNode("$v1", f"{self.offset_of(node.dest) + 4 * node.total_args + 4}($sp)"))
+        # espacio para args
+        self.register_instruction(mips.AddiNode("$sp", "$sp", f"{4 * node.total_args + 4}"))
+    
 
     @visitor.when(cil.ArgNode)
     def visit(self, node: cil.ArgNode):
         if node.arg_index == 0:
-            self.register_comment("Passing function arguments")
+            self.register_comment("FUNCT ARGS")
             ## reservando espacio para los argumentos
             self.register_instruction(mips.AddiNode("$sp", "$sp", f"-{4 * node.total_args + 4}"))
             ## funcion de retorno (espacio)
             self.register_instruction(mips.StoreWordNode("$ra", f"{4 * (node.total_args)}($sp)"))
             self.register_empty_instruction()
         
-        self.register_comment(f"Argument {node.name}")
+        # self.register_comment(f"Argument {node.name}")
         self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.name) +  4 * node.total_args + 4}($sp)"))
         # guardando el node.name
         self.register_instruction(mips.StoreWordNode("$t0", f"{4 * (node.total_args - node.arg_index - 1)}($sp)"))
@@ -608,6 +643,11 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
     def visit(self, node: cil.EmptyInstructionNode):
         pass
     
+    
+    @visitor.when(cil.LabelNode)
+    def visit(self, node: cil.LabelNode):
+        label = mips.LabelNode(node.label)
+        self.register_instruction(label)
     
 class MipsFormatter:
     pass
