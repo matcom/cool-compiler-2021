@@ -113,10 +113,6 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         stack_size = 4 * len(self.current_function_stk)
         
 
-    @visitor.when(cil.ParamNode)
-    def visit(self, node: cil.ParamNode):
-        pass
-
     @visitor.when(cil.LocalNode)
     def visit(self, node: cil.LocalNode):
         pass 
@@ -346,9 +342,6 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         # asignando el valor en la 3era word del objeto
         self.register_instruction(mips.StoreWordNode("$t2", "8($t0)"))
     
-    @visitor.when(cil.CommentNode)
-    def visit(self, node: cil.CommentNode):
-        pass
     
     @visitor.when(cil.EndOfLineNode) ######
     def visit(self, node: cil.EndOfLineNode):
@@ -464,7 +457,11 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
     
     @visitor.when(cil.AllocateNullNode)
     def visit(self, node: cil.AllocateNullNode):
-        pass
+        self.register_comment(f"ALLOCATE NUll into {node.dest}")
+        
+        # node.dest = 0
+        self.register_instruction(mips.StoreWordNode("$zero", f"{self.offset_of(node.dest)}($sp)"))
+
 
     @visitor.when(cil.ArrayNode)
     def visit(self, node: cil.ArrayNode):
@@ -484,10 +481,6 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
     
     @visitor.when(cil.TypeOfNode)
     def visit(self, node: cil.TypeOfNode):
-        pass
-    
-    @visitor.when(cil.LabelNode)
-    def visit(self, node: cil.LabelNode):
         pass
 
     @visitor.when(cil.GotoNode)
@@ -530,15 +523,19 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         offset = self.offset_of(node.value)
         self.register_instruction(mips.LoadWordNode("$v1", f"{offset}($sp)"))
 
-    @visitor.when(cil.LoadNode)
-    def visit(self, node: cil.LoadNode):
-        pass
 
     @visitor.when(cil.LengthNode)
     def visit(self, node: cil.LengthNode):
         self.register_comment(f"LENGHT: {node.dest} <- {node.str_address}")
         ###
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.str_address)}($sp)"))
+        self.register_instruction(mips.LoadWordNode("$t1", "4($t0)"))
         
+        # borrando el tipo, tamaño y el null-term
+        self.register_instruction(mips.AddiNode("$t1", "$t1", "-9"))
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.dest)}($sp)"))
+        
+        self.register_instruction(mips.StoreWordNode("$t1", "8($t0)"))
 
     @visitor.when(cil.ConcatNode)
     def visit(self, node: cil.ConcatNode):
@@ -598,7 +595,10 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
     
     @visitor.when(cil.HaltNode)
     def visit(self, node: cil.HaltNode):
-        pass
+        self.register_comment("EXIT")
+        
+        self.register_instruction(mips.LoadInmediateNode("$v0", "10"))
+        self.register_instruction(mips.SystemCallNode())
     
     @visitor.when(cil.CopyNode)
     def visit(self, node: cil.CopyNode):
