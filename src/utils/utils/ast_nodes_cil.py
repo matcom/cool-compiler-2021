@@ -307,6 +307,10 @@ class PrintStringNode(InstructionNode):
 class PrintIntNode(InstructionNode):
     def __init__(self, int_source):
         self.int_source = int_source
+        
+class PrintTypeNameNode(InstructionNode):
+    def __init__(self, address: str):
+        self.address: str = address
 
 
 class AllocateNullNode(InstructionNode):
