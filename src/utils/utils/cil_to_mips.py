@@ -574,7 +574,63 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
 
     @visitor.when(cil.ConcatNode)
     def visit(self, node: cil.ConcatNode):
-        pass
+        self.register_comment(f"{node.dest} = CONCAT ({node.str1}, {node.str2})")
+        
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.str1)}($sp)"))
+        self.register_instruction(mips.LoadWordNode("$t1", f"{self.offset_of(node.str2)}($sp)"))
+        # $t2 lenght de str1, $t3 lenght de str2
+        self.register_instruction(mips.LoadWordNode("$t2", "4($t0)"))
+        self.register_instruction(mips.LoadWordNode("$t3", "4($t1)"))
+        self.register_instruction(mips.AddiNode("$t2", "$t2", "-9"))
+        self.register_instruction(mips.AddiNode("$t3", "$t3", "-9"))
+        
+        # length del la cadena concatenada
+        self.register_instruction(mips.AddNode("$t4", "$t2", "$t3"))
+        self.register_instruction(mips.AddiNode("$t4", "$t4", "9"))
+
+        self.register_instruction(mips.LoadInmediateNode("$v0", "9"))
+        self.register_instruction(mips.MoveNode("$a0", "$t4"))
+        self.register_instruction(mips.SystemCallNode())
+        self.register_instruction(mips.AddiNode("$t4", "$t4", "-9"))
+        self.register_instruction(mips.AddNode("$t5", "$zero", "$v0"))
+        self.register_instruction(mips.AddiNode("$t5", "$t5", "8"))
+        
+        self.register_instruction(mips.LoadAddressNode("$t8", "type_String"))
+        self.register_instruction(mips.StoreWordNode("$t8", f"0($v0)"))
+        self.register_empty_instruction()
+
+        self.register_instruction(mips.StoreWordNode("$a0", f"4($v0)"))
+
+        # copiando s1 para el string nuevo
+        self.register_instruction(mips.XorNode("$t6", "$t6", "$t6")) # $t6 c
+        self.register_instruction(mips.LabelNode("while_copy_str1_start"))
+        self.register_instruction(mips.BeqNode("$t6", "$t2", "while_copy_str1_end"))
+        self.register_instruction(mips.LoadByteNode("$t7", f"8($t0)"))
+        self.register_instruction(mips.StoreByteNode("$t7", f"0($t5)"))
+        self.register_instruction(mips.AddNode("$t0", "$t0", "1"))
+        self.register_instruction(mips.AddNode("$t5", "$t5", "1"))
+        self.register_instruction(mips.AddiNode("$t6", "$t6", "1"))
+        self.register_instruction(mips.JumpNode("while_copy_str1_start"))
+        self.register_instruction(mips.LabelNode("while_copy_str1_end"))
+
+        # copiando s2 para el string nuevo
+        self.register_instruction(mips.LabelNode("while_copy_str2_start"))
+        self.register_instruction(mips.BeqNode("$t6", "$t4", "while_copy_str2_end"))
+        self.register_instruction(mips.LoadByteNode("$t7", f"8($t1)"))
+        self.register_instruction(mips.StoreByteNode("$t7", f"0($t5)"))
+        self.register_instruction(mips.AddNode("$t1", "$t1", "1"))
+        self.register_instruction(mips.AddNode("$t5", "$t5", "1"))
+        self.register_instruction(mips.AddiNode("$t6", "$t6", "1"))
+        self.register_instruction(mips.JumpNode("while_copy_str2_start"))
+        self.register_instruction(mips.LabelNode("while_copy_str2_end"))
+        self.register_empty_instruction()
+
+        self.register_instruction(mips.StoreByteNode("$zero", f"0($t5)"))
+        self.register_empty_instruction()
+
+        # valor de retorno
+        self.register_instruction(mips.StoreWordNode("$v0", f"{self.offset_of(node.dest)}($sp)"))
+
 
 
     @visitor.when(cil.SubstringNode)
