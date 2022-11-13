@@ -1,19 +1,17 @@
 .data
-	type_Object: .word 28
+	type_Object: .word 24
 	type_Object_inherits_from: .word 0
 	type_Object_name_address: .word type_Object_name_size
 	type_Object__init_: .word function__init__at_Object
 	type_Object_abort: .word function_abort_at_Object
-	type_Object_get_type: .word function_get_type_at_Object
 	type_Object_type_name: .word function_type_name_at_Object
 	type_Object_copy: .word function_copy_at_Object
 	
-	type_IO: .word 44
+	type_IO: .word 40
 	type_IO_inherits_from: .word type_Object
 	type_IO_name_address: .word type_IO_name_size
 	type_IO__init_: .word function__init__at_IO
 	type_IO_abort: .word function_abort_at_Object
-	type_IO_get_type: .word function_get_type_at_Object
 	type_IO_type_name: .word function_type_name_at_Object
 	type_IO_copy: .word function_copy_at_Object
 	type_IO_out_string: .word function_out_string_at_IO
@@ -21,42 +19,38 @@
 	type_IO_in_string: .word function_in_string_at_IO
 	type_IO_in_int: .word function_in_int_at_IO
 	
-	type_String: .word 40
+	type_String: .word 36
 	type_String_inherits_from: .word type_Object
 	type_String_name_address: .word type_String_name_size
 	type_String__init_: .word function__init__at_String
 	type_String_abort: .word function_abort_at_Object
-	type_String_get_type: .word function_get_type_at_Object
 	type_String_type_name: .word function_type_name_at_Object
 	type_String_copy: .word function_copy_at_Object
 	type_String_length: .word function_length_at_String
 	type_String_concat: .word function_concat_at_String
 	type_String_substr: .word function_substr_at_String
 	
-	type_Int: .word 28
+	type_Int: .word 24
 	type_Int_inherits_from: .word type_Object
 	type_Int_name_address: .word type_Int_name_size
 	type_Int__init_: .word function__init__at_Int
 	type_Int_abort: .word function_abort_at_Object
-	type_Int_get_type: .word function_get_type_at_Object
 	type_Int_type_name: .word function_type_name_at_Object
 	type_Int_copy: .word function_copy_at_Object
 	
-	type_Bool: .word 28
+	type_Bool: .word 24
 	type_Bool_inherits_from: .word type_Object
 	type_Bool_name_address: .word type_Bool_name_size
 	type_Bool__init_: .word function__init__at_Bool
 	type_Bool_abort: .word function_abort_at_Object
-	type_Bool_get_type: .word function_get_type_at_Object
 	type_Bool_type_name: .word function_type_name_at_Object
 	type_Bool_copy: .word function_copy_at_Object
 	
-	type_Book: .word 60
+	type_Book: .word 56
 	type_Book_inherits_from: .word type_IO
 	type_Book_name_address: .word type_Book_name_size
 	type_Book__init_: .word function__init__at_Book
 	type_Book_abort: .word function_abort_at_Object
-	type_Book_get_type: .word function_get_type_at_Object
 	type_Book_type_name: .word function_type_name_at_Object
 	type_Book_copy: .word function_copy_at_Object
 	type_Book_out_string: .word function_out_string_at_IO
@@ -66,12 +60,11 @@
 	type_Book_initBook: .word function_initBook_at_Book
 	type_Book_print: .word function_print_at_Book
 	
-	type_Article: .word 68
+	type_Article: .word 64
 	type_Article_inherits_from: .word type_Book
 	type_Article_name_address: .word type_Article_name_size
 	type_Article__init_: .word function__init__at_Article
 	type_Article_abort: .word function_abort_at_Object
-	type_Article_get_type: .word function_get_type_at_Object
 	type_Article_type_name: .word function_type_name_at_Object
 	type_Article_copy: .word function_copy_at_Object
 	type_Article_out_string: .word function_out_string_at_IO
@@ -82,12 +75,11 @@
 	type_Article_print: .word function_print_at_Article
 	type_Article_initArticle: .word function_initArticle_at_Article
 	
-	type_BookList: .word 64
+	type_BookList: .word 60
 	type_BookList_inherits_from: .word type_IO
 	type_BookList_name_address: .word type_BookList_name_size
 	type_BookList__init_: .word function__init__at_BookList
 	type_BookList_abort: .word function_abort_at_Object
-	type_BookList_get_type: .word function_get_type_at_Object
 	type_BookList_type_name: .word function_type_name_at_Object
 	type_BookList_copy: .word function_copy_at_Object
 	type_BookList_out_string: .word function_out_string_at_IO
@@ -100,12 +92,11 @@
 	type_BookList_cdr: .word function_cdr_at_BookList
 	type_BookList_print_list: .word function_print_list_at_BookList
 	
-	type_Cons: .word 76
+	type_Cons: .word 72
 	type_Cons_inherits_from: .word type_BookList
 	type_Cons_name_address: .word type_Cons_name_size
 	type_Cons__init_: .word function__init__at_Cons
 	type_Cons_abort: .word function_abort_at_Object
-	type_Cons_get_type: .word function_get_type_at_Object
 	type_Cons_type_name: .word function_type_name_at_Object
 	type_Cons_copy: .word function_copy_at_Object
 	type_Cons_out_string: .word function_out_string_at_IO
@@ -119,12 +110,11 @@
 	type_Cons_print_list: .word function_print_list_at_Cons
 	type_Cons_init: .word function_init_at_Cons
 	
-	type_Nil: .word 64
+	type_Nil: .word 60
 	type_Nil_inherits_from: .word type_BookList
 	type_Nil_name_address: .word type_Nil_name_size
 	type_Nil__init_: .word function__init__at_Nil
 	type_Nil_abort: .word function_abort_at_Object
-	type_Nil_get_type: .word function_get_type_at_Object
 	type_Nil_type_name: .word function_type_name_at_Object
 	type_Nil_copy: .word function_copy_at_Object
 	type_Nil_out_string: .word function_out_string_at_IO
@@ -137,12 +127,11 @@
 	type_Nil_cdr: .word function_cdr_at_BookList
 	type_Nil_print_list: .word function_print_list_at_Nil
 	
-	type_Main: .word 36
+	type_Main: .word 32
 	type_Main_inherits_from: .word type_Object
 	type_Main_name_address: .word type_Main_name_size
 	type_Main__init_: .word function__init__at_Main
 	type_Main_abort: .word function_abort_at_Object
-	type_Main_get_type: .word function_get_type_at_Object
 	type_Main_type_name: .word function_type_name_at_Object
 	type_Main_copy: .word function_copy_at_Object
 	type_Main_main: .word function_main_at_Main
@@ -492,7 +481,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 3
+		addi $t0, $zero, 2
 		sw $t0, 8($v0)
 		sw $v0, 4($sp)
 		
@@ -515,6 +504,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_5
+		lw $t0, 8($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 24($sp)
+		addi $sp, $sp, 8
+		
 		# ALLOCATE INT
 		li $v0, 9
 		addi $a0, $zero, 12
@@ -522,7 +517,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 6
+		addi $t0, $zero, 5
 		sw $t0, 8($v0)
 		sw $v0, 4($sp)
 		
@@ -548,6 +543,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_5
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 24($sp)
+		addi $sp, $sp, 12
+		
 		# ALLOCATE INT
 		li $v0, 9
 		addi $a0, $zero, 12
@@ -555,7 +556,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 6
+		addi $t0, $zero, 5
 		sw $t0, 8($v0)
 		sw $v0, 4($sp)
 		
@@ -581,6 +582,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_5
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 24($sp)
+		addi $sp, $sp, 12
+		
 		lw $t0, 12($sp)
 		addi $t0, $t0, 8
 		# PRINT STRING -> internal_2
@@ -946,68 +953,6 @@
 		
 		jr $ra
 		
-	main:
-		addi $sp, $sp, -16
-		
-		# ALLOCATE Main
-		li $v0, 9
-		lw $a0, type_Main
-		syscall
-		la $t0, type_Main
-		sw $t0, 0($v0)
-		sw $a0, 4($v0)
-		sw $v0, 12($sp)
-		
-		# FUNCT ARGS
-		addi $sp, $sp, -8
-		sw $ra, 4($sp)
-		
-		lw $t0, 20($sp)
-		sw $t0, 0($sp)
-		
-		# STATIC FUNCT CALL function__init__at_Main
-		jal function__init__at_Main
-		lw $ra, 4($sp)
-		sw $v1, 20($sp)
-		addi $sp, $sp, 8
-		
-		
-		# ALLOCATE INT
-		li $v0, 9
-		addi $a0, $zero, 12
-		syscall
-		la $t0, type_Int
-		sw $t0, 0($v0)
-		sw $a0, 4($v0)
-		addi $t0, $zero, 5
-		sw $t0, 8($v0)
-		sw $v0, 4($sp)
-		
-		# GET METHOD main OF Main
-		lw $t0, 12($sp)
-		lw $t0, 0($t0)
-		addi $t0, $t0, 12
-		lw $t1, 4($sp)
-		lw $t1, 8($t1)
-		sll $t1, $t1, 2
-		add $t0, $t0, $t1
-		lw $t0, 0($t0)
-		sw $t0, 0($sp)
-		
-		# FUNCT ARGS
-		addi $sp, $sp, -8
-		sw $ra, 4($sp)
-		
-		lw $t0, 20($sp)
-		sw $t0, 0($sp)
-		
-		# DYNAMIC FUNCT CALL internal_3
-		
-		# EXIT
-		li $v0, 10
-		syscall
-		
-		
 	function__init__at_Book:
 		addi $sp, $sp, -8
 		
@@ -1130,7 +1075,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 5
+		addi $t0, $zero, 4
 		sw $t0, 8($v0)
 		sw $v0, 76($sp)
 		
@@ -1156,6 +1101,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_3
+		lw $t0, 84($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 92($sp)
+		addi $sp, $sp, 12
+		
 		# ALLOCATE INT
 		li $v0, 9
 		addi $a0, $zero, 12
@@ -1163,7 +1114,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 5
+		addi $t0, $zero, 4
 		sw $t0, 8($v0)
 		sw $v0, 64($sp)
 		
@@ -1186,6 +1137,12 @@
 		sw $t0, 4($sp)
 		
 		# DYNAMIC FUNCT CALL internal_6
+		lw $t0, 72($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 80($sp)
+		addi $sp, $sp, 12
+		
 		# ALLOCATING STRING
 		li $v0, 9
 		addi $a0, $zero, 10
@@ -1206,7 +1163,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 5
+		addi $t0, $zero, 4
 		sw $t0, 8($v0)
 		sw $v0, 48($sp)
 		
@@ -1232,6 +1189,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_10
+		lw $t0, 56($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 64($sp)
+		addi $sp, $sp, 12
+		
 		# ALLOCATING STRING
 		li $v0, 9
 		addi $a0, $zero, 21
@@ -1274,7 +1237,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 5
+		addi $t0, $zero, 4
 		sw $t0, 8($v0)
 		sw $v0, 32($sp)
 		
@@ -1300,6 +1263,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_14
+		lw $t0, 40($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 48($sp)
+		addi $sp, $sp, 12
+		
 		# ALLOCATE INT
 		li $v0, 9
 		addi $a0, $zero, 12
@@ -1307,7 +1276,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 5
+		addi $t0, $zero, 4
 		sw $t0, 8($v0)
 		sw $v0, 20($sp)
 		
@@ -1330,6 +1299,12 @@
 		sw $t0, 4($sp)
 		
 		# DYNAMIC FUNCT CALL internal_17
+		lw $t0, 28($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 36($sp)
+		addi $sp, $sp, 12
+		
 		# ALLOCATING STRING
 		li $v0, 9
 		addi $a0, $zero, 10
@@ -1350,7 +1325,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 5
+		addi $t0, $zero, 4
 		sw $t0, 8($v0)
 		sw $v0, 4($sp)
 		
@@ -1376,6 +1351,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_21
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 20($sp)
+		addi $sp, $sp, 12
+		
 		lw $v1, 88($sp)
 		
 		# FREE SPACE FOR LOCALVARS
@@ -1466,7 +1447,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 9
+		addi $t0, $zero, 8
 		sw $t0, 8($v0)
 		sw $v0, 4($sp)
 		
@@ -1495,6 +1476,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_2
+		lw $t0, 16($sp)
+		jalr $t0
+		lw $ra, 12($sp)
+		sw $v1, 24($sp)
+		addi $sp, $sp, 16
+		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
 		sw $ra, 8($sp)
@@ -1522,7 +1509,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 10
+		addi $t0, $zero, 9
 		sw $t0, 8($v0)
 		sw $v0, 48($sp)
 		
@@ -1594,7 +1581,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 5
+		addi $t0, $zero, 4
 		sw $t0, 8($v0)
 		sw $v0, 32($sp)
 		
@@ -1620,6 +1607,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_6
+		lw $t0, 40($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 48($sp)
+		addi $sp, $sp, 12
+		
 		# ALLOCATE INT
 		li $v0, 9
 		addi $a0, $zero, 12
@@ -1627,7 +1620,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 5
+		addi $t0, $zero, 4
 		sw $t0, 8($v0)
 		sw $v0, 20($sp)
 		
@@ -1650,6 +1643,12 @@
 		sw $t0, 4($sp)
 		
 		# DYNAMIC FUNCT CALL internal_9
+		lw $t0, 28($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 36($sp)
+		addi $sp, $sp, 12
+		
 		# ALLOCATING STRING
 		li $v0, 9
 		addi $a0, $zero, 10
@@ -1670,7 +1669,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 5
+		addi $t0, $zero, 4
 		sw $t0, 8($v0)
 		sw $v0, 4($sp)
 		
@@ -1696,6 +1695,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_13
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 20($sp)
+		addi $sp, $sp, 12
+		
 		lw $v1, 56($sp)
 		
 		# FREE SPACE FOR LOCALVARS
@@ -1741,6 +1746,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_2
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 20($sp)
+		addi $sp, $sp, 8
+		
 		# ALLOCATE BOOL 1
 		li $v0, 9
 		addi $a0, $zero, 12
@@ -1807,7 +1818,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 14
+		addi $t0, $zero, 13
 		sw $t0, 8($v0)
 		sw $v0, 4($sp)
 		
@@ -1836,6 +1847,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_4
+		lw $t0, 16($sp)
+		jalr $t0
+		lw $ra, 12($sp)
+		sw $v1, 24($sp)
+		addi $sp, $sp, 16
+		
 		lw $v1, 8($sp)
 		
 		# FREE SPACE FOR LOCALVARS
@@ -1876,6 +1893,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_2
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 20($sp)
+		addi $sp, $sp, 8
+		
 		# ALLOCATE Book
 		li $v0, 9
 		lw $a0, type_Book
@@ -1938,6 +1961,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_2
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 20($sp)
+		addi $sp, $sp, 8
+		
 		# ALLOCATE BookList
 		li $v0, 9
 		lw $a0, type_BookList
@@ -2000,6 +2029,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_2
+		lw $t0, 8($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 16($sp)
+		addi $sp, $sp, 8
+		
 		lw $v1, 8($sp)
 		
 		# FREE SPACE FOR LOCALVARS
@@ -2105,7 +2140,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 10
+		addi $t0, $zero, 9
 		sw $t0, 8($v0)
 		sw $v0, 204($sp)
 		
@@ -2115,6 +2150,12 @@
 		sw $ra, 4($sp)
 		
 		# DYNAMIC FUNCT CALL internal_2
+		lw $t0, 208($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 216($sp)
+		addi $sp, $sp, 8
+		
 		# ALLOCATE INT
 		li $v0, 9
 		addi $a0, $zero, 12
@@ -2178,7 +2219,7 @@
 		lw $t0, 172($sp)
 		sw $t0, 168($sp)
 		
-		while_start_8760993781375:
+		while_start_8760769550785:
 		
 		# internal_8 <-- EQUAL ADDRESS(internal_10, internal_6)
 		lw $t0, 168($sp)
@@ -2187,11 +2228,11 @@
 		lw $t0, 176($sp)
 		sw $t2, 8($t0)
 		
-		# IF internal_8 IS TRUE -> GO TO while_end_8760993781375
+		# IF internal_8 IS TRUE -> GO TO while_end_8760769550785
 		lw $t0, 176($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, while_end_8760993781375
+		beq $t0, $t1, while_end_8760769550785
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2214,7 +2255,7 @@
 		lw $t0, 4($t0)
 		sw $t0, 168($sp)
 		
-		while_end_8760993781375:
+		while_end_8760769550785:
 		
 		
 		# internal_10 <- internal_9
@@ -2254,7 +2295,7 @@
 		sw $t0, 8($v0)
 		sw $v0, 156($sp)
 		
-		foreach_start_8760993781375:
+		foreach_start_8760769550785:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2272,13 +2313,13 @@
 		sw $v1, 168($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_13 IS TRUE -> GO TO foreach_body_8760993781375
+		# IF internal_13 IS TRUE -> GO TO foreach_body_8760769550785
 		lw $t0, 156($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_body_8760993781375
+		beq $t0, $t1, foreach_body_8760769550785
 		
-		foreach_body_8760993781375:
+		foreach_body_8760769550785:
 		
 		# ARRAY internal_11[internal_12] = internal_10
 		lw $t0, 160($sp)
@@ -2312,7 +2353,7 @@
 		sw $v1, 172($sp)
 		addi $sp, $sp, 12
 		
-		foreach_end_8760993781375:
+		foreach_end_8760769550785:
 		
 		
 		# ARRAY OF SIZE [internal_5]
@@ -2447,7 +2488,7 @@
 		sw $t0, 8($v0)
 		sw $v0, 104($sp)
 		
-		foreach_type_start_8760993781375:
+		foreach_type_start_8760769550785:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2465,13 +2506,13 @@
 		sw $v1, 136($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_21 IS TRUE -> GO TO foreach_type_body_8760993781375
+		# IF internal_21 IS TRUE -> GO TO foreach_type_body_8760769550785
 		lw $t0, 124($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_type_body_8760993781375
+		beq $t0, $t1, foreach_type_body_8760769550785
 		
-		foreach_type_body_8760993781375:
+		foreach_type_body_8760769550785:
 		
 		# internal_22 = ARRAY internal_14[internal_20]
 		lw $t0, 128($sp)
@@ -2500,7 +2541,7 @@
 		sw $v1, 128($sp)
 		addi $sp, $sp, 12
 		
-		foreach_ancestor_start_8760993781375:
+		foreach_ancestor_start_8760769550785:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2518,13 +2559,13 @@
 		sw $v1, 124($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_24 IS TRUE -> GO TO foreach_ancestor_body_8760993781375
+		# IF internal_24 IS TRUE -> GO TO foreach_ancestor_body_8760769550785
 		lw $t0, 112($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_ancestor_body_8760993781375
+		beq $t0, $t1, foreach_ancestor_body_8760769550785
 		
-		foreach_ancestor_body_8760993781375:
+		foreach_ancestor_body_8760769550785:
 		
 		# internal_25 = ARRAY internal_11[internal_23]
 		lw $t0, 116($sp)
@@ -2544,11 +2585,11 @@
 		lw $t0, 104($sp)
 		sw $t2, 8($t0)
 		
-		# IF internal_26 IS TRUE -> GO TO foreach_ancestor_end_8760993781375
+		# IF internal_26 IS TRUE -> GO TO foreach_ancestor_end_8760769550785
 		lw $t0, 104($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_ancestor_end_8760993781375
+		beq $t0, $t1, foreach_ancestor_end_8760769550785
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2566,7 +2607,7 @@
 		sw $v1, 128($sp)
 		addi $sp, $sp, 12
 		
-		foreach_ancestor_end_8760993781375:
+		foreach_ancestor_end_8760769550785:
 		
 		
 		# FUNCT ARGS
@@ -2585,7 +2626,7 @@
 		sw $v1, 140($sp)
 		addi $sp, $sp, 12
 		
-		foreach_type_end_8760993781375:
+		foreach_type_end_8760769550785:
 		
 		
 		# ALLOCATE INT
@@ -2659,7 +2700,7 @@
 		sw $v1, 100($sp)
 		addi $sp, $sp, 12
 		
-		foreach_min_start_8760993781375:
+		foreach_min_start_8760769550785:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2677,13 +2718,13 @@
 		sw $v1, 96($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_31 IS TRUE -> GO TO foreach_min_body_8760993781375
+		# IF internal_31 IS TRUE -> GO TO foreach_min_body_8760769550785
 		lw $t0, 84($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_min_body_8760993781375
+		beq $t0, $t1, foreach_min_body_8760769550785
 		
-		foreach_min_body_8760993781375:
+		foreach_min_body_8760769550785:
 		
 		# ARRAY internal_15[internal_27]
 		lw $t0, 100($sp)
@@ -2713,13 +2754,13 @@
 		sw $v1, 96($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_31 IS TRUE -> GO TO update_min_8760993781375
+		# IF internal_31 IS TRUE -> GO TO update_min_8760769550785
 		lw $t0, 84($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, update_min_8760993781375
+		beq $t0, $t1, update_min_8760769550785
 		
-		update_min_8760993781375:
+		update_min_8760769550785:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2753,7 +2794,7 @@
 		sw $v1, 108($sp)
 		addi $sp, $sp, 12
 		
-		update_min_end_8760993781375:
+		update_min_end_8760769550785:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2771,7 +2812,7 @@
 		sw $v1, 112($sp)
 		addi $sp, $sp, 12
 		
-		foreach_min_end_8760993781375:
+		foreach_min_end_8760769550785:
 		
 		# ARRAY OF SIZE [internal_5]
 		lw $t0, 188($sp)
@@ -2836,11 +2877,11 @@
 		sw $v1, 80($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_35 IS TRUE -> GO TO error_branch_8760993781375
+		# IF internal_35 IS TRUE -> GO TO error_branch_8760769550785
 		lw $t0, 68($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, error_branch_8760993781375
+		beq $t0, $t1, error_branch_8760769550785
 		
 		
 		# ALLOCATE BOOL 0
@@ -2879,11 +2920,11 @@
 		lw $t2, 64($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_36 IS TRUE -> GO TO branch_Book_8760993781375
+		# IF internal_36 IS TRUE -> GO TO branch_Book_8760769550785
 		lw $t0, 64($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Book_8760993781375
+		beq $t0, $t1, branch_Book_8760769550785
 		
 		
 		# ALLOCATE INT
@@ -2909,14 +2950,14 @@
 		lw $t2, 64($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_36 IS TRUE -> GO TO branch_Article_8760993781375
+		# IF internal_36 IS TRUE -> GO TO branch_Article_8760769550785
 		lw $t0, 64($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Article_8760993781375
+		beq $t0, $t1, branch_Article_8760769550785
 		
 		
-		branch_Book_8760993781375:
+		branch_Book_8760769550785:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -3004,7 +3045,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 5
+		addi $t0, $zero, 4
 		sw $t0, 8($v0)
 		sw $v0, 36($sp)
 		
@@ -3030,6 +3071,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_44
+		lw $t0, 44($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 52($sp)
+		addi $sp, $sp, 12
+		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
 		sw $ra, 8($sp)
@@ -3051,7 +3098,7 @@
 		sw $t0, 52($sp)
 		
 		
-		branch_Article_8760993781375:
+		branch_Article_8760769550785:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -3145,7 +3192,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 5
+		addi $t0, $zero, 4
 		sw $t0, 8($v0)
 		sw $v0, 16($sp)
 		
@@ -3171,6 +3218,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_49
+		lw $t0, 24($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 32($sp)
+		addi $sp, $sp, 12
+		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
 		sw $ra, 8($sp)
@@ -3192,9 +3245,9 @@
 		sw $t0, 52($sp)
 		
 		
-		error_branch_8760993781375:
+		error_branch_8760769550785:
 		
-		branch_end_8760993781375:
+		branch_end_8760769550785:
 		
 		# ALLOCATE INT
 		li $v0, 9
@@ -3203,7 +3256,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 13
+		addi $t0, $zero, 12
 		sw $t0, 8($v0)
 		sw $v0, 4($sp)
 		
@@ -3213,6 +3266,12 @@
 		sw $ra, 4($sp)
 		
 		# DYNAMIC FUNCT CALL internal_52
+		lw $t0, 8($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 16($sp)
+		addi $sp, $sp, 8
+		
 		lw $v1, 8($sp)
 		
 		# FREE SPACE FOR LOCALVARS
@@ -3476,7 +3535,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 9
+		addi $t0, $zero, 8
 		sw $t0, 8($v0)
 		sw $v0, 76($sp)
 		
@@ -3505,6 +3564,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_6
+		lw $t0, 88($sp)
+		jalr $t0
+		lw $ra, 12($sp)
+		sw $v1, 96($sp)
+		addi $sp, $sp, 16
+		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
 		sw $ra, 8($sp)
@@ -3657,7 +3722,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 11
+		addi $t0, $zero, 10
 		sw $t0, 8($v0)
 		sw $v0, 44($sp)
 		
@@ -3689,6 +3754,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_14
+		lw $t0, 60($sp)
+		jalr $t0
+		lw $ra, 16($sp)
+		sw $v1, 68($sp)
+		addi $sp, $sp, 20
+		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
 		sw $ra, 8($sp)
@@ -3734,7 +3805,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 10
+		addi $t0, $zero, 9
 		sw $t0, 8($v0)
 		sw $v0, 28($sp)
 		
@@ -3760,6 +3831,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_18
+		lw $t0, 36($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 44($sp)
+		addi $sp, $sp, 12
+		
 		# ALLOCATE INT
 		li $v0, 9
 		addi $a0, $zero, 12
@@ -3767,7 +3844,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 10
+		addi $t0, $zero, 9
 		sw $t0, 8($v0)
 		sw $v0, 16($sp)
 		
@@ -3793,6 +3870,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_21
+		lw $t0, 24($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 32($sp)
+		addi $sp, $sp, 12
+		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
 		sw $ra, 8($sp)
@@ -3810,7 +3893,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 13
+		addi $t0, $zero, 12
 		sw $t0, 8($v0)
 		sw $v0, 4($sp)
 		
@@ -3820,6 +3903,12 @@
 		sw $ra, 4($sp)
 		
 		# DYNAMIC FUNCT CALL internal_24
+		lw $t0, 8($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 16($sp)
+		addi $sp, $sp, 8
+		
 		lw $v1, 8($sp)
 		
 		# FREE SPACE FOR LOCALVARS
@@ -3860,7 +3949,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 5
+		addi $t0, $zero, 4
 		sw $t0, 8($v0)
 		sw $v0, 4($sp)
 		
@@ -3883,6 +3972,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_3
+		lw $t0, 8($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 16($sp)
+		addi $sp, $sp, 8
+		
 		
 		# EXIT
 		li $v0, 10

@@ -735,7 +735,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
     def visit(self, node: cil.DynamicCallNode):
         self.register_comment(f"DYNAMIC FUNCT CALL {node.method_addr}")
         
-        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.method_address) + 4 * node.total_args + 4}($sp)"))
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.method_addr) + 4 * node.total_args + 4}($sp)"))
         self.register_instruction(mips.JumpAndLinkRegisterNode("$t0"))
         self.register_instruction(mips.LoadWordNode("$ra", f"{4 * node.total_args}($sp)"))
         
@@ -1189,7 +1189,7 @@ class MipsFormatter:
         # recorriendo el dottext
         inst = []
         for item in node.dottext:
-            if isinstance(item, mips.LabelNode) and (item.name.startswith("function_") or item.name == "main"):
+            if isinstance(item, mips.LabelNode) and ((item.name.startswith("function_") or item.name == "main")):
                 inst.append(f"{self.visit(item)}")
             else:
                 inst.append(f"\t{self.visit(item)}")

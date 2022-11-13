@@ -1,19 +1,17 @@
 .data
-	type_Object: .word 28
+	type_Object: .word 24
 	type_Object_inherits_from: .word 0
 	type_Object_name_address: .word type_Object_name_size
 	type_Object__init_: .word function__init__at_Object
 	type_Object_abort: .word function_abort_at_Object
-	type_Object_get_type: .word function_get_type_at_Object
 	type_Object_type_name: .word function_type_name_at_Object
 	type_Object_copy: .word function_copy_at_Object
 	
-	type_IO: .word 44
+	type_IO: .word 40
 	type_IO_inherits_from: .word type_Object
 	type_IO_name_address: .word type_IO_name_size
 	type_IO__init_: .word function__init__at_IO
 	type_IO_abort: .word function_abort_at_Object
-	type_IO_get_type: .word function_get_type_at_Object
 	type_IO_type_name: .word function_type_name_at_Object
 	type_IO_copy: .word function_copy_at_Object
 	type_IO_out_string: .word function_out_string_at_IO
@@ -21,42 +19,38 @@
 	type_IO_in_string: .word function_in_string_at_IO
 	type_IO_in_int: .word function_in_int_at_IO
 	
-	type_String: .word 40
+	type_String: .word 36
 	type_String_inherits_from: .word type_Object
 	type_String_name_address: .word type_String_name_size
 	type_String__init_: .word function__init__at_String
 	type_String_abort: .word function_abort_at_Object
-	type_String_get_type: .word function_get_type_at_Object
 	type_String_type_name: .word function_type_name_at_Object
 	type_String_copy: .word function_copy_at_Object
 	type_String_length: .word function_length_at_String
 	type_String_concat: .word function_concat_at_String
 	type_String_substr: .word function_substr_at_String
 	
-	type_Int: .word 28
+	type_Int: .word 24
 	type_Int_inherits_from: .word type_Object
 	type_Int_name_address: .word type_Int_name_size
 	type_Int__init_: .word function__init__at_Int
 	type_Int_abort: .word function_abort_at_Object
-	type_Int_get_type: .word function_get_type_at_Object
 	type_Int_type_name: .word function_type_name_at_Object
 	type_Int_copy: .word function_copy_at_Object
 	
-	type_Bool: .word 28
+	type_Bool: .word 24
 	type_Bool_inherits_from: .word type_Object
 	type_Bool_name_address: .word type_Bool_name_size
 	type_Bool__init_: .word function__init__at_Bool
 	type_Bool_abort: .word function_abort_at_Object
-	type_Bool_get_type: .word function_get_type_at_Object
 	type_Bool_type_name: .word function_type_name_at_Object
 	type_Bool_copy: .word function_copy_at_Object
 	
-	type_Foo: .word 72
+	type_Foo: .word 68
 	type_Foo_inherits_from: .word type_Bazz
 	type_Foo_name_address: .word type_Foo_name_size
 	type_Foo__init_: .word function__init__at_Foo
 	type_Foo_abort: .word function_abort_at_Object
-	type_Foo_get_type: .word function_get_type_at_Object
 	type_Foo_type_name: .word function_type_name_at_Object
 	type_Foo_copy: .word function_copy_at_Object
 	type_Foo_out_string: .word function_out_string_at_IO
@@ -66,12 +60,11 @@
 	type_Foo_printh: .word function_printh_at_Bazz
 	type_Foo_doh: .word function_doh_at_Foo
 	
-	type_Bar: .word 88
+	type_Bar: .word 84
 	type_Bar_inherits_from: .word type_Razz
 	type_Bar_name_address: .word type_Bar_name_size
 	type_Bar__init_: .word function__init__at_Bar
 	type_Bar_abort: .word function_abort_at_Object
-	type_Bar_get_type: .word function_get_type_at_Object
 	type_Bar_type_name: .word function_type_name_at_Object
 	type_Bar_copy: .word function_copy_at_Object
 	type_Bar_out_string: .word function_out_string_at_IO
@@ -81,12 +74,11 @@
 	type_Bar_printh: .word function_printh_at_Bazz
 	type_Bar_doh: .word function_doh_at_Foo
 	
-	type_Razz: .word 80
+	type_Razz: .word 76
 	type_Razz_inherits_from: .word type_Foo
 	type_Razz_name_address: .word type_Razz_name_size
 	type_Razz__init_: .word function__init__at_Razz
 	type_Razz_abort: .word function_abort_at_Object
-	type_Razz_get_type: .word function_get_type_at_Object
 	type_Razz_type_name: .word function_type_name_at_Object
 	type_Razz_copy: .word function_copy_at_Object
 	type_Razz_out_string: .word function_out_string_at_IO
@@ -96,12 +88,11 @@
 	type_Razz_printh: .word function_printh_at_Bazz
 	type_Razz_doh: .word function_doh_at_Foo
 	
-	type_Bazz: .word 64
+	type_Bazz: .word 60
 	type_Bazz_inherits_from: .word type_IO
 	type_Bazz_name_address: .word type_Bazz_name_size
 	type_Bazz__init_: .word function__init__at_Bazz
 	type_Bazz_abort: .word function_abort_at_Object
-	type_Bazz_get_type: .word function_get_type_at_Object
 	type_Bazz_type_name: .word function_type_name_at_Object
 	type_Bazz_copy: .word function_copy_at_Object
 	type_Bazz_out_string: .word function_out_string_at_IO
@@ -111,12 +102,11 @@
 	type_Bazz_printh: .word function_printh_at_Bazz
 	type_Bazz_doh: .word function_doh_at_Bazz
 	
-	type_Main: .word 48
+	type_Main: .word 44
 	type_Main_inherits_from: .word type_Object
 	type_Main_name_address: .word type_Main_name_size
 	type_Main__init_: .word function__init__at_Main
 	type_Main_abort: .word function_abort_at_Object
-	type_Main_get_type: .word function_get_type_at_Object
 	type_Main_type_name: .word function_type_name_at_Object
 	type_Main_copy: .word function_copy_at_Object
 	type_Main_main: .word function_main_at_Main
@@ -463,7 +453,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 3
+		addi $t0, $zero, 2
 		sw $t0, 8($v0)
 		sw $v0, 4($sp)
 		
@@ -486,6 +476,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_5
+		lw $t0, 8($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 24($sp)
+		addi $sp, $sp, 8
+		
 		# ALLOCATE INT
 		li $v0, 9
 		addi $a0, $zero, 12
@@ -493,7 +489,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 6
+		addi $t0, $zero, 5
 		sw $t0, 8($v0)
 		sw $v0, 4($sp)
 		
@@ -519,6 +515,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_5
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 24($sp)
+		addi $sp, $sp, 12
+		
 		# ALLOCATE INT
 		li $v0, 9
 		addi $a0, $zero, 12
@@ -526,7 +528,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 6
+		addi $t0, $zero, 5
 		sw $t0, 8($v0)
 		sw $v0, 4($sp)
 		
@@ -552,6 +554,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_5
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 24($sp)
+		addi $sp, $sp, 12
+		
 		lw $t0, 12($sp)
 		addi $t0, $t0, 8
 		# PRINT STRING -> internal_2
@@ -917,68 +925,6 @@
 		
 		jr $ra
 		
-	main:
-		addi $sp, $sp, -16
-		
-		# ALLOCATE Main
-		li $v0, 9
-		lw $a0, type_Main
-		syscall
-		la $t0, type_Main
-		sw $t0, 0($v0)
-		sw $a0, 4($v0)
-		sw $v0, 12($sp)
-		
-		# FUNCT ARGS
-		addi $sp, $sp, -8
-		sw $ra, 4($sp)
-		
-		lw $t0, 20($sp)
-		sw $t0, 0($sp)
-		
-		# STATIC FUNCT CALL function__init__at_Main
-		jal function__init__at_Main
-		lw $ra, 4($sp)
-		sw $v1, 20($sp)
-		addi $sp, $sp, 8
-		
-		
-		# ALLOCATE INT
-		li $v0, 9
-		addi $a0, $zero, 12
-		syscall
-		la $t0, type_Int
-		sw $t0, 0($v0)
-		sw $a0, 4($v0)
-		addi $t0, $zero, 5
-		sw $t0, 8($v0)
-		sw $v0, 4($sp)
-		
-		# GET METHOD main OF Main
-		lw $t0, 12($sp)
-		lw $t0, 0($t0)
-		addi $t0, $t0, 12
-		lw $t1, 4($sp)
-		lw $t1, 8($t1)
-		sll $t1, $t1, 2
-		add $t0, $t0, $t1
-		lw $t0, 0($t0)
-		sw $t0, 0($sp)
-		
-		# FUNCT ARGS
-		addi $sp, $sp, -8
-		sw $ra, 4($sp)
-		
-		lw $t0, 20($sp)
-		sw $t0, 0($sp)
-		
-		# DYNAMIC FUNCT CALL internal_3
-		
-		# EXIT
-		li $v0, 10
-		syscall
-		
-		
 	function__init__at_Foo:
 		addi $sp, $sp, -468
 		
@@ -1066,7 +1012,7 @@
 		lw $t0, 436($sp)
 		sw $t0, 432($sp)
 		
-		while_start_8752275041012:
+		while_start_8780614691831:
 		
 		# internal_6 <-- EQUAL ADDRESS(internal_8, internal_4)
 		lw $t0, 432($sp)
@@ -1075,11 +1021,11 @@
 		lw $t0, 440($sp)
 		sw $t2, 8($t0)
 		
-		# IF internal_6 IS TRUE -> GO TO while_end_8752275041012
+		# IF internal_6 IS TRUE -> GO TO while_end_8780614691831
 		lw $t0, 440($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, while_end_8752275041012
+		beq $t0, $t1, while_end_8780614691831
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -1102,7 +1048,7 @@
 		lw $t0, 4($t0)
 		sw $t0, 432($sp)
 		
-		while_end_8752275041012:
+		while_end_8780614691831:
 		
 		
 		# internal_8 <- internal_7
@@ -1142,7 +1088,7 @@
 		sw $t0, 8($v0)
 		sw $v0, 420($sp)
 		
-		foreach_start_8752275041012:
+		foreach_start_8780614691831:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -1160,13 +1106,13 @@
 		sw $v1, 432($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_11 IS TRUE -> GO TO foreach_body_8752275041012
+		# IF internal_11 IS TRUE -> GO TO foreach_body_8780614691831
 		lw $t0, 420($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_body_8752275041012
+		beq $t0, $t1, foreach_body_8780614691831
 		
-		foreach_body_8752275041012:
+		foreach_body_8780614691831:
 		
 		# ARRAY internal_9[internal_10] = internal_8
 		lw $t0, 424($sp)
@@ -1200,7 +1146,7 @@
 		sw $v1, 436($sp)
 		addi $sp, $sp, 12
 		
-		foreach_end_8752275041012:
+		foreach_end_8780614691831:
 		
 		
 		# ARRAY OF SIZE [internal_3]
@@ -1389,7 +1335,7 @@
 		sw $t0, 8($v0)
 		sw $v0, 352($sp)
 		
-		foreach_type_start_8752275041012:
+		foreach_type_start_8780614691831:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -1407,13 +1353,13 @@
 		sw $v1, 384($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_23 IS TRUE -> GO TO foreach_type_body_8752275041012
+		# IF internal_23 IS TRUE -> GO TO foreach_type_body_8780614691831
 		lw $t0, 372($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_type_body_8752275041012
+		beq $t0, $t1, foreach_type_body_8780614691831
 		
-		foreach_type_body_8752275041012:
+		foreach_type_body_8780614691831:
 		
 		# internal_24 = ARRAY internal_12[internal_22]
 		lw $t0, 376($sp)
@@ -1442,7 +1388,7 @@
 		sw $v1, 376($sp)
 		addi $sp, $sp, 12
 		
-		foreach_ancestor_start_8752275041012:
+		foreach_ancestor_start_8780614691831:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -1460,13 +1406,13 @@
 		sw $v1, 372($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_26 IS TRUE -> GO TO foreach_ancestor_body_8752275041012
+		# IF internal_26 IS TRUE -> GO TO foreach_ancestor_body_8780614691831
 		lw $t0, 360($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_ancestor_body_8752275041012
+		beq $t0, $t1, foreach_ancestor_body_8780614691831
 		
-		foreach_ancestor_body_8752275041012:
+		foreach_ancestor_body_8780614691831:
 		
 		# internal_27 = ARRAY internal_9[internal_25]
 		lw $t0, 364($sp)
@@ -1486,11 +1432,11 @@
 		lw $t0, 352($sp)
 		sw $t2, 8($t0)
 		
-		# IF internal_28 IS TRUE -> GO TO foreach_ancestor_end_8752275041012
+		# IF internal_28 IS TRUE -> GO TO foreach_ancestor_end_8780614691831
 		lw $t0, 352($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_ancestor_end_8752275041012
+		beq $t0, $t1, foreach_ancestor_end_8780614691831
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -1508,7 +1454,7 @@
 		sw $v1, 376($sp)
 		addi $sp, $sp, 12
 		
-		foreach_ancestor_end_8752275041012:
+		foreach_ancestor_end_8780614691831:
 		
 		
 		# FUNCT ARGS
@@ -1527,7 +1473,7 @@
 		sw $v1, 388($sp)
 		addi $sp, $sp, 12
 		
-		foreach_type_end_8752275041012:
+		foreach_type_end_8780614691831:
 		
 		
 		# ALLOCATE INT
@@ -1601,7 +1547,7 @@
 		sw $v1, 348($sp)
 		addi $sp, $sp, 12
 		
-		foreach_min_start_8752275041012:
+		foreach_min_start_8780614691831:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -1619,13 +1565,13 @@
 		sw $v1, 344($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_33 IS TRUE -> GO TO foreach_min_body_8752275041012
+		# IF internal_33 IS TRUE -> GO TO foreach_min_body_8780614691831
 		lw $t0, 332($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_min_body_8752275041012
+		beq $t0, $t1, foreach_min_body_8780614691831
 		
-		foreach_min_body_8752275041012:
+		foreach_min_body_8780614691831:
 		
 		# ARRAY internal_13[internal_29]
 		lw $t0, 348($sp)
@@ -1655,13 +1601,13 @@
 		sw $v1, 344($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_33 IS TRUE -> GO TO update_min_8752275041012
+		# IF internal_33 IS TRUE -> GO TO update_min_8780614691831
 		lw $t0, 332($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, update_min_8752275041012
+		beq $t0, $t1, update_min_8780614691831
 		
-		update_min_8752275041012:
+		update_min_8780614691831:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -1695,7 +1641,7 @@
 		sw $v1, 356($sp)
 		addi $sp, $sp, 12
 		
-		update_min_end_8752275041012:
+		update_min_end_8780614691831:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -1713,7 +1659,7 @@
 		sw $v1, 360($sp)
 		addi $sp, $sp, 12
 		
-		foreach_min_end_8752275041012:
+		foreach_min_end_8780614691831:
 		
 		# ARRAY OF SIZE [internal_3]
 		lw $t0, 452($sp)
@@ -1802,11 +1748,11 @@
 		sw $v1, 320($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_39 IS TRUE -> GO TO error_branch_8752275041012
+		# IF internal_39 IS TRUE -> GO TO error_branch_8780614691831
 		lw $t0, 308($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, error_branch_8752275041012
+		beq $t0, $t1, error_branch_8780614691831
 		
 		
 		# ALLOCATE BOOL 0
@@ -1845,11 +1791,11 @@
 		lw $t2, 304($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_40 IS TRUE -> GO TO branch_Bazz_8752275041012
+		# IF internal_40 IS TRUE -> GO TO branch_Bazz_8780614691831
 		lw $t0, 304($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Bazz_8752275041012
+		beq $t0, $t1, branch_Bazz_8780614691831
 		
 		
 		# ALLOCATE INT
@@ -1875,11 +1821,11 @@
 		lw $t2, 304($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_40 IS TRUE -> GO TO branch_Razz_8752275041012
+		# IF internal_40 IS TRUE -> GO TO branch_Razz_8780614691831
 		lw $t0, 304($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Razz_8752275041012
+		beq $t0, $t1, branch_Razz_8780614691831
 		
 		
 		# ALLOCATE INT
@@ -1905,11 +1851,11 @@
 		lw $t2, 304($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_40 IS TRUE -> GO TO branch_Foo_8752275041012
+		# IF internal_40 IS TRUE -> GO TO branch_Foo_8780614691831
 		lw $t0, 304($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Foo_8752275041012
+		beq $t0, $t1, branch_Foo_8780614691831
 		
 		
 		# ALLOCATE INT
@@ -1935,14 +1881,14 @@
 		lw $t2, 304($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_40 IS TRUE -> GO TO branch_Bar_8752275041012
+		# IF internal_40 IS TRUE -> GO TO branch_Bar_8780614691831
 		lw $t0, 304($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Bar_8752275041012
+		beq $t0, $t1, branch_Bar_8780614691831
 		
 		
-		branch_Bazz_8752275041012:
+		branch_Bazz_8780614691831:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2003,7 +1949,7 @@
 		sw $t0, 284($sp)
 		
 		
-		branch_Razz_8752275041012:
+		branch_Razz_8780614691831:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2064,7 +2010,7 @@
 		sw $t0, 284($sp)
 		
 		
-		branch_Foo_8752275041012:
+		branch_Foo_8780614691831:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2125,7 +2071,7 @@
 		sw $t0, 284($sp)
 		
 		
-		branch_Bar_8752275041012:
+		branch_Bar_8780614691831:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2164,9 +2110,9 @@
 		sw $t0, 284($sp)
 		
 		
-		error_branch_8752275041012:
+		error_branch_8780614691831:
 		
-		branch_end_8752275041012:
+		branch_end_8780614691831:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2185,7 +2131,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 9
+		addi $t0, $zero, 8
 		sw $t0, 8($v0)
 		sw $v0, 248($sp)
 		
@@ -2208,6 +2154,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_55
+		lw $t0, 252($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 260($sp)
+		addi $sp, $sp, 8
+		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
 		sw $ra, 8($sp)
@@ -2281,7 +2233,7 @@
 		lw $t0, 216($sp)
 		sw $t0, 212($sp)
 		
-		while_start_8752275020707:
+		while_start_8780614671526:
 		
 		# internal_61 <-- EQUAL ADDRESS(internal_63, internal_59)
 		lw $t0, 212($sp)
@@ -2290,11 +2242,11 @@
 		lw $t0, 220($sp)
 		sw $t2, 8($t0)
 		
-		# IF internal_61 IS TRUE -> GO TO while_end_8752275020707
+		# IF internal_61 IS TRUE -> GO TO while_end_8780614671526
 		lw $t0, 220($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, while_end_8752275020707
+		beq $t0, $t1, while_end_8780614671526
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2317,7 +2269,7 @@
 		lw $t0, 4($t0)
 		sw $t0, 212($sp)
 		
-		while_end_8752275020707:
+		while_end_8780614671526:
 		
 		
 		# internal_63 <- internal_62
@@ -2357,7 +2309,7 @@
 		sw $t0, 8($v0)
 		sw $v0, 200($sp)
 		
-		foreach_start_8752275020707:
+		foreach_start_8780614671526:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2375,13 +2327,13 @@
 		sw $v1, 212($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_66 IS TRUE -> GO TO foreach_body_8752275020707
+		# IF internal_66 IS TRUE -> GO TO foreach_body_8780614671526
 		lw $t0, 200($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_body_8752275020707
+		beq $t0, $t1, foreach_body_8780614671526
 		
-		foreach_body_8752275020707:
+		foreach_body_8780614671526:
 		
 		# ARRAY internal_64[internal_65] = internal_63
 		lw $t0, 204($sp)
@@ -2415,7 +2367,7 @@
 		sw $v1, 216($sp)
 		addi $sp, $sp, 12
 		
-		foreach_end_8752275020707:
+		foreach_end_8780614671526:
 		
 		
 		# ARRAY OF SIZE [internal_58]
@@ -2577,7 +2529,7 @@
 		sw $t0, 8($v0)
 		sw $v0, 140($sp)
 		
-		foreach_type_start_8752275020707:
+		foreach_type_start_8780614671526:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2595,13 +2547,13 @@
 		sw $v1, 172($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_76 IS TRUE -> GO TO foreach_type_body_8752275020707
+		# IF internal_76 IS TRUE -> GO TO foreach_type_body_8780614671526
 		lw $t0, 160($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_type_body_8752275020707
+		beq $t0, $t1, foreach_type_body_8780614671526
 		
-		foreach_type_body_8752275020707:
+		foreach_type_body_8780614671526:
 		
 		# internal_77 = ARRAY internal_67[internal_75]
 		lw $t0, 164($sp)
@@ -2630,7 +2582,7 @@
 		sw $v1, 164($sp)
 		addi $sp, $sp, 12
 		
-		foreach_ancestor_start_8752275020707:
+		foreach_ancestor_start_8780614671526:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2648,13 +2600,13 @@
 		sw $v1, 160($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_79 IS TRUE -> GO TO foreach_ancestor_body_8752275020707
+		# IF internal_79 IS TRUE -> GO TO foreach_ancestor_body_8780614671526
 		lw $t0, 148($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_ancestor_body_8752275020707
+		beq $t0, $t1, foreach_ancestor_body_8780614671526
 		
-		foreach_ancestor_body_8752275020707:
+		foreach_ancestor_body_8780614671526:
 		
 		# internal_80 = ARRAY internal_64[internal_78]
 		lw $t0, 152($sp)
@@ -2674,11 +2626,11 @@
 		lw $t0, 140($sp)
 		sw $t2, 8($t0)
 		
-		# IF internal_81 IS TRUE -> GO TO foreach_ancestor_end_8752275020707
+		# IF internal_81 IS TRUE -> GO TO foreach_ancestor_end_8780614671526
 		lw $t0, 140($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_ancestor_end_8752275020707
+		beq $t0, $t1, foreach_ancestor_end_8780614671526
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2696,7 +2648,7 @@
 		sw $v1, 164($sp)
 		addi $sp, $sp, 12
 		
-		foreach_ancestor_end_8752275020707:
+		foreach_ancestor_end_8780614671526:
 		
 		
 		# FUNCT ARGS
@@ -2715,7 +2667,7 @@
 		sw $v1, 176($sp)
 		addi $sp, $sp, 12
 		
-		foreach_type_end_8752275020707:
+		foreach_type_end_8780614671526:
 		
 		
 		# ALLOCATE INT
@@ -2789,7 +2741,7 @@
 		sw $v1, 136($sp)
 		addi $sp, $sp, 12
 		
-		foreach_min_start_8752275020707:
+		foreach_min_start_8780614671526:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2807,13 +2759,13 @@
 		sw $v1, 132($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_86 IS TRUE -> GO TO foreach_min_body_8752275020707
+		# IF internal_86 IS TRUE -> GO TO foreach_min_body_8780614671526
 		lw $t0, 120($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_min_body_8752275020707
+		beq $t0, $t1, foreach_min_body_8780614671526
 		
-		foreach_min_body_8752275020707:
+		foreach_min_body_8780614671526:
 		
 		# ARRAY internal_68[internal_82]
 		lw $t0, 136($sp)
@@ -2843,13 +2795,13 @@
 		sw $v1, 132($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_86 IS TRUE -> GO TO update_min_8752275020707
+		# IF internal_86 IS TRUE -> GO TO update_min_8780614671526
 		lw $t0, 120($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, update_min_8752275020707
+		beq $t0, $t1, update_min_8780614671526
 		
-		update_min_8752275020707:
+		update_min_8780614671526:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2883,7 +2835,7 @@
 		sw $v1, 144($sp)
 		addi $sp, $sp, 12
 		
-		update_min_end_8752275020707:
+		update_min_end_8780614671526:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2901,7 +2853,7 @@
 		sw $v1, 148($sp)
 		addi $sp, $sp, 12
 		
-		foreach_min_end_8752275020707:
+		foreach_min_end_8780614671526:
 		
 		# ARRAY OF SIZE [internal_58]
 		lw $t0, 232($sp)
@@ -2978,11 +2930,11 @@
 		sw $v1, 112($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_91 IS TRUE -> GO TO error_branch_8752275020707
+		# IF internal_91 IS TRUE -> GO TO error_branch_8780614671526
 		lw $t0, 100($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, error_branch_8752275020707
+		beq $t0, $t1, error_branch_8780614671526
 		
 		
 		# ALLOCATE BOOL 0
@@ -3021,11 +2973,11 @@
 		lw $t2, 96($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_92 IS TRUE -> GO TO branch_Razz_8752275020707
+		# IF internal_92 IS TRUE -> GO TO branch_Razz_8780614671526
 		lw $t0, 96($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Razz_8752275020707
+		beq $t0, $t1, branch_Razz_8780614671526
 		
 		
 		# ALLOCATE INT
@@ -3051,11 +3003,11 @@
 		lw $t2, 96($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_92 IS TRUE -> GO TO branch_Foo_8752275020707
+		# IF internal_92 IS TRUE -> GO TO branch_Foo_8780614671526
 		lw $t0, 96($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Foo_8752275020707
+		beq $t0, $t1, branch_Foo_8780614671526
 		
 		
 		# ALLOCATE INT
@@ -3081,14 +3033,14 @@
 		lw $t2, 96($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_92 IS TRUE -> GO TO branch_Bar_8752275020707
+		# IF internal_92 IS TRUE -> GO TO branch_Bar_8780614671526
 		lw $t0, 96($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Bar_8752275020707
+		beq $t0, $t1, branch_Bar_8780614671526
 		
 		
-		branch_Razz_8752275020707:
+		branch_Razz_8780614671526:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -3149,7 +3101,7 @@
 		sw $t0, 80($sp)
 		
 		
-		branch_Foo_8752275020707:
+		branch_Foo_8780614671526:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -3210,7 +3162,7 @@
 		sw $t0, 80($sp)
 		
 		
-		branch_Bar_8752275020707:
+		branch_Bar_8780614671526:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -3249,9 +3201,9 @@
 		sw $t0, 80($sp)
 		
 		
-		error_branch_8752275020707:
+		error_branch_8780614671526:
 		
-		branch_end_8752275020707:
+		branch_end_8780614671526:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -3270,7 +3222,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 10
+		addi $t0, $zero, 9
 		sw $t0, 8($v0)
 		sw $v0, 52($sp)
 		
@@ -3280,6 +3232,12 @@
 		sw $ra, 4($sp)
 		
 		# DYNAMIC FUNCT CALL internal_104
+		lw $t0, 56($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 64($sp)
+		addi $sp, $sp, 8
+		
 		# ALLOCATE INT
 		li $v0, 9
 		addi $a0, $zero, 12
@@ -3287,7 +3245,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 10
+		addi $t0, $zero, 9
 		sw $t0, 8($v0)
 		sw $v0, 40($sp)
 		
@@ -3297,6 +3255,12 @@
 		sw $ra, 4($sp)
 		
 		# DYNAMIC FUNCT CALL internal_107
+		lw $t0, 44($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 52($sp)
+		addi $sp, $sp, 8
+		
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -3321,7 +3285,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 10
+		addi $t0, $zero, 9
 		sw $t0, 8($v0)
 		sw $v0, 24($sp)
 		
@@ -3344,6 +3308,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_111
+		lw $t0, 28($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 36($sp)
+		addi $sp, $sp, 8
+		
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -3368,7 +3338,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 9
+		addi $t0, $zero, 8
 		sw $t0, 8($v0)
 		sw $v0, 8($sp)
 		
@@ -3391,6 +3361,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_115
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 20($sp)
+		addi $sp, $sp, 8
+		
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -3570,7 +3546,7 @@
 		lw $t0, 696($sp)
 		sw $t0, 692($sp)
 		
-		while_start_8752274999420:
+		while_start_8780614651007:
 		
 		# internal_6 <-- EQUAL ADDRESS(internal_8, internal_4)
 		lw $t0, 692($sp)
@@ -3579,11 +3555,11 @@
 		lw $t0, 700($sp)
 		sw $t2, 8($t0)
 		
-		# IF internal_6 IS TRUE -> GO TO while_end_8752274999420
+		# IF internal_6 IS TRUE -> GO TO while_end_8780614651007
 		lw $t0, 700($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, while_end_8752274999420
+		beq $t0, $t1, while_end_8780614651007
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -3606,7 +3582,7 @@
 		lw $t0, 4($t0)
 		sw $t0, 692($sp)
 		
-		while_end_8752274999420:
+		while_end_8780614651007:
 		
 		
 		# internal_8 <- internal_7
@@ -3646,7 +3622,7 @@
 		sw $t0, 8($v0)
 		sw $v0, 680($sp)
 		
-		foreach_start_8752274999420:
+		foreach_start_8780614651007:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -3664,13 +3640,13 @@
 		sw $v1, 692($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_11 IS TRUE -> GO TO foreach_body_8752274999420
+		# IF internal_11 IS TRUE -> GO TO foreach_body_8780614651007
 		lw $t0, 680($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_body_8752274999420
+		beq $t0, $t1, foreach_body_8780614651007
 		
-		foreach_body_8752274999420:
+		foreach_body_8780614651007:
 		
 		# ARRAY internal_9[internal_10] = internal_8
 		lw $t0, 684($sp)
@@ -3704,7 +3680,7 @@
 		sw $v1, 696($sp)
 		addi $sp, $sp, 12
 		
-		foreach_end_8752274999420:
+		foreach_end_8780614651007:
 		
 		
 		# ARRAY OF SIZE [internal_3]
@@ -3893,7 +3869,7 @@
 		sw $t0, 8($v0)
 		sw $v0, 612($sp)
 		
-		foreach_type_start_8752274999420:
+		foreach_type_start_8780614651007:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -3911,13 +3887,13 @@
 		sw $v1, 644($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_23 IS TRUE -> GO TO foreach_type_body_8752274999420
+		# IF internal_23 IS TRUE -> GO TO foreach_type_body_8780614651007
 		lw $t0, 632($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_type_body_8752274999420
+		beq $t0, $t1, foreach_type_body_8780614651007
 		
-		foreach_type_body_8752274999420:
+		foreach_type_body_8780614651007:
 		
 		# internal_24 = ARRAY internal_12[internal_22]
 		lw $t0, 636($sp)
@@ -3946,7 +3922,7 @@
 		sw $v1, 636($sp)
 		addi $sp, $sp, 12
 		
-		foreach_ancestor_start_8752274999420:
+		foreach_ancestor_start_8780614651007:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -3964,13 +3940,13 @@
 		sw $v1, 632($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_26 IS TRUE -> GO TO foreach_ancestor_body_8752274999420
+		# IF internal_26 IS TRUE -> GO TO foreach_ancestor_body_8780614651007
 		lw $t0, 620($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_ancestor_body_8752274999420
+		beq $t0, $t1, foreach_ancestor_body_8780614651007
 		
-		foreach_ancestor_body_8752274999420:
+		foreach_ancestor_body_8780614651007:
 		
 		# internal_27 = ARRAY internal_9[internal_25]
 		lw $t0, 624($sp)
@@ -3990,11 +3966,11 @@
 		lw $t0, 612($sp)
 		sw $t2, 8($t0)
 		
-		# IF internal_28 IS TRUE -> GO TO foreach_ancestor_end_8752274999420
+		# IF internal_28 IS TRUE -> GO TO foreach_ancestor_end_8780614651007
 		lw $t0, 612($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_ancestor_end_8752274999420
+		beq $t0, $t1, foreach_ancestor_end_8780614651007
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -4012,7 +3988,7 @@
 		sw $v1, 636($sp)
 		addi $sp, $sp, 12
 		
-		foreach_ancestor_end_8752274999420:
+		foreach_ancestor_end_8780614651007:
 		
 		
 		# FUNCT ARGS
@@ -4031,7 +4007,7 @@
 		sw $v1, 648($sp)
 		addi $sp, $sp, 12
 		
-		foreach_type_end_8752274999420:
+		foreach_type_end_8780614651007:
 		
 		
 		# ALLOCATE INT
@@ -4105,7 +4081,7 @@
 		sw $v1, 608($sp)
 		addi $sp, $sp, 12
 		
-		foreach_min_start_8752274999420:
+		foreach_min_start_8780614651007:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -4123,13 +4099,13 @@
 		sw $v1, 604($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_33 IS TRUE -> GO TO foreach_min_body_8752274999420
+		# IF internal_33 IS TRUE -> GO TO foreach_min_body_8780614651007
 		lw $t0, 592($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_min_body_8752274999420
+		beq $t0, $t1, foreach_min_body_8780614651007
 		
-		foreach_min_body_8752274999420:
+		foreach_min_body_8780614651007:
 		
 		# ARRAY internal_13[internal_29]
 		lw $t0, 608($sp)
@@ -4159,13 +4135,13 @@
 		sw $v1, 604($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_33 IS TRUE -> GO TO update_min_8752274999420
+		# IF internal_33 IS TRUE -> GO TO update_min_8780614651007
 		lw $t0, 592($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, update_min_8752274999420
+		beq $t0, $t1, update_min_8780614651007
 		
-		update_min_8752274999420:
+		update_min_8780614651007:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -4199,7 +4175,7 @@
 		sw $v1, 616($sp)
 		addi $sp, $sp, 12
 		
-		update_min_end_8752274999420:
+		update_min_end_8780614651007:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -4217,7 +4193,7 @@
 		sw $v1, 620($sp)
 		addi $sp, $sp, 12
 		
-		foreach_min_end_8752274999420:
+		foreach_min_end_8780614651007:
 		
 		# ARRAY OF SIZE [internal_3]
 		lw $t0, 712($sp)
@@ -4306,11 +4282,11 @@
 		sw $v1, 580($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_39 IS TRUE -> GO TO error_branch_8752274999420
+		# IF internal_39 IS TRUE -> GO TO error_branch_8780614651007
 		lw $t0, 568($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, error_branch_8752274999420
+		beq $t0, $t1, error_branch_8780614651007
 		
 		
 		# ALLOCATE BOOL 0
@@ -4349,11 +4325,11 @@
 		lw $t2, 564($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_40 IS TRUE -> GO TO branch_Bazz_8752274999420
+		# IF internal_40 IS TRUE -> GO TO branch_Bazz_8780614651007
 		lw $t0, 564($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Bazz_8752274999420
+		beq $t0, $t1, branch_Bazz_8780614651007
 		
 		
 		# ALLOCATE INT
@@ -4379,11 +4355,11 @@
 		lw $t2, 564($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_40 IS TRUE -> GO TO branch_Razz_8752274999420
+		# IF internal_40 IS TRUE -> GO TO branch_Razz_8780614651007
 		lw $t0, 564($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Razz_8752274999420
+		beq $t0, $t1, branch_Razz_8780614651007
 		
 		
 		# ALLOCATE INT
@@ -4409,11 +4385,11 @@
 		lw $t2, 564($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_40 IS TRUE -> GO TO branch_Foo_8752274999420
+		# IF internal_40 IS TRUE -> GO TO branch_Foo_8780614651007
 		lw $t0, 564($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Foo_8752274999420
+		beq $t0, $t1, branch_Foo_8780614651007
 		
 		
 		# ALLOCATE INT
@@ -4439,14 +4415,14 @@
 		lw $t2, 564($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_40 IS TRUE -> GO TO branch_Bar_8752274999420
+		# IF internal_40 IS TRUE -> GO TO branch_Bar_8780614651007
 		lw $t0, 564($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Bar_8752274999420
+		beq $t0, $t1, branch_Bar_8780614651007
 		
 		
-		branch_Bazz_8752274999420:
+		branch_Bazz_8780614651007:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -4507,7 +4483,7 @@
 		sw $t0, 544($sp)
 		
 		
-		branch_Razz_8752274999420:
+		branch_Razz_8780614651007:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -4568,7 +4544,7 @@
 		sw $t0, 544($sp)
 		
 		
-		branch_Foo_8752274999420:
+		branch_Foo_8780614651007:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -4629,7 +4605,7 @@
 		sw $t0, 544($sp)
 		
 		
-		branch_Bar_8752274999420:
+		branch_Bar_8780614651007:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -4668,9 +4644,9 @@
 		sw $t0, 544($sp)
 		
 		
-		error_branch_8752274999420:
+		error_branch_8780614651007:
 		
-		branch_end_8752274999420:
+		branch_end_8780614651007:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -4689,7 +4665,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 9
+		addi $t0, $zero, 8
 		sw $t0, 8($v0)
 		sw $v0, 508($sp)
 		
@@ -4712,6 +4688,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_55
+		lw $t0, 512($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 520($sp)
+		addi $sp, $sp, 8
+		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
 		sw $ra, 8($sp)
@@ -4785,7 +4767,7 @@
 		lw $t0, 476($sp)
 		sw $t0, 472($sp)
 		
-		while_start_8752275011124:
+		while_start_8780614661943:
 		
 		# internal_61 <-- EQUAL ADDRESS(internal_63, internal_59)
 		lw $t0, 472($sp)
@@ -4794,11 +4776,11 @@
 		lw $t0, 480($sp)
 		sw $t2, 8($t0)
 		
-		# IF internal_61 IS TRUE -> GO TO while_end_8752275011124
+		# IF internal_61 IS TRUE -> GO TO while_end_8780614661943
 		lw $t0, 480($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, while_end_8752275011124
+		beq $t0, $t1, while_end_8780614661943
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -4821,7 +4803,7 @@
 		lw $t0, 4($t0)
 		sw $t0, 472($sp)
 		
-		while_end_8752275011124:
+		while_end_8780614661943:
 		
 		
 		# internal_63 <- internal_62
@@ -4861,7 +4843,7 @@
 		sw $t0, 8($v0)
 		sw $v0, 460($sp)
 		
-		foreach_start_8752275011124:
+		foreach_start_8780614661943:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -4879,13 +4861,13 @@
 		sw $v1, 472($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_66 IS TRUE -> GO TO foreach_body_8752275011124
+		# IF internal_66 IS TRUE -> GO TO foreach_body_8780614661943
 		lw $t0, 460($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_body_8752275011124
+		beq $t0, $t1, foreach_body_8780614661943
 		
-		foreach_body_8752275011124:
+		foreach_body_8780614661943:
 		
 		# ARRAY internal_64[internal_65] = internal_63
 		lw $t0, 464($sp)
@@ -4919,7 +4901,7 @@
 		sw $v1, 476($sp)
 		addi $sp, $sp, 12
 		
-		foreach_end_8752275011124:
+		foreach_end_8780614661943:
 		
 		
 		# ARRAY OF SIZE [internal_58]
@@ -5081,7 +5063,7 @@
 		sw $t0, 8($v0)
 		sw $v0, 400($sp)
 		
-		foreach_type_start_8752275011124:
+		foreach_type_start_8780614661943:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -5099,13 +5081,13 @@
 		sw $v1, 432($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_76 IS TRUE -> GO TO foreach_type_body_8752275011124
+		# IF internal_76 IS TRUE -> GO TO foreach_type_body_8780614661943
 		lw $t0, 420($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_type_body_8752275011124
+		beq $t0, $t1, foreach_type_body_8780614661943
 		
-		foreach_type_body_8752275011124:
+		foreach_type_body_8780614661943:
 		
 		# internal_77 = ARRAY internal_67[internal_75]
 		lw $t0, 424($sp)
@@ -5134,7 +5116,7 @@
 		sw $v1, 424($sp)
 		addi $sp, $sp, 12
 		
-		foreach_ancestor_start_8752275011124:
+		foreach_ancestor_start_8780614661943:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -5152,13 +5134,13 @@
 		sw $v1, 420($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_79 IS TRUE -> GO TO foreach_ancestor_body_8752275011124
+		# IF internal_79 IS TRUE -> GO TO foreach_ancestor_body_8780614661943
 		lw $t0, 408($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_ancestor_body_8752275011124
+		beq $t0, $t1, foreach_ancestor_body_8780614661943
 		
-		foreach_ancestor_body_8752275011124:
+		foreach_ancestor_body_8780614661943:
 		
 		# internal_80 = ARRAY internal_64[internal_78]
 		lw $t0, 412($sp)
@@ -5178,11 +5160,11 @@
 		lw $t0, 400($sp)
 		sw $t2, 8($t0)
 		
-		# IF internal_81 IS TRUE -> GO TO foreach_ancestor_end_8752275011124
+		# IF internal_81 IS TRUE -> GO TO foreach_ancestor_end_8780614661943
 		lw $t0, 400($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_ancestor_end_8752275011124
+		beq $t0, $t1, foreach_ancestor_end_8780614661943
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -5200,7 +5182,7 @@
 		sw $v1, 424($sp)
 		addi $sp, $sp, 12
 		
-		foreach_ancestor_end_8752275011124:
+		foreach_ancestor_end_8780614661943:
 		
 		
 		# FUNCT ARGS
@@ -5219,7 +5201,7 @@
 		sw $v1, 436($sp)
 		addi $sp, $sp, 12
 		
-		foreach_type_end_8752275011124:
+		foreach_type_end_8780614661943:
 		
 		
 		# ALLOCATE INT
@@ -5293,7 +5275,7 @@
 		sw $v1, 396($sp)
 		addi $sp, $sp, 12
 		
-		foreach_min_start_8752275011124:
+		foreach_min_start_8780614661943:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -5311,13 +5293,13 @@
 		sw $v1, 392($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_86 IS TRUE -> GO TO foreach_min_body_8752275011124
+		# IF internal_86 IS TRUE -> GO TO foreach_min_body_8780614661943
 		lw $t0, 380($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_min_body_8752275011124
+		beq $t0, $t1, foreach_min_body_8780614661943
 		
-		foreach_min_body_8752275011124:
+		foreach_min_body_8780614661943:
 		
 		# ARRAY internal_68[internal_82]
 		lw $t0, 396($sp)
@@ -5347,13 +5329,13 @@
 		sw $v1, 392($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_86 IS TRUE -> GO TO update_min_8752275011124
+		# IF internal_86 IS TRUE -> GO TO update_min_8780614661943
 		lw $t0, 380($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, update_min_8752275011124
+		beq $t0, $t1, update_min_8780614661943
 		
-		update_min_8752275011124:
+		update_min_8780614661943:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -5387,7 +5369,7 @@
 		sw $v1, 404($sp)
 		addi $sp, $sp, 12
 		
-		update_min_end_8752275011124:
+		update_min_end_8780614661943:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -5405,7 +5387,7 @@
 		sw $v1, 408($sp)
 		addi $sp, $sp, 12
 		
-		foreach_min_end_8752275011124:
+		foreach_min_end_8780614661943:
 		
 		# ARRAY OF SIZE [internal_58]
 		lw $t0, 492($sp)
@@ -5482,11 +5464,11 @@
 		sw $v1, 372($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_91 IS TRUE -> GO TO error_branch_8752275011124
+		# IF internal_91 IS TRUE -> GO TO error_branch_8780614661943
 		lw $t0, 360($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, error_branch_8752275011124
+		beq $t0, $t1, error_branch_8780614661943
 		
 		
 		# ALLOCATE BOOL 0
@@ -5525,11 +5507,11 @@
 		lw $t2, 356($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_92 IS TRUE -> GO TO branch_Razz_8752275011124
+		# IF internal_92 IS TRUE -> GO TO branch_Razz_8780614661943
 		lw $t0, 356($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Razz_8752275011124
+		beq $t0, $t1, branch_Razz_8780614661943
 		
 		
 		# ALLOCATE INT
@@ -5555,11 +5537,11 @@
 		lw $t2, 356($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_92 IS TRUE -> GO TO branch_Foo_8752275011124
+		# IF internal_92 IS TRUE -> GO TO branch_Foo_8780614661943
 		lw $t0, 356($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Foo_8752275011124
+		beq $t0, $t1, branch_Foo_8780614661943
 		
 		
 		# ALLOCATE INT
@@ -5585,14 +5567,14 @@
 		lw $t2, 356($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_92 IS TRUE -> GO TO branch_Bar_8752275011124
+		# IF internal_92 IS TRUE -> GO TO branch_Bar_8780614661943
 		lw $t0, 356($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Bar_8752275011124
+		beq $t0, $t1, branch_Bar_8780614661943
 		
 		
-		branch_Razz_8752275011124:
+		branch_Razz_8780614661943:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -5653,7 +5635,7 @@
 		sw $t0, 340($sp)
 		
 		
-		branch_Foo_8752275011124:
+		branch_Foo_8780614661943:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -5714,7 +5696,7 @@
 		sw $t0, 340($sp)
 		
 		
-		branch_Bar_8752275011124:
+		branch_Bar_8780614661943:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -5753,9 +5735,9 @@
 		sw $t0, 340($sp)
 		
 		
-		error_branch_8752275011124:
+		error_branch_8780614661943:
 		
-		branch_end_8752275011124:
+		branch_end_8780614661943:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -5774,7 +5756,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 10
+		addi $t0, $zero, 9
 		sw $t0, 8($v0)
 		sw $v0, 312($sp)
 		
@@ -5784,6 +5766,12 @@
 		sw $ra, 4($sp)
 		
 		# DYNAMIC FUNCT CALL internal_104
+		lw $t0, 316($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 324($sp)
+		addi $sp, $sp, 8
+		
 		# ALLOCATE INT
 		li $v0, 9
 		addi $a0, $zero, 12
@@ -5791,7 +5779,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 10
+		addi $t0, $zero, 9
 		sw $t0, 8($v0)
 		sw $v0, 300($sp)
 		
@@ -5801,6 +5789,12 @@
 		sw $ra, 4($sp)
 		
 		# DYNAMIC FUNCT CALL internal_107
+		lw $t0, 304($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 312($sp)
+		addi $sp, $sp, 8
+		
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -5825,7 +5819,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 10
+		addi $t0, $zero, 9
 		sw $t0, 8($v0)
 		sw $v0, 284($sp)
 		
@@ -5848,6 +5842,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_111
+		lw $t0, 288($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 296($sp)
+		addi $sp, $sp, 8
+		
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -5872,7 +5872,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 9
+		addi $t0, $zero, 8
 		sw $t0, 8($v0)
 		sw $v0, 268($sp)
 		
@@ -5895,6 +5895,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_115
+		lw $t0, 272($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 280($sp)
+		addi $sp, $sp, 8
+		
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -5985,7 +5991,7 @@
 		lw $t0, 232($sp)
 		sw $t0, 228($sp)
 		
-		while_start_8752274986656:
+		while_start_8780614637475:
 		
 		# internal_122 <-- EQUAL ADDRESS(internal_124, internal_120)
 		lw $t0, 228($sp)
@@ -5994,11 +6000,11 @@
 		lw $t0, 236($sp)
 		sw $t2, 8($t0)
 		
-		# IF internal_122 IS TRUE -> GO TO while_end_8752274986656
+		# IF internal_122 IS TRUE -> GO TO while_end_8780614637475
 		lw $t0, 236($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, while_end_8752274986656
+		beq $t0, $t1, while_end_8780614637475
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -6021,7 +6027,7 @@
 		lw $t0, 4($t0)
 		sw $t0, 228($sp)
 		
-		while_end_8752274986656:
+		while_end_8780614637475:
 		
 		
 		# internal_124 <- internal_123
@@ -6061,7 +6067,7 @@
 		sw $t0, 8($v0)
 		sw $v0, 216($sp)
 		
-		foreach_start_8752274986656:
+		foreach_start_8780614637475:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -6079,13 +6085,13 @@
 		sw $v1, 228($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_127 IS TRUE -> GO TO foreach_body_8752274986656
+		# IF internal_127 IS TRUE -> GO TO foreach_body_8780614637475
 		lw $t0, 216($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_body_8752274986656
+		beq $t0, $t1, foreach_body_8780614637475
 		
-		foreach_body_8752274986656:
+		foreach_body_8780614637475:
 		
 		# ARRAY internal_125[internal_126] = internal_124
 		lw $t0, 220($sp)
@@ -6119,7 +6125,7 @@
 		sw $v1, 232($sp)
 		addi $sp, $sp, 12
 		
-		foreach_end_8752274986656:
+		foreach_end_8780614637475:
 		
 		
 		# ARRAY OF SIZE [internal_119]
@@ -6254,7 +6260,7 @@
 		sw $t0, 8($v0)
 		sw $v0, 164($sp)
 		
-		foreach_type_start_8752274986656:
+		foreach_type_start_8780614637475:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -6272,13 +6278,13 @@
 		sw $v1, 196($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_135 IS TRUE -> GO TO foreach_type_body_8752274986656
+		# IF internal_135 IS TRUE -> GO TO foreach_type_body_8780614637475
 		lw $t0, 184($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_type_body_8752274986656
+		beq $t0, $t1, foreach_type_body_8780614637475
 		
-		foreach_type_body_8752274986656:
+		foreach_type_body_8780614637475:
 		
 		# internal_136 = ARRAY internal_128[internal_134]
 		lw $t0, 188($sp)
@@ -6307,7 +6313,7 @@
 		sw $v1, 188($sp)
 		addi $sp, $sp, 12
 		
-		foreach_ancestor_start_8752274986656:
+		foreach_ancestor_start_8780614637475:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -6325,13 +6331,13 @@
 		sw $v1, 184($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_138 IS TRUE -> GO TO foreach_ancestor_body_8752274986656
+		# IF internal_138 IS TRUE -> GO TO foreach_ancestor_body_8780614637475
 		lw $t0, 172($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_ancestor_body_8752274986656
+		beq $t0, $t1, foreach_ancestor_body_8780614637475
 		
-		foreach_ancestor_body_8752274986656:
+		foreach_ancestor_body_8780614637475:
 		
 		# internal_139 = ARRAY internal_125[internal_137]
 		lw $t0, 176($sp)
@@ -6351,11 +6357,11 @@
 		lw $t0, 164($sp)
 		sw $t2, 8($t0)
 		
-		# IF internal_140 IS TRUE -> GO TO foreach_ancestor_end_8752274986656
+		# IF internal_140 IS TRUE -> GO TO foreach_ancestor_end_8780614637475
 		lw $t0, 164($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_ancestor_end_8752274986656
+		beq $t0, $t1, foreach_ancestor_end_8780614637475
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -6373,7 +6379,7 @@
 		sw $v1, 188($sp)
 		addi $sp, $sp, 12
 		
-		foreach_ancestor_end_8752274986656:
+		foreach_ancestor_end_8780614637475:
 		
 		
 		# FUNCT ARGS
@@ -6392,7 +6398,7 @@
 		sw $v1, 200($sp)
 		addi $sp, $sp, 12
 		
-		foreach_type_end_8752274986656:
+		foreach_type_end_8780614637475:
 		
 		
 		# ALLOCATE INT
@@ -6466,7 +6472,7 @@
 		sw $v1, 160($sp)
 		addi $sp, $sp, 12
 		
-		foreach_min_start_8752274986656:
+		foreach_min_start_8780614637475:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -6484,13 +6490,13 @@
 		sw $v1, 156($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_145 IS TRUE -> GO TO foreach_min_body_8752274986656
+		# IF internal_145 IS TRUE -> GO TO foreach_min_body_8780614637475
 		lw $t0, 144($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_min_body_8752274986656
+		beq $t0, $t1, foreach_min_body_8780614637475
 		
-		foreach_min_body_8752274986656:
+		foreach_min_body_8780614637475:
 		
 		# ARRAY internal_129[internal_141]
 		lw $t0, 160($sp)
@@ -6520,13 +6526,13 @@
 		sw $v1, 156($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_145 IS TRUE -> GO TO update_min_8752274986656
+		# IF internal_145 IS TRUE -> GO TO update_min_8780614637475
 		lw $t0, 144($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, update_min_8752274986656
+		beq $t0, $t1, update_min_8780614637475
 		
-		update_min_8752274986656:
+		update_min_8780614637475:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -6560,7 +6566,7 @@
 		sw $v1, 168($sp)
 		addi $sp, $sp, 12
 		
-		update_min_end_8752274986656:
+		update_min_end_8780614637475:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -6578,7 +6584,7 @@
 		sw $v1, 172($sp)
 		addi $sp, $sp, 12
 		
-		foreach_min_end_8752274986656:
+		foreach_min_end_8780614637475:
 		
 		# ARRAY OF SIZE [internal_119]
 		lw $t0, 248($sp)
@@ -6643,11 +6649,11 @@
 		sw $v1, 140($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_149 IS TRUE -> GO TO error_branch_8752274986656
+		# IF internal_149 IS TRUE -> GO TO error_branch_8780614637475
 		lw $t0, 128($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, error_branch_8752274986656
+		beq $t0, $t1, error_branch_8780614637475
 		
 		
 		# ALLOCATE BOOL 0
@@ -6686,11 +6692,11 @@
 		lw $t2, 124($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_150 IS TRUE -> GO TO branch_Razz_8752274986656
+		# IF internal_150 IS TRUE -> GO TO branch_Razz_8780614637475
 		lw $t0, 124($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Razz_8752274986656
+		beq $t0, $t1, branch_Razz_8780614637475
 		
 		
 		# ALLOCATE INT
@@ -6716,14 +6722,14 @@
 		lw $t2, 124($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_150 IS TRUE -> GO TO branch_Bar_8752274986656
+		# IF internal_150 IS TRUE -> GO TO branch_Bar_8780614637475
 		lw $t0, 124($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Bar_8752274986656
+		beq $t0, $t1, branch_Bar_8780614637475
 		
 		
-		branch_Razz_8752274986656:
+		branch_Razz_8780614637475:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -6784,7 +6790,7 @@
 		sw $t0, 112($sp)
 		
 		
-		branch_Bar_8752274986656:
+		branch_Bar_8780614637475:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -6823,9 +6829,9 @@
 		sw $t0, 112($sp)
 		
 		
-		error_branch_8752274986656:
+		error_branch_8780614637475:
 		
-		branch_end_8752274986656:
+		branch_end_8780614637475:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -6844,7 +6850,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 10
+		addi $t0, $zero, 9
 		sw $t0, 8($v0)
 		sw $v0, 92($sp)
 		
@@ -6866,7 +6872,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 10
+		addi $t0, $zero, 9
 		sw $t0, 8($v0)
 		sw $v0, 80($sp)
 		
@@ -6876,6 +6882,12 @@
 		sw $ra, 4($sp)
 		
 		# DYNAMIC FUNCT CALL internal_162
+		lw $t0, 84($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 92($sp)
+		addi $sp, $sp, 8
+		
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -6900,7 +6912,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 10
+		addi $t0, $zero, 9
 		sw $t0, 8($v0)
 		sw $v0, 64($sp)
 		
@@ -6910,6 +6922,12 @@
 		sw $ra, 4($sp)
 		
 		# DYNAMIC FUNCT CALL internal_166
+		lw $t0, 68($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 76($sp)
+		addi $sp, $sp, 8
+		
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -6934,7 +6952,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 10
+		addi $t0, $zero, 9
 		sw $t0, 8($v0)
 		sw $v0, 48($sp)
 		
@@ -6957,6 +6975,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_170
+		lw $t0, 52($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 60($sp)
+		addi $sp, $sp, 8
+		
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -6981,7 +7005,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 9
+		addi $t0, $zero, 8
 		sw $t0, 8($v0)
 		sw $v0, 32($sp)
 		
@@ -7004,6 +7028,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_174
+		lw $t0, 36($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 44($sp)
+		addi $sp, $sp, 8
+		
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -7038,7 +7068,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 10
+		addi $t0, $zero, 9
 		sw $t0, 8($v0)
 		sw $v0, 16($sp)
 		
@@ -7061,6 +7091,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_178
+		lw $t0, 20($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 28($sp)
+		addi $sp, $sp, 8
+		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
 		sw $ra, 8($sp)
@@ -7078,7 +7114,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 9
+		addi $t0, $zero, 8
 		sw $t0, 8($v0)
 		sw $v0, 4($sp)
 		
@@ -7101,6 +7137,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_181
+		lw $t0, 8($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 16($sp)
+		addi $sp, $sp, 8
+		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
 		sw $ra, 8($sp)
@@ -7205,7 +7247,7 @@
 		lw $t0, 672($sp)
 		sw $t0, 668($sp)
 		
-		while_start_8752274973302:
+		while_start_8780614624121:
 		
 		# internal_6 <-- EQUAL ADDRESS(internal_8, internal_4)
 		lw $t0, 668($sp)
@@ -7214,11 +7256,11 @@
 		lw $t0, 676($sp)
 		sw $t2, 8($t0)
 		
-		# IF internal_6 IS TRUE -> GO TO while_end_8752274973302
+		# IF internal_6 IS TRUE -> GO TO while_end_8780614624121
 		lw $t0, 676($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, while_end_8752274973302
+		beq $t0, $t1, while_end_8780614624121
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -7241,7 +7283,7 @@
 		lw $t0, 4($t0)
 		sw $t0, 668($sp)
 		
-		while_end_8752274973302:
+		while_end_8780614624121:
 		
 		
 		# internal_8 <- internal_7
@@ -7281,7 +7323,7 @@
 		sw $t0, 8($v0)
 		sw $v0, 656($sp)
 		
-		foreach_start_8752274973302:
+		foreach_start_8780614624121:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -7299,13 +7341,13 @@
 		sw $v1, 668($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_11 IS TRUE -> GO TO foreach_body_8752274973302
+		# IF internal_11 IS TRUE -> GO TO foreach_body_8780614624121
 		lw $t0, 656($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_body_8752274973302
+		beq $t0, $t1, foreach_body_8780614624121
 		
-		foreach_body_8752274973302:
+		foreach_body_8780614624121:
 		
 		# ARRAY internal_9[internal_10] = internal_8
 		lw $t0, 660($sp)
@@ -7339,7 +7381,7 @@
 		sw $v1, 672($sp)
 		addi $sp, $sp, 12
 		
-		foreach_end_8752274973302:
+		foreach_end_8780614624121:
 		
 		
 		# ARRAY OF SIZE [internal_3]
@@ -7528,7 +7570,7 @@
 		sw $t0, 8($v0)
 		sw $v0, 588($sp)
 		
-		foreach_type_start_8752274973302:
+		foreach_type_start_8780614624121:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -7546,13 +7588,13 @@
 		sw $v1, 620($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_23 IS TRUE -> GO TO foreach_type_body_8752274973302
+		# IF internal_23 IS TRUE -> GO TO foreach_type_body_8780614624121
 		lw $t0, 608($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_type_body_8752274973302
+		beq $t0, $t1, foreach_type_body_8780614624121
 		
-		foreach_type_body_8752274973302:
+		foreach_type_body_8780614624121:
 		
 		# internal_24 = ARRAY internal_12[internal_22]
 		lw $t0, 612($sp)
@@ -7581,7 +7623,7 @@
 		sw $v1, 612($sp)
 		addi $sp, $sp, 12
 		
-		foreach_ancestor_start_8752274973302:
+		foreach_ancestor_start_8780614624121:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -7599,13 +7641,13 @@
 		sw $v1, 608($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_26 IS TRUE -> GO TO foreach_ancestor_body_8752274973302
+		# IF internal_26 IS TRUE -> GO TO foreach_ancestor_body_8780614624121
 		lw $t0, 596($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_ancestor_body_8752274973302
+		beq $t0, $t1, foreach_ancestor_body_8780614624121
 		
-		foreach_ancestor_body_8752274973302:
+		foreach_ancestor_body_8780614624121:
 		
 		# internal_27 = ARRAY internal_9[internal_25]
 		lw $t0, 600($sp)
@@ -7625,11 +7667,11 @@
 		lw $t0, 588($sp)
 		sw $t2, 8($t0)
 		
-		# IF internal_28 IS TRUE -> GO TO foreach_ancestor_end_8752274973302
+		# IF internal_28 IS TRUE -> GO TO foreach_ancestor_end_8780614624121
 		lw $t0, 588($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_ancestor_end_8752274973302
+		beq $t0, $t1, foreach_ancestor_end_8780614624121
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -7647,7 +7689,7 @@
 		sw $v1, 612($sp)
 		addi $sp, $sp, 12
 		
-		foreach_ancestor_end_8752274973302:
+		foreach_ancestor_end_8780614624121:
 		
 		
 		# FUNCT ARGS
@@ -7666,7 +7708,7 @@
 		sw $v1, 624($sp)
 		addi $sp, $sp, 12
 		
-		foreach_type_end_8752274973302:
+		foreach_type_end_8780614624121:
 		
 		
 		# ALLOCATE INT
@@ -7740,7 +7782,7 @@
 		sw $v1, 584($sp)
 		addi $sp, $sp, 12
 		
-		foreach_min_start_8752274973302:
+		foreach_min_start_8780614624121:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -7758,13 +7800,13 @@
 		sw $v1, 580($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_33 IS TRUE -> GO TO foreach_min_body_8752274973302
+		# IF internal_33 IS TRUE -> GO TO foreach_min_body_8780614624121
 		lw $t0, 568($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_min_body_8752274973302
+		beq $t0, $t1, foreach_min_body_8780614624121
 		
-		foreach_min_body_8752274973302:
+		foreach_min_body_8780614624121:
 		
 		# ARRAY internal_13[internal_29]
 		lw $t0, 584($sp)
@@ -7794,13 +7836,13 @@
 		sw $v1, 580($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_33 IS TRUE -> GO TO update_min_8752274973302
+		# IF internal_33 IS TRUE -> GO TO update_min_8780614624121
 		lw $t0, 568($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, update_min_8752274973302
+		beq $t0, $t1, update_min_8780614624121
 		
-		update_min_8752274973302:
+		update_min_8780614624121:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -7834,7 +7876,7 @@
 		sw $v1, 592($sp)
 		addi $sp, $sp, 12
 		
-		update_min_end_8752274973302:
+		update_min_end_8780614624121:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -7852,7 +7894,7 @@
 		sw $v1, 596($sp)
 		addi $sp, $sp, 12
 		
-		foreach_min_end_8752274973302:
+		foreach_min_end_8780614624121:
 		
 		# ARRAY OF SIZE [internal_3]
 		lw $t0, 688($sp)
@@ -7941,11 +7983,11 @@
 		sw $v1, 556($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_39 IS TRUE -> GO TO error_branch_8752274973302
+		# IF internal_39 IS TRUE -> GO TO error_branch_8780614624121
 		lw $t0, 544($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, error_branch_8752274973302
+		beq $t0, $t1, error_branch_8780614624121
 		
 		
 		# ALLOCATE BOOL 0
@@ -7984,11 +8026,11 @@
 		lw $t2, 540($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_40 IS TRUE -> GO TO branch_Bazz_8752274973302
+		# IF internal_40 IS TRUE -> GO TO branch_Bazz_8780614624121
 		lw $t0, 540($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Bazz_8752274973302
+		beq $t0, $t1, branch_Bazz_8780614624121
 		
 		
 		# ALLOCATE INT
@@ -8014,11 +8056,11 @@
 		lw $t2, 540($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_40 IS TRUE -> GO TO branch_Razz_8752274973302
+		# IF internal_40 IS TRUE -> GO TO branch_Razz_8780614624121
 		lw $t0, 540($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Razz_8752274973302
+		beq $t0, $t1, branch_Razz_8780614624121
 		
 		
 		# ALLOCATE INT
@@ -8044,11 +8086,11 @@
 		lw $t2, 540($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_40 IS TRUE -> GO TO branch_Foo_8752274973302
+		# IF internal_40 IS TRUE -> GO TO branch_Foo_8780614624121
 		lw $t0, 540($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Foo_8752274973302
+		beq $t0, $t1, branch_Foo_8780614624121
 		
 		
 		# ALLOCATE INT
@@ -8074,14 +8116,14 @@
 		lw $t2, 540($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_40 IS TRUE -> GO TO branch_Bar_8752274973302
+		# IF internal_40 IS TRUE -> GO TO branch_Bar_8780614624121
 		lw $t0, 540($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Bar_8752274973302
+		beq $t0, $t1, branch_Bar_8780614624121
 		
 		
-		branch_Bazz_8752274973302:
+		branch_Bazz_8780614624121:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -8142,7 +8184,7 @@
 		sw $t0, 520($sp)
 		
 		
-		branch_Razz_8752274973302:
+		branch_Razz_8780614624121:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -8203,7 +8245,7 @@
 		sw $t0, 520($sp)
 		
 		
-		branch_Foo_8752274973302:
+		branch_Foo_8780614624121:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -8264,7 +8306,7 @@
 		sw $t0, 520($sp)
 		
 		
-		branch_Bar_8752274973302:
+		branch_Bar_8780614624121:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -8303,9 +8345,9 @@
 		sw $t0, 520($sp)
 		
 		
-		error_branch_8752274973302:
+		error_branch_8780614624121:
 		
-		branch_end_8752274973302:
+		branch_end_8780614624121:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -8324,7 +8366,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 9
+		addi $t0, $zero, 8
 		sw $t0, 8($v0)
 		sw $v0, 484($sp)
 		
@@ -8347,6 +8389,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_55
+		lw $t0, 488($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 496($sp)
+		addi $sp, $sp, 8
+		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
 		sw $ra, 8($sp)
@@ -8420,7 +8468,7 @@
 		lw $t0, 452($sp)
 		sw $t0, 448($sp)
 		
-		while_start_8752274973422:
+		while_start_8780614624247:
 		
 		# internal_61 <-- EQUAL ADDRESS(internal_63, internal_59)
 		lw $t0, 448($sp)
@@ -8429,11 +8477,11 @@
 		lw $t0, 456($sp)
 		sw $t2, 8($t0)
 		
-		# IF internal_61 IS TRUE -> GO TO while_end_8752274973422
+		# IF internal_61 IS TRUE -> GO TO while_end_8780614624247
 		lw $t0, 456($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, while_end_8752274973422
+		beq $t0, $t1, while_end_8780614624247
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -8456,7 +8504,7 @@
 		lw $t0, 4($t0)
 		sw $t0, 448($sp)
 		
-		while_end_8752274973422:
+		while_end_8780614624247:
 		
 		
 		# internal_63 <- internal_62
@@ -8496,7 +8544,7 @@
 		sw $t0, 8($v0)
 		sw $v0, 436($sp)
 		
-		foreach_start_8752274973422:
+		foreach_start_8780614624247:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -8514,13 +8562,13 @@
 		sw $v1, 448($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_66 IS TRUE -> GO TO foreach_body_8752274973422
+		# IF internal_66 IS TRUE -> GO TO foreach_body_8780614624247
 		lw $t0, 436($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_body_8752274973422
+		beq $t0, $t1, foreach_body_8780614624247
 		
-		foreach_body_8752274973422:
+		foreach_body_8780614624247:
 		
 		# ARRAY internal_64[internal_65] = internal_63
 		lw $t0, 440($sp)
@@ -8554,7 +8602,7 @@
 		sw $v1, 452($sp)
 		addi $sp, $sp, 12
 		
-		foreach_end_8752274973422:
+		foreach_end_8780614624247:
 		
 		
 		# ARRAY OF SIZE [internal_58]
@@ -8716,7 +8764,7 @@
 		sw $t0, 8($v0)
 		sw $v0, 376($sp)
 		
-		foreach_type_start_8752274973422:
+		foreach_type_start_8780614624247:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -8734,13 +8782,13 @@
 		sw $v1, 408($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_76 IS TRUE -> GO TO foreach_type_body_8752274973422
+		# IF internal_76 IS TRUE -> GO TO foreach_type_body_8780614624247
 		lw $t0, 396($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_type_body_8752274973422
+		beq $t0, $t1, foreach_type_body_8780614624247
 		
-		foreach_type_body_8752274973422:
+		foreach_type_body_8780614624247:
 		
 		# internal_77 = ARRAY internal_67[internal_75]
 		lw $t0, 400($sp)
@@ -8769,7 +8817,7 @@
 		sw $v1, 400($sp)
 		addi $sp, $sp, 12
 		
-		foreach_ancestor_start_8752274973422:
+		foreach_ancestor_start_8780614624247:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -8787,13 +8835,13 @@
 		sw $v1, 396($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_79 IS TRUE -> GO TO foreach_ancestor_body_8752274973422
+		# IF internal_79 IS TRUE -> GO TO foreach_ancestor_body_8780614624247
 		lw $t0, 384($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_ancestor_body_8752274973422
+		beq $t0, $t1, foreach_ancestor_body_8780614624247
 		
-		foreach_ancestor_body_8752274973422:
+		foreach_ancestor_body_8780614624247:
 		
 		# internal_80 = ARRAY internal_64[internal_78]
 		lw $t0, 388($sp)
@@ -8813,11 +8861,11 @@
 		lw $t0, 376($sp)
 		sw $t2, 8($t0)
 		
-		# IF internal_81 IS TRUE -> GO TO foreach_ancestor_end_8752274973422
+		# IF internal_81 IS TRUE -> GO TO foreach_ancestor_end_8780614624247
 		lw $t0, 376($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_ancestor_end_8752274973422
+		beq $t0, $t1, foreach_ancestor_end_8780614624247
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -8835,7 +8883,7 @@
 		sw $v1, 400($sp)
 		addi $sp, $sp, 12
 		
-		foreach_ancestor_end_8752274973422:
+		foreach_ancestor_end_8780614624247:
 		
 		
 		# FUNCT ARGS
@@ -8854,7 +8902,7 @@
 		sw $v1, 412($sp)
 		addi $sp, $sp, 12
 		
-		foreach_type_end_8752274973422:
+		foreach_type_end_8780614624247:
 		
 		
 		# ALLOCATE INT
@@ -8928,7 +8976,7 @@
 		sw $v1, 372($sp)
 		addi $sp, $sp, 12
 		
-		foreach_min_start_8752274973422:
+		foreach_min_start_8780614624247:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -8946,13 +8994,13 @@
 		sw $v1, 368($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_86 IS TRUE -> GO TO foreach_min_body_8752274973422
+		# IF internal_86 IS TRUE -> GO TO foreach_min_body_8780614624247
 		lw $t0, 356($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_min_body_8752274973422
+		beq $t0, $t1, foreach_min_body_8780614624247
 		
-		foreach_min_body_8752274973422:
+		foreach_min_body_8780614624247:
 		
 		# ARRAY internal_68[internal_82]
 		lw $t0, 372($sp)
@@ -8982,13 +9030,13 @@
 		sw $v1, 368($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_86 IS TRUE -> GO TO update_min_8752274973422
+		# IF internal_86 IS TRUE -> GO TO update_min_8780614624247
 		lw $t0, 356($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, update_min_8752274973422
+		beq $t0, $t1, update_min_8780614624247
 		
-		update_min_8752274973422:
+		update_min_8780614624247:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -9022,7 +9070,7 @@
 		sw $v1, 380($sp)
 		addi $sp, $sp, 12
 		
-		update_min_end_8752274973422:
+		update_min_end_8780614624247:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -9040,7 +9088,7 @@
 		sw $v1, 384($sp)
 		addi $sp, $sp, 12
 		
-		foreach_min_end_8752274973422:
+		foreach_min_end_8780614624247:
 		
 		# ARRAY OF SIZE [internal_58]
 		lw $t0, 468($sp)
@@ -9117,11 +9165,11 @@
 		sw $v1, 348($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_91 IS TRUE -> GO TO error_branch_8752274973422
+		# IF internal_91 IS TRUE -> GO TO error_branch_8780614624247
 		lw $t0, 336($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, error_branch_8752274973422
+		beq $t0, $t1, error_branch_8780614624247
 		
 		
 		# ALLOCATE BOOL 0
@@ -9160,11 +9208,11 @@
 		lw $t2, 332($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_92 IS TRUE -> GO TO branch_Razz_8752274973422
+		# IF internal_92 IS TRUE -> GO TO branch_Razz_8780614624247
 		lw $t0, 332($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Razz_8752274973422
+		beq $t0, $t1, branch_Razz_8780614624247
 		
 		
 		# ALLOCATE INT
@@ -9190,11 +9238,11 @@
 		lw $t2, 332($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_92 IS TRUE -> GO TO branch_Foo_8752274973422
+		# IF internal_92 IS TRUE -> GO TO branch_Foo_8780614624247
 		lw $t0, 332($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Foo_8752274973422
+		beq $t0, $t1, branch_Foo_8780614624247
 		
 		
 		# ALLOCATE INT
@@ -9220,14 +9268,14 @@
 		lw $t2, 332($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_92 IS TRUE -> GO TO branch_Bar_8752274973422
+		# IF internal_92 IS TRUE -> GO TO branch_Bar_8780614624247
 		lw $t0, 332($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Bar_8752274973422
+		beq $t0, $t1, branch_Bar_8780614624247
 		
 		
-		branch_Razz_8752274973422:
+		branch_Razz_8780614624247:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -9288,7 +9336,7 @@
 		sw $t0, 316($sp)
 		
 		
-		branch_Foo_8752274973422:
+		branch_Foo_8780614624247:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -9349,7 +9397,7 @@
 		sw $t0, 316($sp)
 		
 		
-		branch_Bar_8752274973422:
+		branch_Bar_8780614624247:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -9388,9 +9436,9 @@
 		sw $t0, 316($sp)
 		
 		
-		error_branch_8752274973422:
+		error_branch_8780614624247:
 		
-		branch_end_8752274973422:
+		branch_end_8780614624247:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -9409,7 +9457,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 10
+		addi $t0, $zero, 9
 		sw $t0, 8($v0)
 		sw $v0, 288($sp)
 		
@@ -9419,6 +9467,12 @@
 		sw $ra, 4($sp)
 		
 		# DYNAMIC FUNCT CALL internal_104
+		lw $t0, 292($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 300($sp)
+		addi $sp, $sp, 8
+		
 		# ALLOCATE INT
 		li $v0, 9
 		addi $a0, $zero, 12
@@ -9426,7 +9480,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 10
+		addi $t0, $zero, 9
 		sw $t0, 8($v0)
 		sw $v0, 276($sp)
 		
@@ -9436,6 +9490,12 @@
 		sw $ra, 4($sp)
 		
 		# DYNAMIC FUNCT CALL internal_107
+		lw $t0, 280($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 288($sp)
+		addi $sp, $sp, 8
+		
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -9460,7 +9520,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 10
+		addi $t0, $zero, 9
 		sw $t0, 8($v0)
 		sw $v0, 260($sp)
 		
@@ -9483,6 +9543,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_111
+		lw $t0, 264($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 272($sp)
+		addi $sp, $sp, 8
+		
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -9507,7 +9573,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 9
+		addi $t0, $zero, 8
 		sw $t0, 8($v0)
 		sw $v0, 244($sp)
 		
@@ -9530,6 +9596,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_115
+		lw $t0, 248($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 256($sp)
+		addi $sp, $sp, 8
+		
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -9620,7 +9692,7 @@
 		lw $t0, 208($sp)
 		sw $t0, 204($sp)
 		
-		while_start_8752274956641:
+		while_start_8780614607460:
 		
 		# internal_122 <-- EQUAL ADDRESS(internal_124, internal_120)
 		lw $t0, 204($sp)
@@ -9629,11 +9701,11 @@
 		lw $t0, 212($sp)
 		sw $t2, 8($t0)
 		
-		# IF internal_122 IS TRUE -> GO TO while_end_8752274956641
+		# IF internal_122 IS TRUE -> GO TO while_end_8780614607460
 		lw $t0, 212($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, while_end_8752274956641
+		beq $t0, $t1, while_end_8780614607460
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -9656,7 +9728,7 @@
 		lw $t0, 4($t0)
 		sw $t0, 204($sp)
 		
-		while_end_8752274956641:
+		while_end_8780614607460:
 		
 		
 		# internal_124 <- internal_123
@@ -9696,7 +9768,7 @@
 		sw $t0, 8($v0)
 		sw $v0, 192($sp)
 		
-		foreach_start_8752274956641:
+		foreach_start_8780614607460:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -9714,13 +9786,13 @@
 		sw $v1, 204($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_127 IS TRUE -> GO TO foreach_body_8752274956641
+		# IF internal_127 IS TRUE -> GO TO foreach_body_8780614607460
 		lw $t0, 192($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_body_8752274956641
+		beq $t0, $t1, foreach_body_8780614607460
 		
-		foreach_body_8752274956641:
+		foreach_body_8780614607460:
 		
 		# ARRAY internal_125[internal_126] = internal_124
 		lw $t0, 196($sp)
@@ -9754,7 +9826,7 @@
 		sw $v1, 208($sp)
 		addi $sp, $sp, 12
 		
-		foreach_end_8752274956641:
+		foreach_end_8780614607460:
 		
 		
 		# ARRAY OF SIZE [internal_119]
@@ -9889,7 +9961,7 @@
 		sw $t0, 8($v0)
 		sw $v0, 140($sp)
 		
-		foreach_type_start_8752274956641:
+		foreach_type_start_8780614607460:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -9907,13 +9979,13 @@
 		sw $v1, 172($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_135 IS TRUE -> GO TO foreach_type_body_8752274956641
+		# IF internal_135 IS TRUE -> GO TO foreach_type_body_8780614607460
 		lw $t0, 160($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_type_body_8752274956641
+		beq $t0, $t1, foreach_type_body_8780614607460
 		
-		foreach_type_body_8752274956641:
+		foreach_type_body_8780614607460:
 		
 		# internal_136 = ARRAY internal_128[internal_134]
 		lw $t0, 164($sp)
@@ -9942,7 +10014,7 @@
 		sw $v1, 164($sp)
 		addi $sp, $sp, 12
 		
-		foreach_ancestor_start_8752274956641:
+		foreach_ancestor_start_8780614607460:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -9960,13 +10032,13 @@
 		sw $v1, 160($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_138 IS TRUE -> GO TO foreach_ancestor_body_8752274956641
+		# IF internal_138 IS TRUE -> GO TO foreach_ancestor_body_8780614607460
 		lw $t0, 148($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_ancestor_body_8752274956641
+		beq $t0, $t1, foreach_ancestor_body_8780614607460
 		
-		foreach_ancestor_body_8752274956641:
+		foreach_ancestor_body_8780614607460:
 		
 		# internal_139 = ARRAY internal_125[internal_137]
 		lw $t0, 152($sp)
@@ -9986,11 +10058,11 @@
 		lw $t0, 140($sp)
 		sw $t2, 8($t0)
 		
-		# IF internal_140 IS TRUE -> GO TO foreach_ancestor_end_8752274956641
+		# IF internal_140 IS TRUE -> GO TO foreach_ancestor_end_8780614607460
 		lw $t0, 140($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_ancestor_end_8752274956641
+		beq $t0, $t1, foreach_ancestor_end_8780614607460
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -10008,7 +10080,7 @@
 		sw $v1, 164($sp)
 		addi $sp, $sp, 12
 		
-		foreach_ancestor_end_8752274956641:
+		foreach_ancestor_end_8780614607460:
 		
 		
 		# FUNCT ARGS
@@ -10027,7 +10099,7 @@
 		sw $v1, 176($sp)
 		addi $sp, $sp, 12
 		
-		foreach_type_end_8752274956641:
+		foreach_type_end_8780614607460:
 		
 		
 		# ALLOCATE INT
@@ -10101,7 +10173,7 @@
 		sw $v1, 136($sp)
 		addi $sp, $sp, 12
 		
-		foreach_min_start_8752274956641:
+		foreach_min_start_8780614607460:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -10119,13 +10191,13 @@
 		sw $v1, 132($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_145 IS TRUE -> GO TO foreach_min_body_8752274956641
+		# IF internal_145 IS TRUE -> GO TO foreach_min_body_8780614607460
 		lw $t0, 120($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_min_body_8752274956641
+		beq $t0, $t1, foreach_min_body_8780614607460
 		
-		foreach_min_body_8752274956641:
+		foreach_min_body_8780614607460:
 		
 		# ARRAY internal_129[internal_141]
 		lw $t0, 136($sp)
@@ -10155,13 +10227,13 @@
 		sw $v1, 132($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_145 IS TRUE -> GO TO update_min_8752274956641
+		# IF internal_145 IS TRUE -> GO TO update_min_8780614607460
 		lw $t0, 120($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, update_min_8752274956641
+		beq $t0, $t1, update_min_8780614607460
 		
-		update_min_8752274956641:
+		update_min_8780614607460:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -10195,7 +10267,7 @@
 		sw $v1, 144($sp)
 		addi $sp, $sp, 12
 		
-		update_min_end_8752274956641:
+		update_min_end_8780614607460:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -10213,7 +10285,7 @@
 		sw $v1, 148($sp)
 		addi $sp, $sp, 12
 		
-		foreach_min_end_8752274956641:
+		foreach_min_end_8780614607460:
 		
 		# ARRAY OF SIZE [internal_119]
 		lw $t0, 224($sp)
@@ -10278,11 +10350,11 @@
 		sw $v1, 116($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_149 IS TRUE -> GO TO error_branch_8752274956641
+		# IF internal_149 IS TRUE -> GO TO error_branch_8780614607460
 		lw $t0, 104($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, error_branch_8752274956641
+		beq $t0, $t1, error_branch_8780614607460
 		
 		
 		# ALLOCATE BOOL 0
@@ -10321,11 +10393,11 @@
 		lw $t2, 100($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_150 IS TRUE -> GO TO branch_Razz_8752274956641
+		# IF internal_150 IS TRUE -> GO TO branch_Razz_8780614607460
 		lw $t0, 100($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Razz_8752274956641
+		beq $t0, $t1, branch_Razz_8780614607460
 		
 		
 		# ALLOCATE INT
@@ -10351,14 +10423,14 @@
 		lw $t2, 100($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_150 IS TRUE -> GO TO branch_Bar_8752274956641
+		# IF internal_150 IS TRUE -> GO TO branch_Bar_8780614607460
 		lw $t0, 100($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Bar_8752274956641
+		beq $t0, $t1, branch_Bar_8780614607460
 		
 		
-		branch_Razz_8752274956641:
+		branch_Razz_8780614607460:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -10419,7 +10491,7 @@
 		sw $t0, 88($sp)
 		
 		
-		branch_Bar_8752274956641:
+		branch_Bar_8780614607460:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -10458,9 +10530,9 @@
 		sw $t0, 88($sp)
 		
 		
-		error_branch_8752274956641:
+		error_branch_8780614607460:
 		
-		branch_end_8752274956641:
+		branch_end_8780614607460:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -10479,7 +10551,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 10
+		addi $t0, $zero, 9
 		sw $t0, 8($v0)
 		sw $v0, 68($sp)
 		
@@ -10501,7 +10573,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 10
+		addi $t0, $zero, 9
 		sw $t0, 8($v0)
 		sw $v0, 56($sp)
 		
@@ -10511,6 +10583,12 @@
 		sw $ra, 4($sp)
 		
 		# DYNAMIC FUNCT CALL internal_162
+		lw $t0, 60($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 68($sp)
+		addi $sp, $sp, 8
+		
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -10535,7 +10613,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 10
+		addi $t0, $zero, 9
 		sw $t0, 8($v0)
 		sw $v0, 40($sp)
 		
@@ -10545,6 +10623,12 @@
 		sw $ra, 4($sp)
 		
 		# DYNAMIC FUNCT CALL internal_166
+		lw $t0, 44($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 52($sp)
+		addi $sp, $sp, 8
+		
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -10569,7 +10653,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 10
+		addi $t0, $zero, 9
 		sw $t0, 8($v0)
 		sw $v0, 24($sp)
 		
@@ -10592,6 +10676,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_170
+		lw $t0, 28($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 36($sp)
+		addi $sp, $sp, 8
+		
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -10616,7 +10706,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 9
+		addi $t0, $zero, 8
 		sw $t0, 8($v0)
 		sw $v0, 8($sp)
 		
@@ -10639,6 +10729,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_174
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 20($sp)
+		addi $sp, $sp, 8
+		
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -10760,7 +10856,7 @@
 		lw $t0, 192($sp)
 		sw $t0, 188($sp)
 		
-		while_start_8752274935534:
+		while_start_8780614586353:
 		
 		# internal_6 <-- EQUAL ADDRESS(internal_8, internal_4)
 		lw $t0, 188($sp)
@@ -10769,11 +10865,11 @@
 		lw $t0, 196($sp)
 		sw $t2, 8($t0)
 		
-		# IF internal_6 IS TRUE -> GO TO while_end_8752274935534
+		# IF internal_6 IS TRUE -> GO TO while_end_8780614586353
 		lw $t0, 196($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, while_end_8752274935534
+		beq $t0, $t1, while_end_8780614586353
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -10796,7 +10892,7 @@
 		lw $t0, 4($t0)
 		sw $t0, 188($sp)
 		
-		while_end_8752274935534:
+		while_end_8780614586353:
 		
 		
 		# internal_8 <- internal_7
@@ -10836,7 +10932,7 @@
 		sw $t0, 8($v0)
 		sw $v0, 176($sp)
 		
-		foreach_start_8752274935534:
+		foreach_start_8780614586353:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -10854,13 +10950,13 @@
 		sw $v1, 188($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_11 IS TRUE -> GO TO foreach_body_8752274935534
+		# IF internal_11 IS TRUE -> GO TO foreach_body_8780614586353
 		lw $t0, 176($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_body_8752274935534
+		beq $t0, $t1, foreach_body_8780614586353
 		
-		foreach_body_8752274935534:
+		foreach_body_8780614586353:
 		
 		# ARRAY internal_9[internal_10] = internal_8
 		lw $t0, 180($sp)
@@ -10894,7 +10990,7 @@
 		sw $v1, 192($sp)
 		addi $sp, $sp, 12
 		
-		foreach_end_8752274935534:
+		foreach_end_8780614586353:
 		
 		
 		# ARRAY OF SIZE [internal_3]
@@ -11083,7 +11179,7 @@
 		sw $t0, 8($v0)
 		sw $v0, 108($sp)
 		
-		foreach_type_start_8752274935534:
+		foreach_type_start_8780614586353:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -11101,13 +11197,13 @@
 		sw $v1, 140($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_23 IS TRUE -> GO TO foreach_type_body_8752274935534
+		# IF internal_23 IS TRUE -> GO TO foreach_type_body_8780614586353
 		lw $t0, 128($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_type_body_8752274935534
+		beq $t0, $t1, foreach_type_body_8780614586353
 		
-		foreach_type_body_8752274935534:
+		foreach_type_body_8780614586353:
 		
 		# internal_24 = ARRAY internal_12[internal_22]
 		lw $t0, 132($sp)
@@ -11136,7 +11232,7 @@
 		sw $v1, 132($sp)
 		addi $sp, $sp, 12
 		
-		foreach_ancestor_start_8752274935534:
+		foreach_ancestor_start_8780614586353:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -11154,13 +11250,13 @@
 		sw $v1, 128($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_26 IS TRUE -> GO TO foreach_ancestor_body_8752274935534
+		# IF internal_26 IS TRUE -> GO TO foreach_ancestor_body_8780614586353
 		lw $t0, 116($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_ancestor_body_8752274935534
+		beq $t0, $t1, foreach_ancestor_body_8780614586353
 		
-		foreach_ancestor_body_8752274935534:
+		foreach_ancestor_body_8780614586353:
 		
 		# internal_27 = ARRAY internal_9[internal_25]
 		lw $t0, 120($sp)
@@ -11180,11 +11276,11 @@
 		lw $t0, 108($sp)
 		sw $t2, 8($t0)
 		
-		# IF internal_28 IS TRUE -> GO TO foreach_ancestor_end_8752274935534
+		# IF internal_28 IS TRUE -> GO TO foreach_ancestor_end_8780614586353
 		lw $t0, 108($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_ancestor_end_8752274935534
+		beq $t0, $t1, foreach_ancestor_end_8780614586353
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -11202,7 +11298,7 @@
 		sw $v1, 132($sp)
 		addi $sp, $sp, 12
 		
-		foreach_ancestor_end_8752274935534:
+		foreach_ancestor_end_8780614586353:
 		
 		
 		# FUNCT ARGS
@@ -11221,7 +11317,7 @@
 		sw $v1, 144($sp)
 		addi $sp, $sp, 12
 		
-		foreach_type_end_8752274935534:
+		foreach_type_end_8780614586353:
 		
 		
 		# ALLOCATE INT
@@ -11295,7 +11391,7 @@
 		sw $v1, 104($sp)
 		addi $sp, $sp, 12
 		
-		foreach_min_start_8752274935534:
+		foreach_min_start_8780614586353:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -11313,13 +11409,13 @@
 		sw $v1, 100($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_33 IS TRUE -> GO TO foreach_min_body_8752274935534
+		# IF internal_33 IS TRUE -> GO TO foreach_min_body_8780614586353
 		lw $t0, 88($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_min_body_8752274935534
+		beq $t0, $t1, foreach_min_body_8780614586353
 		
-		foreach_min_body_8752274935534:
+		foreach_min_body_8780614586353:
 		
 		# ARRAY internal_13[internal_29]
 		lw $t0, 104($sp)
@@ -11349,13 +11445,13 @@
 		sw $v1, 100($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_33 IS TRUE -> GO TO update_min_8752274935534
+		# IF internal_33 IS TRUE -> GO TO update_min_8780614586353
 		lw $t0, 88($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, update_min_8752274935534
+		beq $t0, $t1, update_min_8780614586353
 		
-		update_min_8752274935534:
+		update_min_8780614586353:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -11389,7 +11485,7 @@
 		sw $v1, 112($sp)
 		addi $sp, $sp, 12
 		
-		update_min_end_8752274935534:
+		update_min_end_8780614586353:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -11407,7 +11503,7 @@
 		sw $v1, 116($sp)
 		addi $sp, $sp, 12
 		
-		foreach_min_end_8752274935534:
+		foreach_min_end_8780614586353:
 		
 		# ARRAY OF SIZE [internal_3]
 		lw $t0, 208($sp)
@@ -11496,11 +11592,11 @@
 		sw $v1, 76($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_39 IS TRUE -> GO TO error_branch_8752274935534
+		# IF internal_39 IS TRUE -> GO TO error_branch_8780614586353
 		lw $t0, 64($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, error_branch_8752274935534
+		beq $t0, $t1, error_branch_8780614586353
 		
 		
 		# ALLOCATE BOOL 0
@@ -11539,11 +11635,11 @@
 		lw $t2, 60($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_40 IS TRUE -> GO TO branch_Bazz_8752274935534
+		# IF internal_40 IS TRUE -> GO TO branch_Bazz_8780614586353
 		lw $t0, 60($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Bazz_8752274935534
+		beq $t0, $t1, branch_Bazz_8780614586353
 		
 		
 		# ALLOCATE INT
@@ -11569,11 +11665,11 @@
 		lw $t2, 60($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_40 IS TRUE -> GO TO branch_Razz_8752274935534
+		# IF internal_40 IS TRUE -> GO TO branch_Razz_8780614586353
 		lw $t0, 60($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Razz_8752274935534
+		beq $t0, $t1, branch_Razz_8780614586353
 		
 		
 		# ALLOCATE INT
@@ -11599,11 +11695,11 @@
 		lw $t2, 60($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_40 IS TRUE -> GO TO branch_Foo_8752274935534
+		# IF internal_40 IS TRUE -> GO TO branch_Foo_8780614586353
 		lw $t0, 60($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Foo_8752274935534
+		beq $t0, $t1, branch_Foo_8780614586353
 		
 		
 		# ALLOCATE INT
@@ -11629,14 +11725,14 @@
 		lw $t2, 60($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_40 IS TRUE -> GO TO branch_Bar_8752274935534
+		# IF internal_40 IS TRUE -> GO TO branch_Bar_8780614586353
 		lw $t0, 60($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Bar_8752274935534
+		beq $t0, $t1, branch_Bar_8780614586353
 		
 		
-		branch_Bazz_8752274935534:
+		branch_Bazz_8780614586353:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -11697,7 +11793,7 @@
 		sw $t0, 40($sp)
 		
 		
-		branch_Razz_8752274935534:
+		branch_Razz_8780614586353:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -11758,7 +11854,7 @@
 		sw $t0, 40($sp)
 		
 		
-		branch_Foo_8752274935534:
+		branch_Foo_8780614586353:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -11819,7 +11915,7 @@
 		sw $t0, 40($sp)
 		
 		
-		branch_Bar_8752274935534:
+		branch_Bar_8780614586353:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -11858,9 +11954,9 @@
 		sw $t0, 40($sp)
 		
 		
-		error_branch_8752274935534:
+		error_branch_8780614586353:
 		
-		branch_end_8752274935534:
+		branch_end_8780614586353:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -11879,7 +11975,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 9
+		addi $t0, $zero, 8
 		sw $t0, 8($v0)
 		sw $v0, 4($sp)
 		
@@ -11902,6 +11998,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_55
+		lw $t0, 8($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 16($sp)
+		addi $sp, $sp, 8
+		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
 		sw $ra, 8($sp)
@@ -11929,7 +12031,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 6
+		addi $t0, $zero, 5
 		sw $t0, 8($v0)
 		sw $v0, 8($sp)
 		
@@ -11952,6 +12054,12 @@
 		sw $t0, 4($sp)
 		
 		# DYNAMIC FUNCT CALL internal_2
+		lw $t0, 16($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 24($sp)
+		addi $sp, $sp, 12
+		
 		# ALLOCATE INT
 		li $v0, 9
 		addi $a0, $zero, 12
@@ -12240,7 +12348,7 @@
 		la $t0, type_Int
 		sw $t0, 0($v0)
 		sw $a0, 4($v0)
-		addi $t0, $zero, 5
+		addi $t0, $zero, 4
 		sw $t0, 8($v0)
 		sw $v0, 4($sp)
 		
@@ -12263,6 +12371,12 @@
 		sw $t0, 0($sp)
 		
 		# DYNAMIC FUNCT CALL internal_3
+		lw $t0, 8($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 16($sp)
+		addi $sp, $sp, 8
+		
 		
 		# EXIT
 		li $v0, 10

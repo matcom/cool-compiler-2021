@@ -13,7 +13,7 @@ def methods_declaration_order(t: Type):
     all_methods = t.all_methods()
     visited = set()
     for method, _ in all_methods:
-        if method.name in visited:
+        if method.name in visited or method.name == 'get_type':
             continue
         
         meths = list(all_methods)[::-1]
@@ -97,6 +97,7 @@ class BaseCOOLToCILVisitor:
             cil_type_node = self.register_type(current_type.name, current_type.parent.name if current_type.parent is not None else None)
 
             for method, ancestor in methods_declaration_order(current_type):
+                if method.name == 'get_type': continue
                 cil_type_node.methods.append((method.name, self.to_function_name(method.name, ancestor.name)))
         1
            
@@ -425,6 +426,7 @@ class BaseCOOLToCILVisitor:
 
         
     def add_basic_methods(self):
+        # +, -, *, /, xor
         self.add_arith_methods()
         
         ## initializing main types
@@ -495,7 +497,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         
         self.add_basic_types()    
         self.add_basic_methods()  
-        self.add_main_funct()
+        # self.add_main_funct()
         
         for i, class_ in enumerate(node.class_list):
             self.visit(class_, scope.children[i])
