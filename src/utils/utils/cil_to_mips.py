@@ -71,13 +71,20 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
     def visit(self, node: cil.ProgramNode):
         for type_node in node.dottypes:
             self.visit(type_node)
+        
+        ##
+        for type_node in node.dottypes: 
+            self.register_word(self.to_data_type("name_size", type_node.name), str(len(type_node.name)))
+            self.register_asciiz(self.to_data_type("name", type_node.name), f'"{type_node.name}"')
+            self.register_empty_data()
+        
+        #
+        self.register_space("buffer_input", 1024)
+        self.register_asciiz("debug_log", '"debug_log\\n"')
 
         for function_node in node.dotcode:
             self.visit(function_node)
 
-        for data_node in node.data:
-            self.visit(data_node)
-        
         return mips.ProgramNode(self.dotdata, self.dottext)
     
     @visitor.when(cil.TypeNode)
@@ -104,25 +111,23 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         self.register_instruction(mips.LabelNode(node.name))
 
         param_names = [x.name for x in self.current_function.params]
-        local_names = [x.name for x in self.current_function.local_vars]
+        local_names = [x.name for x in self.current_function.localvars]
         ##
         ## self.current_function_stk = ["$ra"] + local_names
         self.current_function_stk = ["$ra"] + param_names + local_names
 
-        locals_size = 4 * len(self.current_function.local_vars)
+        locals_size = 4 * len(self.current_function.localvars)
         stack_size = 4 * len(self.current_function_stk)
         
-        if node.name != "main":
-            self.register_comment("Function parameters")
-            self.register_comment(f"  $ra = {stack_size - 4}($sp)")
+        # if node.name != "main":
+        #     self.register_comment("FUNCT PARAMS")
             
-            for i, name in enumerate(param_names, start=2):
-                self.register_comment(f"  {name} = {stack_size - (4 * i)}($sp)")
+        #     for i, name in enumerate(param_names, start=2):
+        #         self.register_comment(f"  {name} = {stack_size - (4 * i)}($sp)")
                 
-            self.register_empty_instruction()
-            self.register_empty_instruction()
-
-        if self.current_function.local_vars:
+        #     self.register_comment(f"  $ra = {stack_size - 4}($sp)")
+            
+        if self.current_function.localvars:
             # Espacio para las variables locales
             self.register_instruction(mips.AddiNode("$sp", "$sp", f"{-locals_size}"))
             self.register_empty_instruction()
@@ -136,7 +141,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
             except Exception as e:
                 print('ERROR ' + str(e))
 
-        if node.name != "main" and self.current_function.local_vars:
+        if node.name != "main" and self.current_function.localvars:
             self.register_comment("Freeing space for local variables")
             self.register_instruction(mips.AddiNode("$sp", "$sp", f"{locals_size}"))
             self.register_empty_instruction()
@@ -1050,8 +1055,6 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         self.register_instruction(mips.StoreWordNode("$zero", f"8($t5)"))
         self.register_instruction(mips.JumpNode("while_compare_strings_end"))
         
-        self.register_empty_instruction()
-        
         self.register_instruction(mips.LabelNode("while_compare_strings_update"))
         self.register_instruction(mips.AddiNode("$t0", "$t0", "1"))
         self.register_instruction(mips.AddiNode("$t1", "$t1", "1"))
@@ -1094,11 +1097,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         self.register_instruction(mips.AddiNode("$t4", "$t4", "1")) # ++
         self.register_instruction(mips.AddiNode("$t3", "$t3", "1")) # ++ para el punter en node.source
         self.register_instruction(mips.AddiNode("$t5", "$t5", "1")) # ++
-        
-        self.register_instruction(mips.AddiNode("$t5", "$t5", "1")) # ++
-        self.register_instruction(mips.JumpNode("while_copy_name_start"))
-        self.register_instruction(mips.LabelNode("while_copy_name_end"))
-        
+        # jmp pal while
         self.register_instruction(mips.JumpNode("while_copy_name_start"))
         self.register_instruction(mips.LabelNode("while_copy_name_end"))
         self.register_empty_instruction()
@@ -1165,4 +1164,59 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
     
     
 class MipsFormatter:
-    pass
+    @visitor.on("node")
+    def visit(self, node):
+        pass
+
+    @visitor.when(mips.ProgramNode)
+    def visit(self, node: mips.ProgramNode):
+        dotdata = "\n\t".join([self.visit(data) for data in node.dotdata])
+
+        # recorriendo el dottext
+        inst = []
+        for item in node.dottext:
+            if isinstance(item, mips.LabelNode) and (item.name.startswith("function_") or item.name == "main"):
+                inst.append(f"{self.visit(item)}")
+            else:
+                inst.append(f"\t{self.visit(item)}")
+        
+        dottext = "\n\t".join(inst)
+
+        return dotdata, dottext
+
+    @visitor.when(mips.DataNode)
+    def visit(self, node: mips.DataNode):
+        return f"{node.name}: {node.data_type} {node.value}"
+
+    @visitor.when(mips.OneAddressNode)
+    def visit(self, node: mips.OneAddressNode):
+        return f"{node.code} {node.dest}"
+
+    @visitor.when(mips.TwoAddressNode)
+    def visit(self, node: mips.TwoAddressNode):
+        return f"{node.code} {node.dest}, {node.source}"
+        
+
+    @visitor.when(mips.ThreeAddressNode)
+    def visit(self, node: mips.ThreeAddressNode):
+        return f"{node.code} {node.dest}, {node.source1}, {node.source2}"
+
+    @visitor.when(mips.SystemCallNode)
+    def visit(self, node: mips.SystemCallNode):
+        return node.code
+    
+    @visitor.when(mips.LabelNode)
+    def visit(self, node: mips.LabelNode):
+        return f"{node.name}:"
+
+    @visitor.when(mips.CommentNode)
+    def visit(self, node: mips.CommentNode):
+        return f"# {node.comment}"
+
+    @visitor.when(mips.EmptyInstructionNode)
+    def visit(self, node: mips.EmptyInstructionNode):
+        return ""
+
+    @visitor.when(mips.EmptyDataNode)
+    def visit(self, node: mips.EmptyDataNode):
+        return ""

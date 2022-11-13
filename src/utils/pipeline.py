@@ -16,6 +16,7 @@ from utils.auxiliar_methods import erase_multiline_comment
 from utils.cool_to_cil import COOLToCILVisitor
 from utils.collect_dec import CollectDeclarationsDict, get_declarations_dict
 from utils.code_generation import COOLwithNULL, COOLwithNULL_Type
+from utils.cil_to_mips import CILToMIPSVisitor, MipsFormatter
 
 app = typer.Typer()
 
@@ -25,6 +26,13 @@ def read_file(file_name: str):
         s = f.read()
     return s
     
+def write_file(file_name: str, text: str):
+    with open(file_name, 'w', encoding='utf-8') as f: 
+        s = f.write(text)
+        f.close()
+    return s
+        
+
 def print_errors(s: str):
     styled_e = typer.style(s, fg=typer.colors.RED, bold=True)
     typer.echo(styled_e)
@@ -326,12 +334,18 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
         new_ast = ast_null(ast, context, errors, program, scope)
         
         cil_ast = COOLToCILVisitor(context, [], []).visit(new_ast, scope)
-        1
-        # dict_attr, dict_method = {}, {}
-        # CollectDeclarationsDict(dict_attr, dict_method, context).visit(ast)
-        # get_declarations_dict(dict_attr, dict_method)
+        1 # temporal breakpoint
+       
+        mips_ast = CILToMIPSVisitor(context).visit(cil_ast)
+        1 # temporal breakpoint
         
-        # COOLToCILVisitor(context).visit(ast,scope)   
+        dotdata, dottext = MipsFormatter().visit(mips_ast)
+        program_result =  f".data\n\t{dotdata}\n\n.text\n\t{dottext}"
+        1 # temporal breakpoint
+        
+        write_file(program_file_out, program_result)
+        1 # temporal breakpoint
+         
 
     
 if __name__ == '__main__':
