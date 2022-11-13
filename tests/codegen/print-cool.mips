@@ -917,45 +917,313 @@
 		jr $ra
 		
 	function_main_at_Main:
-		addi $sp, $sp, -16
+		addi $sp, $sp, -116
 		
+		# ALLOCATE Object
+		li $v0, 9
+		lw $a0, type_Object
+		syscall
+		la $t0, type_Object
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		sw $v0, 112($sp)
+		
+		# FUNCT ARGS
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		lw $t0, 120($sp)
+		sw $t0, 0($sp)
+		
+		# STATIC FUNCT CALL function__init__at_Object
+		jal function__init__at_Object
+		lw $ra, 4($sp)
+		sw $v1, 120($sp)
+		addi $sp, $sp, 8
+		
+		# ALLOCATE INT
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 3
+		sw $t0, 8($v0)
+		sw $v0, 104($sp)
+		
+		# GET METHOD type_name OF Object
+		lw $t0, 112($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 104($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 100($sp)
+		
+		# FUNCT ARGS
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		lw $t0, 120($sp)
+		sw $t0, 0($sp)
+		
+		# DYNAMIC FUNCT CALL internal_3
+		# ALLOCATE INT
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 4
+		sw $t0, 8($v0)
+		sw $v0, 96($sp)
+		
+		# ALLOCATE INT
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 1
+		sw $t0, 8($v0)
+		sw $v0, 92($sp)
+		
+		# ALLOCATE INT
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 7
+		sw $t0, 8($v0)
+		sw $v0, 84($sp)
+		
+		# GET METHOD substr OF String
+		lw $t0, 108($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 84($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 80($sp)
+		
+		# FUNCT ARGS
+		addi $sp, $sp, -16
+		sw $ra, 12($sp)
+		
+		lw $t0, 124($sp)
+		sw $t0, 8($sp)
+		
+		lw $t0, 112($sp)
+		sw $t0, 4($sp)
+		
+		lw $t0, 108($sp)
+		sw $t0, 0($sp)
+		
+		# DYNAMIC FUNCT CALL internal_8
+		# ALLOCATE INT
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 5
+		sw $t0, 8($v0)
+		sw $v0, 72($sp)
+		
+		# GET METHOD out_string OF Main
+		lw $t0, 116($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 72($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 68($sp)
+		
+		# FUNCT ARGS
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		lw $t0, 128($sp)
+		sw $t0, 4($sp)
+		
+		lw $t0, 100($sp)
+		sw $t0, 0($sp)
+		
+		# DYNAMIC FUNCT CALL internal_11
+		# ALLOCATE BOOL 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 60($sp)
+		
+		# ALLOCATE NUll into internal_12
+		sw $zero, 64($sp)
+		
+		# FUNCT ARGS
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		lw $t0, 128($sp)
+		sw $t0, 4($sp)
+		
+		lw $t0, 76($sp)
+		sw $t0, 0($sp)
+		
+		# STATIC FUNCT CALL equal_funct
+		jal equal_funct
+		lw $ra, 8($sp)
+		sw $v1, 72($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATE INT
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 3
+		sw $t0, 8($v0)
+		sw $v0, 52($sp)
+		
+		# GET METHOD type_name OF Bool
+		lw $t0, 60($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 52($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 48($sp)
+		
+		# FUNCT ARGS
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		lw $t0, 68($sp)
+		sw $t0, 0($sp)
+		
+		# DYNAMIC FUNCT CALL internal_16
+		# ALLOCATE INT
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 1
+		sw $t0, 8($v0)
+		sw $v0, 44($sp)
+		
+		# ALLOCATE INT
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 3
+		sw $t0, 8($v0)
+		sw $v0, 40($sp)
+		
+		# ALLOCATE INT
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 7
+		sw $t0, 8($v0)
+		sw $v0, 32($sp)
+		
+		# GET METHOD substr OF String
+		lw $t0, 56($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 32($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 28($sp)
+		
+		# FUNCT ARGS
+		addi $sp, $sp, -16
+		sw $ra, 12($sp)
+		
+		lw $t0, 72($sp)
+		sw $t0, 8($sp)
+		
+		lw $t0, 60($sp)
+		sw $t0, 4($sp)
+		
+		lw $t0, 56($sp)
+		sw $t0, 0($sp)
+		
+		# DYNAMIC FUNCT CALL internal_21
+		# ALLOCATE INT
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 5
+		sw $t0, 8($v0)
+		sw $v0, 20($sp)
+		
+		# GET METHOD out_string OF IO
+		lw $t0, 76($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 20($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 16($sp)
+		
+		# FUNCT ARGS
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		lw $t0, 88($sp)
+		sw $t0, 4($sp)
+		
+		lw $t0, 48($sp)
+		sw $t0, 0($sp)
+		
+		# DYNAMIC FUNCT CALL internal_24
 		# ALLOCATING STRING
 		li $v0, 9
-		addi $a0, $zero, 23
+		addi $a0, $zero, 10
 		syscall
 		la $t0, type_String
 		sw $t0, 0($v0)
-		addi $t0, $zero, 23
-		sw $t0, 4($v0)
-		addi $t0, $zero, 72
-		sb $t0, 8($v0)
-		addi $t0, $zero, 101
-		sb $t0, 9($v0)
-		addi $t0, $zero, 108
-		sb $t0, 10($v0)
-		addi $t0, $zero, 108
-		sb $t0, 11($v0)
-		addi $t0, $zero, 111
-		sb $t0, 12($v0)
-		addi $t0, $zero, 44
-		sb $t0, 13($v0)
-		addi $t0, $zero, 32
-		sb $t0, 14($v0)
-		addi $t0, $zero, 87
-		sb $t0, 15($v0)
-		addi $t0, $zero, 111
-		sb $t0, 16($v0)
-		addi $t0, $zero, 114
-		sb $t0, 17($v0)
-		addi $t0, $zero, 108
-		sb $t0, 18($v0)
-		addi $t0, $zero, 100
-		sb $t0, 19($v0)
-		addi $t0, $zero, 46
-		sb $t0, 20($v0)
 		addi $t0, $zero, 10
-		sb $t0, 21($v0)
-		sb $zero, 22($v0)
+		sw $t0, 4($v0)
+		addi $t0, $zero, 10
+		sb $t0, 8($v0)
+		sb $zero, 9($v0)
 		sw $v0, 12($sp)
 		
 		# ALLOCATE INT
@@ -970,7 +1238,7 @@
 		sw $v0, 4($sp)
 		
 		# GET METHOD out_string OF Main
-		lw $t0, 16($sp)
+		lw $t0, 116($sp)
 		lw $t0, 0($t0)
 		addi $t0, $t0, 12
 		lw $t1, 4($sp)
@@ -984,17 +1252,17 @@
 		addi $sp, $sp, -12
 		sw $ra, 8($sp)
 		
-		lw $t0, 28($sp)
+		lw $t0, 128($sp)
 		sw $t0, 4($sp)
 		
 		lw $t0, 24($sp)
 		sw $t0, 0($sp)
 		
-		# DYNAMIC FUNCT CALL internal_3
+		# DYNAMIC FUNCT CALL internal_28
 		lw $v1, 8($sp)
 		
 		# FREE SPACE FOR LOCALVARS
-		addi $sp, $sp, 16
+		addi $sp, $sp, 116
 		
 		jr $ra
 		

@@ -98,6 +98,7 @@ class BaseCOOLToCILVisitor:
 
             for method, ancestor in methods_declaration_order(current_type):
                 cil_type_node.methods.append((method.name, self.to_function_name(method.name, ancestor.name)))
+        1
            
     def add_arith_methods(self):
         ### ADD FUNCTION ###

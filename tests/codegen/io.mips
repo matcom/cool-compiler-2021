@@ -51,6 +51,56 @@
 	type_Bool_type_name: .word function_type_name_at_Object
 	type_Bool_copy: .word function_copy_at_Object
 	
+	type_A: .word 36
+	type_A_inherits_from: .word type_Object
+	type_A_name_address: .word type_A_name_size
+	type_A__init_: .word function__init__at_A
+	type_A_abort: .word function_abort_at_Object
+	type_A_get_type: .word function_get_type_at_Object
+	type_A_type_name: .word function_type_name_at_Object
+	type_A_copy: .word function_copy_at_Object
+	type_A_out_a: .word function_out_a_at_A
+	
+	type_B: .word 40
+	type_B_inherits_from: .word type_A
+	type_B_name_address: .word type_B_name_size
+	type_B__init_: .word function__init__at_B
+	type_B_abort: .word function_abort_at_Object
+	type_B_get_type: .word function_get_type_at_Object
+	type_B_type_name: .word function_type_name_at_Object
+	type_B_copy: .word function_copy_at_Object
+	type_B_out_a: .word function_out_a_at_A
+	type_B_out_b: .word function_out_b_at_B
+	
+	type_C: .word 48
+	type_C_inherits_from: .word type_IO
+	type_C_name_address: .word type_C_name_size
+	type_C__init_: .word function__init__at_C
+	type_C_abort: .word function_abort_at_Object
+	type_C_get_type: .word function_get_type_at_Object
+	type_C_type_name: .word function_type_name_at_Object
+	type_C_copy: .word function_copy_at_Object
+	type_C_out_string: .word function_out_string_at_IO
+	type_C_out_int: .word function_out_int_at_IO
+	type_C_in_string: .word function_in_string_at_IO
+	type_C_in_int: .word function_in_int_at_IO
+	type_C_out_c: .word function_out_c_at_C
+	
+	type_D: .word 52
+	type_D_inherits_from: .word type_C
+	type_D_name_address: .word type_D_name_size
+	type_D__init_: .word function__init__at_D
+	type_D_abort: .word function_abort_at_Object
+	type_D_get_type: .word function_get_type_at_Object
+	type_D_type_name: .word function_type_name_at_Object
+	type_D_copy: .word function_copy_at_Object
+	type_D_out_string: .word function_out_string_at_IO
+	type_D_out_int: .word function_out_int_at_IO
+	type_D_in_string: .word function_in_string_at_IO
+	type_D_in_int: .word function_in_int_at_IO
+	type_D_out_c: .word function_out_c_at_C
+	type_D_out_d: .word function_out_d_at_D
+	
 	type_Main: .word 48
 	type_Main_inherits_from: .word type_IO
 	type_Main_name_address: .word type_Main_name_size
@@ -79,6 +129,18 @@
 	
 	type_Bool_name_size: .word 4
 	type_Bool_name: .asciiz "Bool"
+	
+	type_A_name_size: .word 1
+	type_A_name: .asciiz "A"
+	
+	type_B_name_size: .word 1
+	type_B_name: .asciiz "B"
+	
+	type_C_name_size: .word 1
+	type_C_name: .asciiz "C"
+	
+	type_D_name_size: .word 1
+	type_D_name: .asciiz "D"
 	
 	type_Main_name_size: .word 4
 	type_Main_name: .asciiz "Main"
@@ -911,51 +973,90 @@
 		syscall
 		
 		
-	function__init__at_Main:
-		lw $v1, 0($sp)
+	function__init__at_A:
+		addi $sp, $sp, -4
+		
+		# ALLOCATE IO
+		li $v0, 9
+		lw $a0, type_IO
+		syscall
+		la $t0, type_IO
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		sw $v0, 0($sp)
+		
+		# FUNCT ARGS
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		lw $t0, 8($sp)
+		sw $t0, 0($sp)
+		
+		# STATIC FUNCT CALL function__init__at_IO
+		jal function__init__at_IO
+		lw $ra, 4($sp)
+		sw $v1, 8($sp)
+		addi $sp, $sp, 8
+		
+		# FUNCT ARGS
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		lw $t0, 12($sp)
+		sw $t0, 0($sp)
+		
+		# STATIC FUNCT CALL assign_funct
+		jal assign_funct
+		lw $ra, 8($sp)
+		lw $v1, 4($sp)
+		
+		# FREE SPACE FOR LOCALVARS
+		addi $sp, $sp, 4
 		
 		jr $ra
 		
-	function_main_at_Main:
+	function_out_a_at_A:
 		addi $sp, $sp, -16
 		
 		# ALLOCATING STRING
 		li $v0, 9
-		addi $a0, $zero, 23
+		addi $a0, $zero, 24
 		syscall
 		la $t0, type_String
 		sw $t0, 0($v0)
-		addi $t0, $zero, 23
+		addi $t0, $zero, 24
 		sw $t0, 4($v0)
-		addi $t0, $zero, 72
+		addi $t0, $zero, 65
 		sb $t0, 8($v0)
-		addi $t0, $zero, 101
+		addi $t0, $zero, 58
 		sb $t0, 9($v0)
-		addi $t0, $zero, 108
-		sb $t0, 10($v0)
-		addi $t0, $zero, 108
-		sb $t0, 11($v0)
-		addi $t0, $zero, 111
-		sb $t0, 12($v0)
-		addi $t0, $zero, 44
-		sb $t0, 13($v0)
 		addi $t0, $zero, 32
-		sb $t0, 14($v0)
-		addi $t0, $zero, 87
-		sb $t0, 15($v0)
-		addi $t0, $zero, 111
-		sb $t0, 16($v0)
-		addi $t0, $zero, 114
-		sb $t0, 17($v0)
+		sb $t0, 10($v0)
+		addi $t0, $zero, 72
+		sb $t0, 11($v0)
+		addi $t0, $zero, 101
+		sb $t0, 12($v0)
 		addi $t0, $zero, 108
+		sb $t0, 13($v0)
+		addi $t0, $zero, 108
+		sb $t0, 14($v0)
+		addi $t0, $zero, 111
+		sb $t0, 15($v0)
+		addi $t0, $zero, 32
+		sb $t0, 16($v0)
+		addi $t0, $zero, 119
+		sb $t0, 17($v0)
+		addi $t0, $zero, 111
 		sb $t0, 18($v0)
-		addi $t0, $zero, 100
+		addi $t0, $zero, 114
 		sb $t0, 19($v0)
-		addi $t0, $zero, 46
+		addi $t0, $zero, 108
 		sb $t0, 20($v0)
-		addi $t0, $zero, 10
+		addi $t0, $zero, 100
 		sb $t0, 21($v0)
-		sb $zero, 22($v0)
+		addi $t0, $zero, 10
+		sb $t0, 22($v0)
+		sb $zero, 23($v0)
 		sw $v0, 12($sp)
 		
 		# ALLOCATE INT
@@ -969,7 +1070,196 @@
 		sw $t0, 8($v0)
 		sw $v0, 4($sp)
 		
-		# GET METHOD out_string OF Main
+		# GET METHOD out_string OF IO
+		# FUNCT ARGS
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		lw $t0, 24($sp)
+		sw $t0, 0($sp)
+		
+		# DYNAMIC FUNCT CALL internal_3
+		lw $v1, 8($sp)
+		
+		# FREE SPACE FOR LOCALVARS
+		addi $sp, $sp, 16
+		
+		jr $ra
+		
+	function__init__at_B:
+		addi $sp, $sp, -4
+		
+		# ALLOCATE IO
+		li $v0, 9
+		lw $a0, type_IO
+		syscall
+		la $t0, type_IO
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		sw $v0, 0($sp)
+		
+		# FUNCT ARGS
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		lw $t0, 8($sp)
+		sw $t0, 0($sp)
+		
+		# STATIC FUNCT CALL function__init__at_IO
+		jal function__init__at_IO
+		lw $ra, 4($sp)
+		sw $v1, 8($sp)
+		addi $sp, $sp, 8
+		
+		# FUNCT ARGS
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		lw $t0, 12($sp)
+		sw $t0, 0($sp)
+		
+		# STATIC FUNCT CALL assign_funct
+		jal assign_funct
+		lw $ra, 8($sp)
+		lw $v1, 4($sp)
+		
+		# FREE SPACE FOR LOCALVARS
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_out_b_at_B:
+		addi $sp, $sp, -16
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 24
+		syscall
+		la $t0, type_String
+		sw $t0, 0($v0)
+		addi $t0, $zero, 24
+		sw $t0, 4($v0)
+		addi $t0, $zero, 66
+		sb $t0, 8($v0)
+		addi $t0, $zero, 58
+		sb $t0, 9($v0)
+		addi $t0, $zero, 32
+		sb $t0, 10($v0)
+		addi $t0, $zero, 72
+		sb $t0, 11($v0)
+		addi $t0, $zero, 101
+		sb $t0, 12($v0)
+		addi $t0, $zero, 108
+		sb $t0, 13($v0)
+		addi $t0, $zero, 108
+		sb $t0, 14($v0)
+		addi $t0, $zero, 111
+		sb $t0, 15($v0)
+		addi $t0, $zero, 32
+		sb $t0, 16($v0)
+		addi $t0, $zero, 119
+		sb $t0, 17($v0)
+		addi $t0, $zero, 111
+		sb $t0, 18($v0)
+		addi $t0, $zero, 114
+		sb $t0, 19($v0)
+		addi $t0, $zero, 108
+		sb $t0, 20($v0)
+		addi $t0, $zero, 100
+		sb $t0, 21($v0)
+		addi $t0, $zero, 10
+		sb $t0, 22($v0)
+		sb $zero, 23($v0)
+		sw $v0, 12($sp)
+		
+		# ALLOCATE INT
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 5
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# GET METHOD out_string OF IO
+		# FUNCT ARGS
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		lw $t0, 24($sp)
+		sw $t0, 0($sp)
+		
+		# DYNAMIC FUNCT CALL internal_3
+		lw $v1, 8($sp)
+		
+		# FREE SPACE FOR LOCALVARS
+		addi $sp, $sp, 16
+		
+		jr $ra
+		
+	function__init__at_C:
+		lw $v1, 0($sp)
+		
+		jr $ra
+		
+	function_out_c_at_C:
+		addi $sp, $sp, -16
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 24
+		syscall
+		la $t0, type_String
+		sw $t0, 0($v0)
+		addi $t0, $zero, 24
+		sw $t0, 4($v0)
+		addi $t0, $zero, 67
+		sb $t0, 8($v0)
+		addi $t0, $zero, 58
+		sb $t0, 9($v0)
+		addi $t0, $zero, 32
+		sb $t0, 10($v0)
+		addi $t0, $zero, 72
+		sb $t0, 11($v0)
+		addi $t0, $zero, 101
+		sb $t0, 12($v0)
+		addi $t0, $zero, 108
+		sb $t0, 13($v0)
+		addi $t0, $zero, 108
+		sb $t0, 14($v0)
+		addi $t0, $zero, 111
+		sb $t0, 15($v0)
+		addi $t0, $zero, 32
+		sb $t0, 16($v0)
+		addi $t0, $zero, 119
+		sb $t0, 17($v0)
+		addi $t0, $zero, 111
+		sb $t0, 18($v0)
+		addi $t0, $zero, 114
+		sb $t0, 19($v0)
+		addi $t0, $zero, 108
+		sb $t0, 20($v0)
+		addi $t0, $zero, 100
+		sb $t0, 21($v0)
+		addi $t0, $zero, 10
+		sb $t0, 22($v0)
+		sb $zero, 23($v0)
+		sw $v0, 12($sp)
+		
+		# ALLOCATE INT
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 5
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# GET METHOD out_string OF C
 		lw $t0, 16($sp)
 		lw $t0, 0($t0)
 		addi $t0, $t0, 12
@@ -995,6 +1285,374 @@
 		
 		# FREE SPACE FOR LOCALVARS
 		addi $sp, $sp, 16
+		
+		jr $ra
+		
+	function__init__at_D:
+		lw $v1, 0($sp)
+		
+		jr $ra
+		
+	function_out_d_at_D:
+		addi $sp, $sp, -16
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 24
+		syscall
+		la $t0, type_String
+		sw $t0, 0($v0)
+		addi $t0, $zero, 24
+		sw $t0, 4($v0)
+		addi $t0, $zero, 68
+		sb $t0, 8($v0)
+		addi $t0, $zero, 58
+		sb $t0, 9($v0)
+		addi $t0, $zero, 32
+		sb $t0, 10($v0)
+		addi $t0, $zero, 72
+		sb $t0, 11($v0)
+		addi $t0, $zero, 101
+		sb $t0, 12($v0)
+		addi $t0, $zero, 108
+		sb $t0, 13($v0)
+		addi $t0, $zero, 108
+		sb $t0, 14($v0)
+		addi $t0, $zero, 111
+		sb $t0, 15($v0)
+		addi $t0, $zero, 32
+		sb $t0, 16($v0)
+		addi $t0, $zero, 119
+		sb $t0, 17($v0)
+		addi $t0, $zero, 111
+		sb $t0, 18($v0)
+		addi $t0, $zero, 114
+		sb $t0, 19($v0)
+		addi $t0, $zero, 108
+		sb $t0, 20($v0)
+		addi $t0, $zero, 100
+		sb $t0, 21($v0)
+		addi $t0, $zero, 10
+		sb $t0, 22($v0)
+		sb $zero, 23($v0)
+		sw $v0, 12($sp)
+		
+		# ALLOCATE INT
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 5
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# GET METHOD out_string OF D
+		lw $t0, 16($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# FUNCT ARGS
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		lw $t0, 28($sp)
+		sw $t0, 4($sp)
+		
+		lw $t0, 24($sp)
+		sw $t0, 0($sp)
+		
+		# DYNAMIC FUNCT CALL internal_3
+		lw $v1, 8($sp)
+		
+		# FREE SPACE FOR LOCALVARS
+		addi $sp, $sp, 16
+		
+		jr $ra
+		
+	function__init__at_Main:
+		lw $v1, 0($sp)
+		
+		jr $ra
+		
+	function_main_at_Main:
+		addi $sp, $sp, -80
+		
+		# ALLOCATE A
+		li $v0, 9
+		lw $a0, type_A
+		syscall
+		la $t0, type_A
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		sw $v0, 76($sp)
+		
+		# FUNCT ARGS
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		lw $t0, 84($sp)
+		sw $t0, 0($sp)
+		
+		# STATIC FUNCT CALL function__init__at_A
+		jal function__init__at_A
+		lw $ra, 4($sp)
+		sw $v1, 84($sp)
+		addi $sp, $sp, 8
+		
+		# ALLOCATE INT
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 5
+		sw $t0, 8($v0)
+		sw $v0, 68($sp)
+		
+		# GET METHOD out_a OF A
+		lw $t0, 76($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 68($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 64($sp)
+		
+		# FUNCT ARGS
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		lw $t0, 84($sp)
+		sw $t0, 0($sp)
+		
+		# DYNAMIC FUNCT CALL internal_3
+		# ALLOCATE B
+		li $v0, 9
+		lw $a0, type_B
+		syscall
+		la $t0, type_B
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		sw $v0, 60($sp)
+		
+		# FUNCT ARGS
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		lw $t0, 68($sp)
+		sw $t0, 0($sp)
+		
+		# STATIC FUNCT CALL function__init__at_B
+		jal function__init__at_B
+		lw $ra, 4($sp)
+		sw $v1, 68($sp)
+		addi $sp, $sp, 8
+		
+		# ALLOCATE INT
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 6
+		sw $t0, 8($v0)
+		sw $v0, 52($sp)
+		
+		# GET METHOD out_b OF B
+		lw $t0, 60($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 52($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 48($sp)
+		
+		# FUNCT ARGS
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		lw $t0, 68($sp)
+		sw $t0, 0($sp)
+		
+		# DYNAMIC FUNCT CALL internal_7
+		# ALLOCATE C
+		li $v0, 9
+		lw $a0, type_C
+		syscall
+		la $t0, type_C
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		sw $v0, 44($sp)
+		
+		# FUNCT ARGS
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		lw $t0, 52($sp)
+		sw $t0, 0($sp)
+		
+		# STATIC FUNCT CALL function__init__at_C
+		jal function__init__at_C
+		lw $ra, 4($sp)
+		sw $v1, 52($sp)
+		addi $sp, $sp, 8
+		
+		# ALLOCATE INT
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 9
+		sw $t0, 8($v0)
+		sw $v0, 36($sp)
+		
+		# GET METHOD out_c OF C
+		lw $t0, 44($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 36($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 32($sp)
+		
+		# FUNCT ARGS
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		lw $t0, 52($sp)
+		sw $t0, 0($sp)
+		
+		# DYNAMIC FUNCT CALL internal_11
+		# ALLOCATE D
+		li $v0, 9
+		lw $a0, type_D
+		syscall
+		la $t0, type_D
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		sw $v0, 28($sp)
+		
+		# FUNCT ARGS
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		lw $t0, 36($sp)
+		sw $t0, 0($sp)
+		
+		# STATIC FUNCT CALL function__init__at_D
+		jal function__init__at_D
+		lw $ra, 4($sp)
+		sw $v1, 36($sp)
+		addi $sp, $sp, 8
+		
+		# ALLOCATE INT
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 10
+		sw $t0, 8($v0)
+		sw $v0, 20($sp)
+		
+		# GET METHOD out_d OF D
+		lw $t0, 28($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 20($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 16($sp)
+		
+		# FUNCT ARGS
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		lw $t0, 36($sp)
+		sw $t0, 0($sp)
+		
+		# DYNAMIC FUNCT CALL internal_15
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 15
+		syscall
+		la $t0, type_String
+		sw $t0, 0($v0)
+		addi $t0, $zero, 15
+		sw $t0, 4($v0)
+		addi $t0, $zero, 68
+		sb $t0, 8($v0)
+		addi $t0, $zero, 111
+		sb $t0, 9($v0)
+		addi $t0, $zero, 110
+		sb $t0, 10($v0)
+		addi $t0, $zero, 101
+		sb $t0, 11($v0)
+		addi $t0, $zero, 46
+		sb $t0, 12($v0)
+		addi $t0, $zero, 10
+		sb $t0, 13($v0)
+		sb $zero, 14($v0)
+		sw $v0, 12($sp)
+		
+		# ALLOCATE INT
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 5
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# GET METHOD out_string OF Main
+		lw $t0, 80($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# FUNCT ARGS
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		lw $t0, 92($sp)
+		sw $t0, 4($sp)
+		
+		lw $t0, 24($sp)
+		sw $t0, 0($sp)
+		
+		# DYNAMIC FUNCT CALL internal_19
+		lw $v1, 8($sp)
+		
+		# FREE SPACE FOR LOCALVARS
+		addi $sp, $sp, 80
 		
 		jr $ra
 		

@@ -142,7 +142,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
                 print('ERROR ' + str(e))
 
         if node.name != "main" and self.current_function.localvars:
-            self.register_comment("Freeing space for local variables")
+            self.register_comment("FREE SPACE FOR LOCALVARS")
             self.register_instruction(mips.AddiNode("$sp", "$sp", f"{locals_size}"))
             self.register_empty_instruction()
 
@@ -210,7 +210,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         self.register_instruction(mips.AddNode("$t2", "$t0", "$t1"))
         
         # procesando op binaria de tipo Int
-        self.register_empty_instruction()
+        # self.register_empty_instruction()
         # $t0 = node.dest
         self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.dest)}($sp)"))
         # asignando el valor en la 3era word del objeto
@@ -234,7 +234,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         self.register_instruction(mips.SubNode("$t2", "$t0", "$t1"))
         
         # procesando op binaria de tipo Int
-        self.register_empty_instruction()
+        # self.register_empty_instruction()
         # $t0 = node.dest
         self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.dest)}($sp)"))
         # asignando el valor en la 3era word del objeto
@@ -260,7 +260,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         self.register_instruction(mips.MoveFromLowNode("$t2"))
         
         # procesando op binaria de tipo Int
-        self.register_empty_instruction()
+        # self.register_empty_instruction()
         # $t0 = node.dest
         self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.dest)}($sp)"))
         # asignando el valor en la 3era word del objeto
@@ -286,7 +286,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         self.register_instruction(mips.MoveFromLowNode("$t2"))
 
         # procesando op binaria de tipo Int
-        self.register_empty_instruction()
+        # self.register_empty_instruction()
         # $t0 = node.dest
         self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.dest)}($sp)"))
         # asignando el valor en la 3era word del objeto
@@ -326,7 +326,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         self.register_instruction(mips.XorNode("$t2", "$t0", "$t1"))
         
         # procesando op binaria de tipo Int
-        self.register_empty_instruction()
+        # self.register_empty_instruction()
         # $t0 = node.dest
         self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.dest)}($sp)"))
         # asignando el valor en la 3era word del objeto
@@ -351,7 +351,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         self.register_instruction(mips.SleNode("$t2", "$t0", "$t1"))
         
         # procesando op binaria de tipo Int
-        self.register_empty_instruction()
+        # self.register_empty_instruction()
         # $t0 = node.dest
         self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.dest)}($sp)"))
         # asignando el valor en la 3era word del objeto
@@ -374,7 +374,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         self.register_instruction(mips.SltNode("$t2", "$t0", "$t1"))
         
         # procesando op binaria de tipo Int
-        self.register_empty_instruction()
+        # self.register_empty_instruction()
         # $t0 = node.dest
         self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.dest)}($sp)"))
         # asignando el valor en la 3era word del objeto
@@ -596,25 +596,25 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
     
     @visitor.when(cil.AllocateIntNode)
     def visit(self, node: cil.AllocateIntNode):
-        self.register_comment(f"ALLOCATE INT {node.type}")
+        self.register_comment(f"ALLOCATE INT")
         
         self.register_instruction(mips.LoadInmediateNode("$v0", "9"))
         self.register_instruction(mips.AddiNode("$a0", "$zero", "12"))
         self.register_instruction(mips.SystemCallNode())
-        
-        # self.register_instruction(mips.LoadInmediateNode("$v0", "9"))
-        # self.register_instruction(mips.LoadWordNode("$a0", f"type_{node.type}"))
-        # self.register_instruction(mips.SystemCallNode())
-        
+
         # $t0 = tipo de direccion
-        self.register_instruction(mips.LoadAddressNode("$t0", f"type_{node.type}"))
+        self.register_instruction(mips.LoadAddressNode("$t0", "type_Int"))
         # ajustando tipo en la 1era word
         self.register_instruction(mips.StoreWordNode("$t0", "0($v0)"))
         # tamaño en la 2da word
         self.register_instruction(mips.StoreWordNode("$a0", "4($v0)"))
-        # {node.dest} -> direccion de -> {node.type}
+        self.register_instruction(mips.AddiNode("$t0", "$zero", node.value))
+        # guardando el valoren la 3era word
+        self.register_instruction(mips.StoreWordNode("$t0", "8($v0)"))
+        # dest = dir del int allocado
         self.register_instruction(mips.StoreWordNode("$v0", f"{self.offset_of(node.dest)}($sp)"))
-    
+
+
     @visitor.when(cil.AllocateBoolNode)
     def visit(self, node: cil.AllocateBoolNode):
         self.register_comment(f"ALLOCATE BOOL {node.value}")
@@ -622,22 +622,20 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         self.register_instruction(mips.LoadInmediateNode("$v0", "9"))
         self.register_instruction(mips.AddiNode("$a0", "$zero", "12"))
         self.register_instruction(mips.SystemCallNode())
-        self.register_empty_instruction()
-        
-        ##
-        self.register_instruction(mips.LoadInmediateNode("$v0", "9"))
-        # self.register_instruction(mips.LoadWordNode("$a0", f"type_{node.type}"))
-        # self.register_instruction(mips.SystemCallNode())
         
         # $t0 = tipo de direccion
-        self.register_instruction(mips.LoadAddressNode("$t0", f"type_{node.type}"))
+        self.register_instruction(mips.LoadAddressNode("$t0", "type_Bool"))
         # ajustando tipo en la 1era word
         self.register_instruction(mips.StoreWordNode("$t0", "0($v0)"))
         # tamaño en la 2da word
         self.register_instruction(mips.StoreWordNode("$a0", "4($v0)"))
-        # {node.dest} -> direccion de -> {node.type}
+        self.register_instruction(mips.AddiNode("$t0", "$zero", node.value))
+        # guardando el valoren la 3era word
+        self.register_instruction(mips.StoreWordNode("$t0", "8($v0)"))
+
+        # dest = dir del int allocado
         self.register_instruction(mips.StoreWordNode("$v0", f"{self.offset_of(node.dest)}($sp)"))
-        
+
     
     @visitor.when(cil.AllocateStringNode)
     def visit(self, node: cil.AllocateStringNode):
@@ -648,9 +646,25 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         self.register_instruction(mips.AddiNode("$a0", "$zero", f"{9 + node.length}"))
         self.register_instruction(mips.SystemCallNode())
         
-        self.register_empty_instruction()
-        
-        ### define type 
+        ####
+        self.register_instruction(mips.LoadAddressNode("$t0", "type_String"))
+        # tipo en la 1era word
+        self.register_instruction(mips.StoreWordNode("$t0", f"0($v0)"))
+
+        self.register_instruction(mips.AddiNode("$t0", "$zero", f"{9 + node.length}"))
+        # len en la 2da word
+        self.register_instruction(mips.StoreWordNode("$t0", f"4($v0)"))
+
+        for i, c in enumerate(node.string):
+            ec = c.replace('\n', '\\n').replace('\t', '\\t').replace('\b', '\\b').replace('\f', '\\f')
+            self.register_instruction(mips.AddiNode("$t0", "$zero",  f"{ord(c)}"))
+            self.register_instruction(mips.StoreByteNode("$t0", f"{i + 8}($v0)"))
+
+        # null-term al final del str
+        self.register_instruction(mips.StoreByteNode("$zero", f"{node.length + 8}($v0)"))
+        # dest = valor
+        self.register_instruction(mips.StoreWordNode("$v0", f"{self.offset_of(node.dest)}($sp)"))
+ 
     
     @visitor.when(cil.AllocateNullNode)
     def visit(self, node: cil.AllocateNullNode):
@@ -719,7 +733,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
 
     @visitor.when(cil.DynamicCallNode)
     def visit(self, node: cil.DynamicCallNode):
-        self.register_comment(f"DYNAMIC FUNCT CALL {node.method_address}")
+        self.register_comment(f"DYNAMIC FUNCT CALL {node.method_addr}")
         
         self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.method_address) + 4 * node.total_args + 4}($sp)"))
         self.register_instruction(mips.JumpAndLinkRegisterNode("$t0"))
@@ -974,7 +988,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
     
     @visitor.when(cil.PrintIntNode)
     def visit(self, node: cil.PrintIntNode):
-        self.register_comment(f"PRINT INT -> {node.source}")
+        self.register_comment(f"PRINT INT")
         
         self.register_instruction(mips.LoadInmediateNode("$v0", "1"))
         self.register_instruction(mips.LoadWordNode("$a0", f"{self.offset_of(node.source)}($sp)"))

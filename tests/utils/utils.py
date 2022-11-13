@@ -96,3 +96,4 @@ def compare_outputs(compiler_path: str, cool_file_path: str, input_file_path: st
     fd.close()
 
     assert output == eoutput, UNEXPECTED_OUTPUT % (spim_file, repr(output), repr(eoutput))
+    1
