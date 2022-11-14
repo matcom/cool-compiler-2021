@@ -1592,7 +1592,7 @@
 		# ALLOCATE NUll into internal_6
 		sw $zero, 28($sp)
 		
-		while_start_8790874405717:
+		while_start_8778856546645:
 		
 		# ALLOCATE INT 0
 		li $v0, 9
@@ -1659,16 +1659,16 @@
 		sw $v1, 24($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_10 IS TRUE -> GO TO while_body_8790874405717
+		# IF internal_10 IS TRUE -> GO TO while_body_8778856546645
 		lw $t0, 12($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, while_body_8790874405717
+		beq $t0, $t1, while_body_8778856546645
 		
-		# GO TO while_end_8790874405717
-		j while_end_8790874405717
+		# GO TO while_end_8778856546645
+		j while_end_8778856546645
 		
-		while_body_8790874405717:
+		while_body_8778856546645:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -1777,10 +1777,10 @@
 		sw $v1, 64($sp)
 		addi $sp, $sp, 12
 		
-		# GO TO while_start_8790874405717
-		j while_start_8790874405717
+		# GO TO while_start_8778856546645
+		j while_start_8778856546645
 		
-		while_end_8790874405717:
+		while_end_8778856546645:
 		
 		lw $v1, 36($sp)
 		
@@ -1812,7 +1812,6 @@
 		lw $ra, 4($sp)
 		sw $v1, 20($sp)
 		addi $sp, $sp, 8
-		
 		
 		# ALLOCATE INT 8
 		li $v0, 9
@@ -1849,7 +1848,6 @@
 		lw $ra, 4($sp)
 		sw $v1, 16($sp)
 		addi $sp, $sp, 8
-		
 		
 		# EXIT
 		li $v0, 10

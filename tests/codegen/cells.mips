@@ -1475,16 +1475,16 @@
 		lw $t0, 52($sp)
 		sw $t0, 60($sp)
 		
-		# IF internal_1 IS TRUE -> GO TO then_8782701765867
+		# IF internal_1 IS TRUE -> GO TO then_8733030723292
 		lw $t0, 60($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8782701765867
+		beq $t0, $t1, then_8733030723292
 		
-		# GO TO else_8782701765867
-		j else_8782701765867
+		# GO TO else_8733030723292
+		j else_8733030723292
 		
-		then_8782701765867:
+		then_8733030723292:
 		
 		# ALLOCATE INT 10
 		li $v0, 9
@@ -1592,10 +1592,10 @@
 		lw $t0, 28($sp)
 		sw $t0, 64($sp)
 		
-		# GO TO endif_8782701765867
-		j endif_8782701765867
+		# GO TO endif_8733030723292
+		j endif_8733030723292
 		
-		else_8782701765867:
+		else_8733030723292:
 		
 		# ALLOCATE INT 1
 		li $v0, 9
@@ -1667,10 +1667,10 @@
 		lw $t0, 8($sp)
 		sw $t0, 64($sp)
 		
-		# GO TO endif_8782701765867
-		j endif_8782701765867
+		# GO TO endif_8733030723292
+		j endif_8733030723292
 		
-		endif_8782701765867:
+		endif_8733030723292:
 		
 		lw $v1, 64($sp)
 		
@@ -1775,16 +1775,16 @@
 		lw $t0, 36($sp)
 		sw $t0, 60($sp)
 		
-		# IF internal_1 IS TRUE -> GO TO then_8782701767491
+		# IF internal_1 IS TRUE -> GO TO then_8733030724148
 		lw $t0, 60($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8782701767491
+		beq $t0, $t1, then_8733030724148
 		
-		# GO TO else_8782701767491
-		j else_8782701767491
+		# GO TO else_8733030724148
+		j else_8733030724148
 		
-		then_8782701767491:
+		then_8733030724148:
 		
 		# ALLOCATE INT 0
 		li $v0, 9
@@ -1840,10 +1840,10 @@
 		lw $t0, 28($sp)
 		sw $t0, 64($sp)
 		
-		# GO TO endif_8782701767491
-		j endif_8782701767491
+		# GO TO endif_8733030724148
+		j endif_8733030724148
 		
-		else_8782701767491:
+		else_8733030724148:
 		
 		# ALLOCATE INT 1
 		li $v0, 9
@@ -1915,10 +1915,10 @@
 		lw $t0, 8($sp)
 		sw $t0, 64($sp)
 		
-		# GO TO endif_8782701767491
-		j endif_8782701767491
+		# GO TO endif_8733030724148
+		j endif_8733030724148
 		
-		endif_8782701767491:
+		endif_8733030724148:
 		
 		lw $v1, 64($sp)
 		
@@ -2023,16 +2023,16 @@
 		lw $t0, 104($sp)
 		sw $t0, 124($sp)
 		
-		# IF internal_3 IS TRUE -> GO TO then_8782701767551
+		# IF internal_3 IS TRUE -> GO TO then_8733030724208
 		lw $t0, 124($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8782701767551
+		beq $t0, $t1, then_8733030724208
 		
-		# GO TO else_8782701767551
-		j else_8782701767551
+		# GO TO else_8733030724208
+		j else_8733030724208
 		
-		then_8782701767551:
+		then_8733030724208:
 		
 		# ALLOCATE INT 1
 		li $v0, 9
@@ -2049,10 +2049,10 @@
 		lw $t0, 100($sp)
 		sw $t0, 128($sp)
 		
-		# GO TO endif_8782701767551
-		j endif_8782701767551
+		# GO TO endif_8733030724208
+		j endif_8733030724208
 		
-		else_8782701767551:
+		else_8733030724208:
 		
 		# ALLOCATE INT 0
 		li $v0, 9
@@ -2069,10 +2069,10 @@
 		lw $t0, 96($sp)
 		sw $t0, 128($sp)
 		
-		# GO TO endif_8782701767551
-		j endif_8782701767551
+		# GO TO endif_8733030724208
+		j endif_8733030724208
 		
-		endif_8782701767551:
+		endif_8733030724208:
 		
 		# ALLOCATE BOOL 0
 		li $v0, 9
@@ -2157,16 +2157,16 @@
 		lw $t0, 68($sp)
 		sw $t0, 88($sp)
 		
-		# IF internal_12 IS TRUE -> GO TO then_8782701767602
+		# IF internal_12 IS TRUE -> GO TO then_8733030724259
 		lw $t0, 88($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8782701767602
+		beq $t0, $t1, then_8733030724259
 		
-		# GO TO else_8782701767602
-		j else_8782701767602
+		# GO TO else_8733030724259
+		j else_8733030724259
 		
-		then_8782701767602:
+		then_8733030724259:
 		
 		# ALLOCATE INT 1
 		li $v0, 9
@@ -2183,10 +2183,10 @@
 		lw $t0, 64($sp)
 		sw $t0, 92($sp)
 		
-		# GO TO endif_8782701767602
-		j endif_8782701767602
+		# GO TO endif_8733030724259
+		j endif_8733030724259
 		
-		else_8782701767602:
+		else_8733030724259:
 		
 		# ALLOCATE INT 0
 		li $v0, 9
@@ -2203,10 +2203,10 @@
 		lw $t0, 60($sp)
 		sw $t0, 92($sp)
 		
-		# GO TO endif_8782701767602
-		j endif_8782701767602
+		# GO TO endif_8733030724259
+		j endif_8733030724259
 		
-		endif_8782701767602:
+		endif_8733030724259:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2307,16 +2307,16 @@
 		lw $t0, 28($sp)
 		sw $t0, 48($sp)
 		
-		# IF internal_22 IS TRUE -> GO TO then_8782701767647
+		# IF internal_22 IS TRUE -> GO TO then_8733030724304
 		lw $t0, 48($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8782701767647
+		beq $t0, $t1, then_8733030724304
 		
-		# GO TO else_8782701767647
-		j else_8782701767647
+		# GO TO else_8733030724304
+		j else_8733030724304
 		
-		then_8782701767647:
+		then_8733030724304:
 		
 		# ALLOCATE INT 1
 		li $v0, 9
@@ -2333,10 +2333,10 @@
 		lw $t0, 24($sp)
 		sw $t0, 52($sp)
 		
-		# GO TO endif_8782701767647
-		j endif_8782701767647
+		# GO TO endif_8733030724304
+		j endif_8733030724304
 		
-		else_8782701767647:
+		else_8733030724304:
 		
 		# ALLOCATE INT 0
 		li $v0, 9
@@ -2353,10 +2353,10 @@
 		lw $t0, 20($sp)
 		sw $t0, 52($sp)
 		
-		# GO TO endif_8782701767647
-		j endif_8782701767647
+		# GO TO endif_8733030724304
+		j endif_8733030724304
 		
-		endif_8782701767647:
+		endif_8733030724304:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2405,16 +2405,16 @@
 		lw $t0, 8($sp)
 		sw $t0, 132($sp)
 		
-		# IF internal_1 IS TRUE -> GO TO then_8782701767659
+		# IF internal_1 IS TRUE -> GO TO then_8733030724316
 		lw $t0, 132($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8782701767659
+		beq $t0, $t1, then_8733030724316
 		
-		# GO TO else_8782701767659
-		j else_8782701767659
+		# GO TO else_8733030724316
+		j else_8733030724316
 		
-		then_8782701767659:
+		then_8733030724316:
 		
 		# ALLOCATING STRING
 		li $v0, 9
@@ -2433,10 +2433,10 @@
 		lw $t0, 4($sp)
 		sw $t0, 136($sp)
 		
-		# GO TO endif_8782701767659
-		j endif_8782701767659
+		# GO TO endif_8733030724316
+		j endif_8733030724316
 		
-		else_8782701767659:
+		else_8733030724316:
 		
 		# ALLOCATING STRING
 		li $v0, 9
@@ -2455,10 +2455,10 @@
 		lw $t0, 0($sp)
 		sw $t0, 136($sp)
 		
-		# GO TO endif_8782701767659
-		j endif_8782701767659
+		# GO TO endif_8733030724316
+		j endif_8733030724316
 		
-		endif_8782701767659:
+		endif_8733030724316:
 		
 		lw $v1, 136($sp)
 		
@@ -2546,7 +2546,7 @@
 		# ALLOCATE NUll into internal_6
 		sw $zero, 36($sp)
 		
-		while_start_8782701735223:
+		while_start_8733030692672:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2564,16 +2564,16 @@
 		sw $v1, 44($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_7 IS TRUE -> GO TO while_body_8782701735223
+		# IF internal_7 IS TRUE -> GO TO while_body_8733030692672
 		lw $t0, 32($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, while_body_8782701735223
+		beq $t0, $t1, while_body_8733030692672
 		
-		# GO TO while_end_8782701735223
-		j while_end_8782701735223
+		# GO TO while_end_8733030692672
+		j while_end_8733030692672
 		
-		while_body_8782701735223:
+		while_body_8733030692672:
 		
 		# ALLOCATE INT 14
 		li $v0, 9
@@ -2712,10 +2712,10 @@
 		sw $v1, 72($sp)
 		addi $sp, $sp, 12
 		
-		# GO TO while_start_8782701735223
-		j while_start_8782701735223
+		# GO TO while_start_8733030692672
+		j while_start_8733030692672
 		
-		while_end_8782701735223:
+		while_end_8733030692672:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2931,7 +2931,7 @@
 		# ALLOCATE NUll into internal_10
 		sw $zero, 40($sp)
 		
-		while_start_8782701735364:
+		while_start_8733030692789:
 		
 		# ALLOCATE INT 0
 		li $v0, 9
@@ -2960,16 +2960,16 @@
 		sw $v1, 44($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_12 IS TRUE -> GO TO while_body_8782701735364
+		# IF internal_12 IS TRUE -> GO TO while_body_8733030692789
 		lw $t0, 32($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, while_body_8782701735364
+		beq $t0, $t1, while_body_8733030692789
 		
-		# GO TO while_end_8782701735364
-		j while_end_8782701735364
+		# GO TO while_end_8733030692789
+		j while_end_8733030692789
 		
-		while_body_8782701735364:
+		while_body_8733030692789:
 		
 		# ALLOCATE INT 15
 		li $v0, 9
@@ -3060,10 +3060,10 @@
 		sw $v1, 60($sp)
 		addi $sp, $sp, 12
 		
-		# GO TO while_start_8782701735364
-		j while_start_8782701735364
+		# GO TO while_start_8733030692789
+		j while_start_8733030692789
 		
-		while_end_8782701735364:
+		while_end_8733030692789:
 		
 		lw $v1, 84($sp)
 		
@@ -3095,7 +3095,6 @@
 		lw $ra, 4($sp)
 		sw $v1, 20($sp)
 		addi $sp, $sp, 8
-		
 		
 		# ALLOCATE INT 4
 		li $v0, 9
@@ -3132,7 +3131,6 @@
 		lw $ra, 4($sp)
 		sw $v1, 16($sp)
 		addi $sp, $sp, 8
-		
 		
 		# EXIT
 		li $v0, 10

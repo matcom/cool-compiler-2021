@@ -2042,16 +2042,16 @@
 		lw $t0, 44($sp)
 		sw $t0, 48($sp)
 		
-		# IF internal_1 IS TRUE -> GO TO then_8775593850962
+		# IF internal_1 IS TRUE -> GO TO then_8737399757897
 		lw $t0, 48($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8775593850962
+		beq $t0, $t1, then_8737399757897
 		
-		# GO TO else_8775593850962
-		j else_8775593850962
+		# GO TO else_8737399757897
+		j else_8737399757897
 		
-		then_8775593850962:
+		then_8737399757897:
 		
 		# ALLOCATE Cons
 		li $v0, 9
@@ -2121,10 +2121,10 @@
 		lw $t0, 36($sp)
 		sw $t0, 52($sp)
 		
-		# GO TO endif_8775593850962
-		j endif_8775593850962
+		# GO TO endif_8737399757897
+		j endif_8737399757897
 		
-		else_8775593850962:
+		else_8737399757897:
 		
 		# ALLOCATE Cons
 		li $v0, 9
@@ -2217,10 +2217,10 @@
 		lw $t0, 8($sp)
 		sw $t0, 52($sp)
 		
-		# GO TO endif_8775593850962
-		j endif_8775593850962
+		# GO TO endif_8737399757897
+		j endif_8737399757897
 		
-		endif_8775593850962:
+		endif_8737399757897:
 		
 		lw $v1, 52($sp)
 		
@@ -2707,7 +2707,7 @@
 		# ALLOCATE NUll into internal_3
 		sw $zero, 28($sp)
 		
-		while_start_8775593851944:
+		while_start_8737399758011:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2725,16 +2725,16 @@
 		sw $v1, 36($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_4 IS TRUE -> GO TO while_body_8775593851944
+		# IF internal_4 IS TRUE -> GO TO while_body_8737399758011
 		lw $t0, 24($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, while_body_8775593851944
+		beq $t0, $t1, while_body_8737399758011
 		
-		# GO TO while_end_8775593851944
-		j while_end_8775593851944
+		# GO TO while_end_8737399758011
+		j while_end_8737399758011
 		
-		while_body_8775593851944:
+		while_body_8737399758011:
 		
 		# ALLOCATE Cons
 		li $v0, 9
@@ -2850,10 +2850,10 @@
 		sw $v1, 48($sp)
 		addi $sp, $sp, 12
 		
-		# GO TO while_start_8775593851944
-		j while_start_8775593851944
+		# GO TO while_start_8737399758011
+		j while_start_8737399758011
 		
-		while_end_8775593851944:
+		while_end_8737399758011:
 		
 		# FREE SPACE FOR LOCALVARS
 		addi $sp, $sp, 44
@@ -3178,7 +3178,6 @@
 		sw $v1, 20($sp)
 		addi $sp, $sp, 8
 		
-		
 		# ALLOCATE INT 9
 		li $v0, 9
 		addi $a0, $zero, 12
@@ -3214,7 +3213,6 @@
 		lw $ra, 4($sp)
 		sw $v1, 16($sp)
 		addi $sp, $sp, 8
-		
 		
 		# EXIT
 		li $v0, 10

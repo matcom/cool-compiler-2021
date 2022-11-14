@@ -2549,7 +2549,7 @@
 		lw $t0, 172($sp)
 		sw $t0, 168($sp)
 		
-		while_start_8781317425785:
+		while_start_8769688904641:
 		
 		# internal_8 <-- EQUAL ADDRESS(internal_10, internal_6)
 		lw $t0, 168($sp)
@@ -2558,11 +2558,11 @@
 		lw $t0, 176($sp)
 		sw $t2, 8($t0)
 		
-		# IF internal_8 IS TRUE -> GO TO while_end_8781317425785
+		# IF internal_8 IS TRUE -> GO TO while_end_8769688904641
 		lw $t0, 176($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, while_end_8781317425785
+		beq $t0, $t1, while_end_8769688904641
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2585,10 +2585,10 @@
 		lw $t0, 4($t0)
 		sw $t0, 168($sp)
 		
-		# GO TO while_start_8781317425785
-		j while_start_8781317425785
+		# GO TO while_start_8769688904641
+		j while_start_8769688904641
 		
-		while_end_8781317425785:
+		while_end_8769688904641:
 		
 		
 		# internal_10 <- internal_9
@@ -2628,7 +2628,7 @@
 		sw $t0, 8($v0)
 		sw $v0, 156($sp)
 		
-		foreach_start_8781317425785:
+		foreach_start_8769688904641:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2646,16 +2646,16 @@
 		sw $v1, 168($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_13 IS TRUE -> GO TO foreach_body_8781317425785
+		# IF internal_13 IS TRUE -> GO TO foreach_body_8769688904641
 		lw $t0, 156($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_body_8781317425785
+		beq $t0, $t1, foreach_body_8769688904641
 		
-		# GO TO foreach_end_8781317425785
-		j foreach_end_8781317425785
+		# GO TO foreach_end_8769688904641
+		j foreach_end_8769688904641
 		
-		foreach_body_8781317425785:
+		foreach_body_8769688904641:
 		
 		# ARRAY internal_11[internal_12] = internal_10
 		lw $t0, 160($sp)
@@ -2689,10 +2689,10 @@
 		sw $v1, 172($sp)
 		addi $sp, $sp, 12
 		
-		# GO TO foreach_start_8781317425785
-		j foreach_start_8781317425785
+		# GO TO foreach_start_8769688904641
+		j foreach_start_8769688904641
 		
-		foreach_end_8781317425785:
+		foreach_end_8769688904641:
 		
 		
 		# ARRAY OF SIZE [internal_5]
@@ -2743,6 +2743,17 @@
 		lw $t0, 144($sp)
 		sw $t0, 0($t1)
 		
+		# ARRAY internal_15[internal_17] = internal_7
+		lw $t0, 140($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 4
+		mult $t0, $t1
+		mflo $t0
+		lw $t1, 148($sp)
+		add $t1, $t1, $t0
+		lw $t0, 180($sp)
+		lw $t0, 8($t0)
+		sw $t0, 0($t1)
 		
 		# ALLOCATE INT 1
 		li $v0, 9
@@ -2770,6 +2781,17 @@
 		lw $t0, 136($sp)
 		sw $t0, 0($t1)
 		
+		# ARRAY internal_15[internal_19] = internal_7
+		lw $t0, 132($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 4
+		mult $t0, $t1
+		mflo $t0
+		lw $t1, 148($sp)
+		add $t1, $t1, $t0
+		lw $t0, 180($sp)
+		lw $t0, 8($t0)
+		sw $t0, 0($t1)
 		
 		
 		# ALLOCATE INT 0
@@ -2827,7 +2849,7 @@
 		sw $t0, 8($v0)
 		sw $v0, 104($sp)
 		
-		foreach_type_start_8781317425785:
+		foreach_type_start_8769688904641:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2845,16 +2867,16 @@
 		sw $v1, 136($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_21 IS TRUE -> GO TO foreach_type_body_8781317425785
+		# IF internal_21 IS TRUE -> GO TO foreach_type_body_8769688904641
 		lw $t0, 124($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_type_body_8781317425785
+		beq $t0, $t1, foreach_type_body_8769688904641
 		
-		# GO TO foreach_type_end_8781317425785
-		j foreach_type_end_8781317425785
+		# GO TO foreach_type_end_8769688904641
+		j foreach_type_end_8769688904641
 		
-		foreach_type_body_8781317425785:
+		foreach_type_body_8769688904641:
 		
 		# internal_22 = ARRAY internal_14[internal_20]
 		lw $t0, 128($sp)
@@ -2883,7 +2905,7 @@
 		sw $v1, 128($sp)
 		addi $sp, $sp, 12
 		
-		foreach_ancestor_start_8781317425785:
+		foreach_ancestor_start_8769688904641:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2901,16 +2923,16 @@
 		sw $v1, 124($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_24 IS TRUE -> GO TO foreach_ancestor_body_8781317425785
+		# IF internal_24 IS TRUE -> GO TO foreach_ancestor_body_8769688904641
 		lw $t0, 112($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_ancestor_body_8781317425785
+		beq $t0, $t1, foreach_ancestor_body_8769688904641
 		
-		# GO TO foreach_ancestor_end_8781317425785
-		j foreach_ancestor_end_8781317425785
+		# GO TO foreach_ancestor_end_8769688904641
+		j foreach_ancestor_end_8769688904641
 		
-		foreach_ancestor_body_8781317425785:
+		foreach_ancestor_body_8769688904641:
 		
 		# internal_25 = ARRAY internal_11[internal_23]
 		lw $t0, 116($sp)
@@ -2930,11 +2952,11 @@
 		lw $t0, 104($sp)
 		sw $t2, 8($t0)
 		
-		# IF internal_26 IS TRUE -> GO TO foreach_ancestor_end_8781317425785
+		# IF internal_26 IS TRUE -> GO TO foreach_ancestor_end_8769688904641
 		lw $t0, 104($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_ancestor_end_8781317425785
+		beq $t0, $t1, foreach_ancestor_end_8769688904641
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2952,11 +2974,22 @@
 		sw $v1, 128($sp)
 		addi $sp, $sp, 12
 		
-		# GO TO foreach_ancestor_start_8781317425785
-		j foreach_ancestor_start_8781317425785
+		# GO TO foreach_ancestor_start_8769688904641
+		j foreach_ancestor_start_8769688904641
 		
-		foreach_ancestor_end_8781317425785:
+		foreach_ancestor_end_8769688904641:
 		
+		# ARRAY internal_15[internal_20] = internal_23
+		lw $t0, 128($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 4
+		mult $t0, $t1
+		mflo $t0
+		lw $t1, 148($sp)
+		add $t1, $t1, $t0
+		lw $t0, 116($sp)
+		lw $t0, 8($t0)
+		sw $t0, 0($t1)
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -2974,10 +3007,10 @@
 		sw $v1, 140($sp)
 		addi $sp, $sp, 12
 		
-		# GO TO foreach_type_start_8781317425785
-		j foreach_type_start_8781317425785
+		# GO TO foreach_type_start_8769688904641
+		j foreach_type_start_8769688904641
 		
-		foreach_type_end_8781317425785:
+		foreach_type_end_8769688904641:
 		
 		
 		# ALLOCATE INT 0
@@ -3051,7 +3084,7 @@
 		sw $v1, 100($sp)
 		addi $sp, $sp, 12
 		
-		foreach_min_start_8781317425785:
+		foreach_min_start_8769688904641:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -3069,16 +3102,16 @@
 		sw $v1, 96($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_31 IS TRUE -> GO TO foreach_min_body_8781317425785
+		# IF internal_31 IS TRUE -> GO TO foreach_min_body_8769688904641
 		lw $t0, 84($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, foreach_min_body_8781317425785
+		beq $t0, $t1, foreach_min_body_8769688904641
 		
-		# GO TO foreach_min_end_8781317425785
-		j foreach_min_end_8781317425785
+		# GO TO foreach_min_end_8769688904641
+		j foreach_min_end_8769688904641
 		
-		foreach_min_body_8781317425785:
+		foreach_min_body_8769688904641:
 		
 		# ARRAY internal_15[internal_27]
 		lw $t0, 100($sp)
@@ -3108,16 +3141,16 @@
 		sw $v1, 96($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_31 IS TRUE -> GO TO update_min_8781317425785
+		# IF internal_31 IS TRUE -> GO TO update_min_8769688904641
 		lw $t0, 84($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, update_min_8781317425785
+		beq $t0, $t1, update_min_8769688904641
 		
-		# GO TO update_min_end_8781317425785
-		j update_min_end_8781317425785
+		# GO TO update_min_end_8769688904641
+		j update_min_end_8769688904641
 		
-		update_min_8781317425785:
+		update_min_8769688904641:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -3151,7 +3184,7 @@
 		sw $v1, 108($sp)
 		addi $sp, $sp, 12
 		
-		update_min_end_8781317425785:
+		update_min_end_8769688904641:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -3169,10 +3202,10 @@
 		sw $v1, 112($sp)
 		addi $sp, $sp, 12
 		
-		# GO TO foreach_min_start_8781317425785
-		j foreach_min_start_8781317425785
+		# GO TO foreach_min_start_8769688904641
+		j foreach_min_start_8769688904641
 		
-		foreach_min_end_8781317425785:
+		foreach_min_end_8769688904641:
 		
 		# ARRAY OF SIZE [internal_5]
 		lw $t0, 188($sp)
@@ -3196,6 +3229,17 @@
 		sw $t0, 8($v0)
 		sw $v0, 76($sp)
 		
+		# ARRAY internal_32[internal_33] = internal_3
+		lw $t0, 76($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 4
+		mult $t0, $t1
+		mflo $t0
+		lw $t1, 80($sp)
+		add $t1, $t1, $t0
+		lw $t0, 196($sp)
+		lw $t0, 8($t0)
+		sw $t0, 0($t1)
 		
 		# ALLOCATE INT 1
 		li $v0, 9
@@ -3208,6 +3252,17 @@
 		sw $t0, 8($v0)
 		sw $v0, 72($sp)
 		
+		# ARRAY internal_32[internal_34] = internal_3
+		lw $t0, 72($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 4
+		mult $t0, $t1
+		mflo $t0
+		lw $t1, 80($sp)
+		add $t1, $t1, $t0
+		lw $t0, 196($sp)
+		lw $t0, 8($t0)
+		sw $t0, 0($t1)
 		
 		
 		# ALLOCATE BOOL 0
@@ -3237,12 +3292,23 @@
 		sw $v1, 80($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_35 IS TRUE -> GO TO error_branch_8781317425785
+		# IF internal_35 IS TRUE -> GO TO error_branch_8769688904641
 		lw $t0, 68($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, error_branch_8781317425785
+		beq $t0, $t1, error_branch_8769688904641
 		
+		# ARRAY internal_32[internal_28] = internal_4
+		lw $t0, 96($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 4
+		mult $t0, $t1
+		mflo $t0
+		lw $t1, 80($sp)
+		add $t1, $t1, $t0
+		lw $t0, 192($sp)
+		lw $t0, 8($t0)
+		sw $t0, 0($t1)
 		
 		# ALLOCATE BOOL 0
 		li $v0, 9
@@ -3280,11 +3346,11 @@
 		lw $t2, 64($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_36 IS TRUE -> GO TO branch_Book_8781317425785
+		# IF internal_36 IS TRUE -> GO TO branch_Book_8769688904641
 		lw $t0, 64($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Book_8781317425785
+		beq $t0, $t1, branch_Book_8769688904641
 		
 		
 		# ALLOCATE INT 1
@@ -3310,14 +3376,14 @@
 		lw $t2, 64($sp)
 		sw $t0, 8($t2)
 		
-		# IF internal_36 IS TRUE -> GO TO branch_Article_8781317425785
+		# IF internal_36 IS TRUE -> GO TO branch_Article_8769688904641
 		lw $t0, 64($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, branch_Article_8781317425785
+		beq $t0, $t1, branch_Article_8769688904641
 		
 		
-		branch_Book_8781317425785:
+		branch_Book_8769688904641:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -3457,11 +3523,11 @@
 		lw $t0, 40($sp)
 		sw $t0, 52($sp)
 		
-		# GO TO branch_end_8781317425785
-		j branch_end_8781317425785
+		# GO TO branch_end_8769688904641
+		j branch_end_8769688904641
 		
 		
-		branch_Article_8781317425785:
+		branch_Article_8769688904641:
 		
 		# FUNCT ARGS
 		addi $sp, $sp, -12
@@ -3607,13 +3673,13 @@
 		lw $t0, 20($sp)
 		sw $t0, 52($sp)
 		
-		# GO TO branch_end_8781317425785
-		j branch_end_8781317425785
+		# GO TO branch_end_8769688904641
+		j branch_end_8769688904641
 		
 		
-		error_branch_8781317425785:
+		error_branch_8769688904641:
 		
-		branch_end_8781317425785:
+		branch_end_8769688904641:
 		
 		# ALLOCATE INT 12
 		li $v0, 9
@@ -4302,7 +4368,6 @@
 		sw $v1, 20($sp)
 		addi $sp, $sp, 8
 		
-		
 		# ALLOCATE INT 4
 		li $v0, 9
 		addi $a0, $zero, 12
@@ -4338,7 +4403,6 @@
 		lw $ra, 4($sp)
 		sw $v1, 16($sp)
 		addi $sp, $sp, 8
-		
 		
 		# EXIT
 		li $v0, 10

@@ -13,7 +13,7 @@ def methods_declaration_order(t: Type):
     all_methods = t.all_methods()
     visited = set()
     for method, _ in all_methods:
-        if method.name in visited or method.name == 'get_type':
+        if method.name in visited:# or method.name == 'get_type':
             continue
         
         meths = list(all_methods)[::-1]
@@ -36,6 +36,10 @@ class BaseCOOLToCILVisitor:
         
         self.dict_attr = dict_attr
         self.dict_method = dict_method
+        
+        self.locals_dict = {}
+        self.param_set = set()
+        self.attr_set = set()
     
     @property
     def params(self):
@@ -97,9 +101,9 @@ class BaseCOOLToCILVisitor:
             cil_type_node = self.register_type(current_type.name, current_type.parent.name if current_type.parent is not None else None)
 
             for method, ancestor in methods_declaration_order(current_type):
-                if method.name == 'get_type': continue
+                # if method.name == 'get_type': continue
                 cil_type_node.methods.append((method.name, self.to_function_name(method.name, ancestor.name)))
-        1
+                'hola'
            
     def add_arith_methods(self):
         ### ADD FUNCTION ###
@@ -184,6 +188,7 @@ class BaseCOOLToCILVisitor:
         self.register_comment('EQUAL FUNCTION')
         self.current_function.params.append(cil.ParamNode("a"))
         self.current_function.params.append(cil.ParamNode("b"))
+        
         result = self.define_internal_local()
         constant_null = self.define_internal_local()
         is_null = self.define_internal_local()
@@ -194,6 +199,7 @@ class BaseCOOLToCILVisitor:
         type_a_equals_int = self.define_internal_local()
         type_a_equals_bool = self.define_internal_local()
         type_a_equals_string = self.define_internal_local()
+        
         self.register_EOL()
         
         self.register_instruction(cil.AllocateBoolNode(result, "0"))
@@ -302,6 +308,7 @@ class BaseCOOLToCILVisitor:
     def add_function_abort(self):
         self.current_function = self.register_function(self.to_function_name("abort", "Object"))
         self.current_function.params.append(cil.ParamNode("self"))
+        
         msg1 = self.define_internal_local()
         msg2 = self.define_internal_local()
         msg = self.define_internal_local()
@@ -428,7 +435,7 @@ class BaseCOOLToCILVisitor:
         self.add_function_equal()
         self.add_function_assign()
         
-        ## initializing main types
+        ## initializing build-in types
         self.add_function_init("Object")
         self.add_function_abort()
         self.add_function_type_name()
@@ -451,6 +458,7 @@ class BaseCOOLToCILVisitor:
             
     def add_main_funct(self): 
         self.current_function = self.register_function("main")
+        
         local_main = self.define_internal_local()
         local_result = self.define_internal_local()
         method_index = self.define_internal_local()
@@ -459,8 +467,7 @@ class BaseCOOLToCILVisitor:
         self.register_instruction(cil.AllocateNode("Main", local_main))
         self.register_instruction(cil.ArgNode(local_main, 0, 1))
         self.register_instruction(cil.StaticCallNode(self.to_function_name("_init_", "Main"), local_main, 1))
-        self.register_EOL()
-
+        
         all_methods = methods_declaration_order(self.context.get_type("Main"))
         i = [m.name for m, _ in all_methods].index("main")
         self.register_instruction(cil.AllocateIntNode(method_index, f"{i}"))
@@ -468,7 +475,6 @@ class BaseCOOLToCILVisitor:
 
         self.register_instruction(cil.ArgNode(local_main, 0, 1))
         self.register_instruction(cil.DynamicCallNode("Main", method_address, local_result, 1))
-        self.register_EOL()
         
         self.register_instruction(cil.HaltNode())
 
@@ -533,8 +539,9 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         function_name = self.to_function_name(self.current_method.name, owner_type.name)
         self.current_function = self.register_function(function_name)
         1 #forcing breakpoint
-        self.current_function.params = [cil.ParamNode("self")] + \
-            [cil.ParamNode(item.name) for item in node.params]
+        list_temp =  [cil.ParamNode(item.name) for item in node.params]
+        self.current_function.params = [cil.ParamNode("self")] + list_temp
+           
 
         source, _ = self.visit(node.expr, scope)
 
@@ -673,7 +680,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         len_types_int = self.define_internal_local()
         null_ptr = self.define_internal_local()
         count_of_ancestors_int = self.define_internal_local()
-        comparison_result_bool = self.define_internal_local()
+        step1_comparison_result_bool = self.define_internal_local()
         case_expr_type_address = self.define_internal_local()
         ancestor_type_address = self.define_internal_local()
         ancestors_array = self.define_internal_local()
@@ -685,7 +692,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(cil.AllocateNullNode(null_ptr))
         
         self.register_instruction(cil.AllocateIntNode(count_of_ancestors_int, "0"))
-        self.register_instruction(cil.AllocateBoolNode(comparison_result_bool, "0"))
+        self.register_instruction(cil.AllocateBoolNode(step1_comparison_result_bool, "0"))
 
         self.register_EOL()
         
@@ -696,8 +703,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(cil.AssignNode(ancestor_type_address, case_expr_type_address))
         
         self.register_instruction(cil.LabelNode(f"while_start_{node_id}"))
-        self.register_instruction(cil.EqualAddressNode(comparison_result_bool, ancestor_type_address, null_ptr))
-        self.register_instruction(cil.GotoIfNode(comparison_result_bool, f"while_end_{node_id}"))
+        self.register_instruction(cil.EqualAddressNode(step1_comparison_result_bool, ancestor_type_address, null_ptr))
+        self.register_instruction(cil.GotoIfNode(step1_comparison_result_bool, f"while_end_{node_id}"))
 
         # self.register_comment("Increment the count of ancestors")
         self.register_instruction(cil.ArgNode(count_of_ancestors_int, 0, 2))
@@ -744,7 +751,9 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # por cada tipo de rama guardar el indice del ancestro que le corresponde
         # sino guardar la cantidad de anccestros        
         ##
+        
         types = [self.context.get_type(type_name) for _, type_name, _ in node.params]
+        "hola"
         type_branch_array = self.define_internal_local()
         nearest_ancestor_array = self.define_internal_local()
         
@@ -786,7 +795,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(cil.LabelNode(f"foreach_type_body_{node_id}"))
         self.register_instruction(cil.GetIndexNode(type_i, type_branch_array, i_int))
         
-        
+        # inner foreach
         self.register_instruction(cil.ArgNode(j_int, 0, 2))
         self.register_instruction(cil.ArgNode(zero_int, 1, 2))
         self.register_instruction(cil.StaticCallNode("assign_funct", j_int, 2))
@@ -898,7 +907,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         self.register_instruction(cil.GotoIfNode(exists_error_bool, f"error_branch_{node_id}"))
         self.register_instruction(cil.SetValueInIndexNode(bool_array, s_current_min_index_int, one_int))
  
-        
+        # stp 5
         s_comparison = self.define_internal_local()
         self.register_instruction(cil.AllocateBoolNode(s_comparison, "0"))
         self.register_EOL()
@@ -931,7 +940,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         # self.register_comment("Insert an error call")
         self.register_instruction(cil.LabelNode(f"branch_end_{node_id}"))
 
-        return resutl_address, Type.multi_join(types)
+        x, y = resutl_address, Type.multi_join(types)
+        return x, y
 
     @visitor.when(cool.AssignNode)
     def visit(self, node: cool.AssignNode, scope):

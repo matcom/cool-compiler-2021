@@ -2011,7 +2011,6 @@
 		sw $v1, 20($sp)
 		addi $sp, $sp, 8
 		
-		
 		# ALLOCATE INT 8
 		li $v0, 9
 		addi $a0, $zero, 12
@@ -2047,7 +2046,6 @@
 		lw $ra, 4($sp)
 		sw $v1, 16($sp)
 		addi $sp, $sp, 8
-		
 		
 		# EXIT
 		li $v0, 10
