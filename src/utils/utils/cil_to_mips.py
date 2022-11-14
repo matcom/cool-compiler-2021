@@ -75,7 +75,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         ##
         for type_node in node.dottypes: 
             self.register_word(self.to_data_type("name_size", type_node.name), str(len(type_node.name)))
-            self.register_asciiz(self.to_data_type("name", type_node.name), f'"{type_node.name}"')
+            self.register_asciiz(self.to_data_type("name", type_node.name), f'\"{type_node.name}\"')
             self.register_empty_data()
         
         #
@@ -130,7 +130,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
         if self.current_function.localvars:
             # Espacio para las variables locales
             self.register_instruction(mips.AddiNode("$sp", "$sp", f"{-locals_size}"))
-            self.register_empty_instruction()
+            # self.register_empty_instruction()
 
         for inst in node.instructions:
             try:
@@ -596,7 +596,7 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
     
     @visitor.when(cil.AllocateIntNode)
     def visit(self, node: cil.AllocateIntNode):
-        self.register_comment(f"ALLOCATE INT")
+        self.register_comment(f"ALLOCATE INT {node.value}")
         
         self.register_instruction(mips.LoadInmediateNode("$v0", "9"))
         self.register_instruction(mips.AddiNode("$a0", "$zero", "12"))
@@ -692,9 +692,9 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
     
     @visitor.when(cil.TypeOfNode)
     def visit(self, node: cil.TypeOfNode):
-        self.register_comment(f"{node.dest} STORE <- TYPEOF {node.source}")
+        self.register_comment(f"{node.dest} STORE <- TYPEOF {node.obj}")
         
-        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.source)}($sp)"))
+        self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.obj)}($sp)"))
         self.register_instruction(mips.LoadWordNode("$t0", "0($t0)"))
         
         self.register_instruction(mips.StoreWordNode("$t0", f"{self.offset_of(node.dest)}($sp)"))
@@ -702,14 +702,13 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
 
     @visitor.when(cil.GotoNode)
     def visit(self, node: cil.GotoNode):
-        self.register_comment(f"GO TO {node.address}")
+        self.register_comment(f"GO TO {node.addr}")
         
-        self.register_instruction(mips.JumpNode(node.address))
+        self.register_instruction(mips.JumpNode(node.addr))
 
     @visitor.when(cil.GotoIfNode)
     def visit(self, node: cil.GotoIfNode):
         self.register_comment(f"IF {node.condition} IS TRUE -> GO TO {node.address}")
-        
         # addr de la condicion
         self.register_instruction(mips.LoadWordNode("$t0", f"{self.offset_of(node.condition)}($sp)"))
         # cargando valor y comparandolo con 1
@@ -988,10 +987,11 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
     
     @visitor.when(cil.PrintIntNode)
     def visit(self, node: cil.PrintIntNode):
-        self.register_comment(f"PRINT INT")
+        self.register_comment(f"PRINT INT {node.int_source}")
         
         self.register_instruction(mips.LoadInmediateNode("$v0", "1"))
-        self.register_instruction(mips.LoadWordNode("$a0", f"{self.offset_of(node.source)}($sp)"))
+        
+        self.register_instruction(mips.LoadWordNode("$a0", f"{self.offset_of(node.int_source)}($sp)"))
         self.register_instruction(mips.LoadWordNode("$a0", "8($a0)"))
         
         self.register_instruction(mips.SystemCallNode())
@@ -1189,7 +1189,7 @@ class MipsFormatter:
         # recorriendo el dottext
         inst = []
         for item in node.dottext:
-            if isinstance(item, mips.LabelNode) and ((item.name.startswith("function_") or item.name == "main")):
+            if isinstance(item, mips.LabelNode) and ((item.name.startswith("function_") or item.name.endswith("_funct") or item.name == "main")):
                 inst.append(f"{self.visit(item)}")
             else:
                 inst.append(f"\t{self.visit(item)}")

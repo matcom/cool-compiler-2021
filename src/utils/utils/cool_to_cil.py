@@ -261,7 +261,7 @@ class BaseCOOLToCILVisitor:
         self.register_instruction(cil.AllocateBoolNode(is_null, "0"))
         self.register_instruction(cil.EqualAddressNode(is_null, "source", null_ptr))
         self.register_instruction(cil.EqualAddressNode(is_null, "dest", null_ptr))
-        self.register_instruction(cil.GotoIfNode(is_null))
+        self.register_instruction(cil.GotoIfNode(is_null, "source_is_type_object"))
 
         # types
         self.register_instruction(cil.TypeOfNode(type_source, "source"))
@@ -361,14 +361,12 @@ class BaseCOOLToCILVisitor:
         self.register_instruction(cil.ReturnNode(type_name))
         self.register_EOL()
 
-
     def add_function_out_string(self):
         self.current_function = self.register_function(self.to_function_name("out_string", "IO"))
         self.current_function.params.append(cil.ParamNode("self"))
         self.current_function.params.append(cil.ParamNode("x"))
         self.register_instruction(cil.PrintStringNode("x"))
         self.register_instruction(cil.ReturnNode("self"))
-        self.register_EOL()
 
     def add_function_out_int(self):
         self.current_function = self.register_function(self.to_function_name("out_int", "IO"))
@@ -376,7 +374,6 @@ class BaseCOOLToCILVisitor:
         self.current_function.params.append(cil.ParamNode("x"))
         self.register_instruction(cil.PrintIntNode("x"))
         self.register_instruction(cil.ReturnNode("self"))
-        self.register_EOL()
     
     def add_function_in_string(self):
         self.current_function = self.register_function(self.to_function_name("in_string", "IO"))
@@ -384,7 +381,6 @@ class BaseCOOLToCILVisitor:
         local_str = self.define_internal_local()
         self.register_instruction(cil.ReadStringNode(local_str))
         self.register_instruction(cil.ReturnNode(local_str))
-        self.register_EOL()
     
     def add_function_in_int(self):
         self.current_function = self.register_function(self.to_function_name("in_int", "IO"))
@@ -429,6 +425,9 @@ class BaseCOOLToCILVisitor:
         # +, -, *, /, xor
         self.add_arith_methods()
         
+        self.add_function_equal()
+        self.add_function_assign()
+        
         ## initializing main types
         self.add_function_init("Object")
         self.add_function_abort()
@@ -446,8 +445,8 @@ class BaseCOOLToCILVisitor:
         self.add_function_concat()
         self.add_function_substr()
         
-        self.add_function_init("Bool")
         self.add_function_init("Int")
+        self.add_function_init("Bool")
         
             
     def add_main_funct(self): 
@@ -477,7 +476,7 @@ class BaseCOOLToCILVisitor:
         left, _ = self.visit(node.left, scope)
         right, _ = self.visit(node.right, scope)
         dest = self.define_internal_local()
-        self.register_EOL()
+        # self.register_EOL()
         self.register_instruction(cil.ArgNode(left, 0, 2))
         self.register_instruction(cil.ArgNode(right, 1, 2))
         self.register_instruction(cil.StaticCallNode(operation_function, dest, 2))
@@ -496,8 +495,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         scope = node.scope
         
         self.add_basic_types()    
+        
         self.add_basic_methods()  
-        # self.add_main_funct()
         
         for i, class_ in enumerate(node.class_list):
             self.visit(class_, scope.children[i])
@@ -534,7 +533,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         function_name = self.to_function_name(self.current_method.name, owner_type.name)
         self.current_function = self.register_function(function_name)
         1 #forcing breakpoint
-        self.current_function.params = [cil.ParamNode("self")] + [cil.ParamNode(item.name) for item in node.params]
+        self.current_function.params = [cil.ParamNode("self")] + \
+            [cil.ParamNode(item.name) for item in node.params]
 
         source, _ = self.visit(node.expr, scope)
 
@@ -585,7 +585,8 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(cool.ExprParNode)
     def visit(self, node: cool.ExprParNode, scope):
         scope = node.scope
-        return self.visit(node.expr, scope)
+        parnode = self.visit(node.expr, scope)
+        return parnode
     
     @visitor.when(cool.BlockNode)
     def visit(self, node: cool.BlockNode, scope):
@@ -961,6 +962,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         source, _ = self.visit(node.expr, scope)
         null_ptr = self.define_internal_local()
         result = self.define_internal_local()
+        
         self.register_instruction(cil.AllocateBoolNode(result, "0"))
         self.register_instruction(cil.AllocateNullNode(null_ptr))
 
@@ -995,6 +997,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         call_dest = self.define_internal_local()
         i_method = self.define_internal_local()
         method_address = self.define_internal_local()
+        
         self.register_instruction(cil.AllocateIntNode(i_method, f"{i}"))
         self.register_instruction(cil.GetMethodNode(method_address, obj_source, i_method, method.name, obj_type.name))
 
@@ -1006,6 +1009,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             self.register_instruction(cil.StaticCallNode(self.to_function_name(method.name, obj_type.name), call_dest, len(expr_srcs) + 1))
         else:
             self.register_instruction(cil.DynamicCallNode(obj_type.name, method_address, call_dest, len(expr_srcs) + 1))
+        
         return call_dest, method.return_type
 
     @visitor.when(cool.NewNode)
@@ -1048,17 +1052,17 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     @visitor.when(cool.LessEqualNode)
     def visit(self, node: cool.LessEqualNode, scope):
         scope = node.scope
-        return self.visit_arith_node(node, scope, "lesseq_funct", "Int") 
+        return self.visit_arith_node(node, scope, "lesseq_funct", "Bool") 
     
     @visitor.when(cool.LessNode)
     def visit(self, node: cool.LessNode, scope):
         scope = node.scope
-        return self.visit_arith_node(node, scope, "lessthan_funct", "Int") 
+        return self.visit_arith_node(node, scope, "lessthan_funct", "Bool") 
 
     @visitor.when(cool.EqualNode)
     def visit(self, node: cool.EqualNode, scope):
         scope = node.scope
-        return self.visit_arith_node(node, scope, "equal_funct", "Int") 
+        return self.visit_arith_node(node, scope, "equal_funct", "Bool") 
 
     ## other arith funct
 
@@ -1115,6 +1119,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
             attr_names = [a.name for a, _ in self.current_type.all_attributes()]
             self.register_instruction(cil.GetAttribNode(dest, "self", variable.name, attr_names.index(variable.name)))
             return dest, variable.type
+        
         return variable.name, variable.type
 
     @visitor.when(cool.StringNode)

@@ -212,7 +212,7 @@ class ArrayNode(InstructionNode): #
         self.size = size
 
 class TypeOfNode(InstructionNode): #
-    def __init__(self, obj, dest):
+    def __init__(self, dest, obj):
         self.obj = obj
         self.dest = dest
 
