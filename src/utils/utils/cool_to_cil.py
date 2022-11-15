@@ -24,7 +24,7 @@ def methods_declaration_order(t: Type):
     return method_decl
 
 class BaseCOOLToCILVisitor:
-    def __init__(self, context,dict_attr,dict_method):
+    def __init__(self, context, dict_attr, dict_method):
         self.dottypes = []
         self.dotdata = []
         self.dotcode = []
@@ -494,7 +494,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
     def visit(self, node):
         pass
     
-    # MAIN FLOW almost done
+    # MAIN FLOW 
     
     @visitor.when(cool.ProgramNode)
     def visit(self, node: cool.ProgramNode, scope):
@@ -1113,7 +1113,7 @@ class COOLToCILVisitor(BaseCOOLToCILVisitor):
         return result, self.context.get_type("Bool")
 
     ##########
-    # ATOMIC #   ## almost done!
+    # ATOMIC #   
     ##########
 
     @visitor.when(cool.VariableNode)

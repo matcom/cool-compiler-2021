@@ -102,7 +102,7 @@ def t_USTRING(t):
 
 def t_NUMBER(t):
     r'\d+'
-    t.value = int(t.value)
+    t.value = t.value #int(t.value)
     return t
 
 

@@ -671,12 +671,14 @@ class CILToMIPSVisitor(BaseCILToMIPSVisitor):
 
         for i, c in enumerate(node.string):
             # ec = c.replace('\n', '\\n').replace('\t', '\\t').replace('\b', '\\b').replace('\f', '\\f')
+            self.register_comment(f"CHAR -----------------> {c}")
             self.register_instruction(mips.AddiNode("$t0", "$zero",  f"{ord(c)}"))
             self.register_instruction(mips.StoreByteNode("$t0", f"{i + 8}($v0)"))
 
         # null-term al final del str
         self.register_instruction(mips.StoreByteNode("$zero", f"{node.length + 8}($v0)"))
         # dest = valor
+        self.register_comment(f"{node.dest} = {node.value}")
         self.register_instruction(mips.StoreWordNode("$v0", f"{self.offset_of(node.dest)}($sp)"))
  
     

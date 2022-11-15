@@ -17,6 +17,8 @@ from utils.cool_to_cil import COOLToCILVisitor
 from utils.collect_dec import CollectDeclarationsDict, get_declarations_dict
 from utils.code_generation import COOLwithNULL, COOLwithNULL_Type
 from utils.cil_to_mips import CILToMIPSVisitor, MipsFormatter
+# from utils.cooltocil import ExtendedCoolTranslator, ExtendedCoolTypeChecker, CoolToCilTranslator
+from utils.cool_cil_mips import CoolToCilTranslator, CilToMipsTranslator, MipsFormatter1, ExtendedCoolTranslator, ExtendedCoolTypeChecker
 
 app = typer.Typer()
 
@@ -240,6 +242,7 @@ def print_list(list):
 
 def ast_null(ast, context, errors, program, scope):
     new_ast = COOLwithNULL(context).visit(ast)
+    scope = Scope()
     COOLwithNULL_Type(context, errors, program).visit(new_ast, scope)
     return new_ast
     
@@ -330,21 +333,55 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
         ### CODE GENERATION ###  
         #######################
         
-        # Modificando el ast para que soporte los tipos vacios (null)
-        new_ast = ast_null(ast, context, errors, program, scope)
+        # icool_ast = ExtendedCoolTranslator(context).visit(ast)
+
+        # scope = Scope()
+        # ExtendedCoolTypeChecker(context, errors).visit(icool_ast, scope)
         
-        cil_ast = COOLToCILVisitor(context, [], []).visit(new_ast, scope)
+        # errors
+        # # if verbose or True:
+        # #     log_success(CodeBuilder().visit(icool_ast))
+
+        # cil_ast = CoolToCilTranslator(context).visit(icool_ast, scope)
+        # # mips_ast = CilToMipsTranslator(context).visit(cil_ast)
+        
+        
+        # Modificando el ast para que soporte los tipos vacios (null)
+        # new_ast = ast_null(ast, context, errors, program, scope)
+        
+        # cil_ast = COOLToCILVisitor(context, [], []).visit(new_ast, scope)
+        # 1 # temporal breakpoint
+       
+        # mips_ast = CILToMIPSVisitor(context).visit(cil_ast)
+        # 1 # temporal breakpoint
+        
+        # dotdata, dottext = MipsFormatter().visit(mips_ast)
+        # program_result =  f".data\n\t{dotdata}\n\n.text\n\t{dottext}"
+        # 1 # temporal breakpoint
+        
+        # write_file(program_file_out, program_result)
+        # 1 # temporal breakpoint
+        
+        print(CodeBuilder().visit(ast))
+        new_ast = ExtendedCoolTranslator(context).visit(ast)
+        print(CodeBuilder().visit(new_ast))
+        
+        scope = Scope()
+        ExtendedCoolTypeChecker(context, errors).visit(new_ast, scope)
+        
+        cil_ast = CoolToCilTranslator(context).visit(new_ast, scope)
         1 # temporal breakpoint
        
-        mips_ast = CILToMIPSVisitor(context).visit(cil_ast)
+        mips_ast = CilToMipsTranslator(context).visit(cil_ast)
         1 # temporal breakpoint
         
-        dotdata, dottext = MipsFormatter().visit(mips_ast)
-        program_result =  f".data\n\t{dotdata}\n\n.text\n\t{dottext}"
+        program_result = MipsFormatter1().visit(mips_ast)
+        # program_result =  f".data\n\t{dotdata}\n\n.text\n\t{dottext}"
         1 # temporal breakpoint
         
         write_file(program_file_out, program_result)
         1 # temporal breakpoint
+        
          
 
     

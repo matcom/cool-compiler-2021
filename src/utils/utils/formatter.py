@@ -1,5 +1,6 @@
 import utils.ast_nodes as ast
 import utils.visitor as visitor
+from utils.code_generation import NullNode 
 
 
 class CodeBuilder:
@@ -41,9 +42,21 @@ class CodeBuilder:
         declarations = (',\n' + '    ' * (tabs + 1)).join(declarations)
         return '    ' * tabs + f'let {declarations} in\n{self.visit(node.expr, tabs + 1)}'
 
+    @visitor.when(ast.ParamNode)
+    def visit(self, node: ast.ParamNode, tabs: int = 0):
+        return '    ' * tabs + f'({node.name}: {node.type.name})'
+
+    @visitor.when(ast.ExprParNode)
+    def visit(self, node: ast.ExprParNode, tabs: int = 0):
+        return f"({self.visit(node.expr, tabs)})"
+    
+    @visitor.when(ast.IsVoidNode)
+    def visit(self, node: ast.IsVoidNode, tabs: int = 0):
+        return f'Isvoid({self.visit(node.expr, tabs)})'
+
     @visitor.when(ast.AssignNode)
     def visit(self, node: ast.AssignNode, tabs: int = 0):
-        return '    ' * tabs + f'{node.idx} <- {self.visit(node.expr)}'
+        return '    ' * tabs + f'{node.idx} <- {self.visit(node.expr, tabs)}'
 
     @visitor.when(ast.BlockNode)
     def visit(self, node: ast.BlockNode, tabs: int = 0):
@@ -91,10 +104,23 @@ class CodeBuilder:
         right = self.visit(node.right)
         return f'{left} {node.operation} {right}'
 
+    
+    @visitor.when(ast.ComplementNode)
+    def visit(self, node: ast.ComplementNode, tabs: int = 0):
+        return f'~ {self.visit(node.expr, tabs)}'
+
+    @visitor.when(ast.NegationNode)
+    def visit(self, node: ast.NegationNode, tabs: int = 0):
+        return f'not {self.visit(node.expr, tabs)}'
+
+    @visitor.when(NullNode)
+    def visit(self, node: NullNode, tabs):
+        return 'NULL'
+
     @visitor.when(ast.AtomicNode)
     def visit(self, node: ast.AtomicNode, tabs: int = 0):
         lex = node.lex
-        return '    ' * tabs + f'{lex}'
+        return f'{lex}'
 
     @visitor.when(ast.NewNode)
     def visit(self, node: ast.NewNode, tabs: int = 0):

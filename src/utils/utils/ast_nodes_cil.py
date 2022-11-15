@@ -2,7 +2,11 @@ import utils.visitor as visitor
 
 
 class Node:
-    pass
+    comment: str = ""
+
+    def set_comment(self, comment: str) -> "Node":
+        self.comment = comment
+        return self
 
 class ProgramNode(Node):
     def __init__(self, dottypes, dotdata, dotcode):

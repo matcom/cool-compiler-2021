@@ -646,6 +646,7 @@ class TypeChecker:
     # operaciones atomicas
     @visitor.when(ast.NumberNode)
     def visit(self, node: ast.NumberNode, scope: Scope):
+        node.lex = str(node.lex)
         return self.context.get_type('Int')
 
     @visitor.when(ast.BooleanNode)

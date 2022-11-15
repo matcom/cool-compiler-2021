@@ -1,6 +1,10 @@
 ### nodos del ast de MIPS ###
 class Node:
-    pass
+    comment: str = ""
+
+    def set_comment(self, comment: str) -> "Node":
+        self.comment = comment
+        return self
 
 
 class ProgramNode(Node):
