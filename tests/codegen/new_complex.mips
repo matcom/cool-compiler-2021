@@ -2,7 +2,7 @@
 	type_Object: .word 24
 	type_Object_inherits_from: .word 0
 	type_Object_name_address: .word type_Object_name_size
-	type_Object__init_: .word function__init__at_Object
+	type_Object___init__: .word function___init___at_Object
 	type_Object_abort: .word function_abort_at_Object
 	type_Object_type_name: .word function_type_name_at_Object
 	type_Object_copy: .word function_copy_at_Object
@@ -10,7 +10,7 @@
 	type_IO: .word 40
 	type_IO_inherits_from: .word type_Object
 	type_IO_name_address: .word type_IO_name_size
-	type_IO__init_: .word function__init__at_IO
+	type_IO___init__: .word function___init___at_IO
 	type_IO_abort: .word function_abort_at_Object
 	type_IO_type_name: .word function_type_name_at_Object
 	type_IO_copy: .word function_copy_at_Object
@@ -22,7 +22,7 @@
 	type_String: .word 36
 	type_String_inherits_from: .word type_Object
 	type_String_name_address: .word type_String_name_size
-	type_String__init_: .word function__init__at_String
+	type_String___init__: .word function___init___at_String
 	type_String_abort: .word function_abort_at_Object
 	type_String_type_name: .word function_type_name_at_Object
 	type_String_copy: .word function_copy_at_Object
@@ -33,7 +33,7 @@
 	type_Int: .word 24
 	type_Int_inherits_from: .word type_Object
 	type_Int_name_address: .word type_Int_name_size
-	type_Int__init_: .word function__init__at_Int
+	type_Int___init__: .word function___init___at_Int
 	type_Int_abort: .word function_abort_at_Object
 	type_Int_type_name: .word function_type_name_at_Object
 	type_Int_copy: .word function_copy_at_Object
@@ -41,7 +41,7 @@
 	type_Bool: .word 24
 	type_Bool_inherits_from: .word type_Object
 	type_Bool_name_address: .word type_Bool_name_size
-	type_Bool__init_: .word function__init__at_Bool
+	type_Bool___init__: .word function___init___at_Bool
 	type_Bool_abort: .word function_abort_at_Object
 	type_Bool_type_name: .word function_type_name_at_Object
 	type_Bool_copy: .word function_copy_at_Object
@@ -49,7 +49,7 @@
 	type_Main: .word 44
 	type_Main_inherits_from: .word type_IO
 	type_Main_name_address: .word type_Main_name_size
-	type_Main__init_: .word function__init__at_Main
+	type_Main___init__: .word function___init___at_Main
 	type_Main_abort: .word function_abort_at_Object
 	type_Main_type_name: .word function_type_name_at_Object
 	type_Main_copy: .word function_copy_at_Object
@@ -62,7 +62,7 @@
 	type_Complex: .word 80
 	type_Complex_inherits_from: .word type_IO
 	type_Complex_name_address: .word type_Complex_name_size
-	type_Complex__init_: .word function__init__at_Complex
+	type_Complex___init__: .word function___init___at_Complex
 	type_Complex_abort: .word function_abort_at_Object
 	type_Complex_type_name: .word function_type_name_at_Object
 	type_Complex_copy: .word function_copy_at_Object
@@ -747,7 +747,7 @@
 		
 		jr $ra
 		
-	function__init__at_Object:
+	function___init___at_Object:
 		# Function parameters
 		#   $ra = 4($sp)
 		#   self = 0($sp)
@@ -1109,7 +1109,7 @@
 		
 		jr $ra
 		
-	function__init__at_IO:
+	function___init___at_IO:
 		# Function parameters
 		#   $ra = 4($sp)
 		#   self = 0($sp)
@@ -1245,7 +1245,7 @@
 		
 		jr $ra
 		
-	function__init__at_String:
+	function___init___at_String:
 		# Function parameters
 		#   $ra = 4($sp)
 		#   self = 0($sp)
@@ -1424,7 +1424,7 @@
 		
 		jr $ra
 		
-	function__init__at_Int:
+	function___init___at_Int:
 		# Function parameters
 		#   $ra = 4($sp)
 		#   self = 0($sp)
@@ -1434,7 +1434,7 @@
 		
 		jr $ra
 		
-	function__init__at_Bool:
+	function___init___at_Bool:
 		# Function parameters
 		#   $ra = 4($sp)
 		#   self = 0($sp)
@@ -1444,7 +1444,7 @@
 		
 		jr $ra
 		
-	function__init__at_Main:
+	function___init___at_Main:
 		# Function parameters
 		#   $ra = 4($sp)
 		#   self = 0($sp)
@@ -1479,10 +1479,10 @@
 		lw $t0, 184($sp)
 		sw $t0, 0($sp) # Storing internal_1
 		
-		# Calling function function__init__at_Complex
-		jal function__init__at_Complex
+		# Calling function function___init___at_Complex
+		jal function___init___at_Complex
 		lw $ra, 4($sp)
-		sw $v1, 184($sp) # internal_1 = result of function__init__at_Complex
+		sw $v1, 184($sp) # internal_1 = result of function___init___at_Complex
 		addi $sp, $sp, 8 # Freeing space for arguments
 		
 		# Allocating Int 1
@@ -1683,16 +1683,16 @@
 		lw $t0, 120($sp)
 		sw $t0, 148($sp)
 		
-		# If internal_8 then goto then_8769295856553
+		# If internal_8 then goto then_8755101957864
 		lw $t0, 148($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, then_8769295856553
+		beq $t0, $t1, then_8755101957864
 		
-		# Jumping to else_8769295856553
-		j else_8769295856553
+		# Jumping to else_8755101957864
+		j else_8755101957864
 		
-		then_8769295856553:
+		then_8755101957864:
 		
 		# Allocating String
 		li $v0, 9
@@ -1764,10 +1764,10 @@
 		lw $t0, 112($sp)
 		sw $t0, 152($sp)
 		
-		# Jumping to endif_8769295856553
-		j endif_8769295856553
+		# Jumping to endif_8755101957864
+		j endif_8755101957864
 		
-		else_8769295856553:
+		else_8755101957864:
 		
 		# Allocating String
 		li $v0, 9
@@ -1839,10 +1839,10 @@
 		lw $t0, 96($sp)
 		sw $t0, 152($sp)
 		
-		# Jumping to endif_8769295856553
-		j endif_8769295856553
+		# Jumping to endif_8755101957864
+		j endif_8755101957864
 		
-		endif_8769295856553:
+		endif_8755101957864:
 		
 		# Allocating Bool 0
 		li $v0, 9
@@ -2016,16 +2016,16 @@
 		lw $t0, 40($sp)
 		sw $t0, 80($sp)
 		
-		# If internal_25 then goto then_8769295857749
+		# If internal_25 then goto then_8755101958286
 		lw $t0, 80($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, then_8769295857749
+		beq $t0, $t1, then_8755101958286
 		
-		# Jumping to else_8769295857749
-		j else_8769295857749
+		# Jumping to else_8755101958286
+		j else_8755101958286
 		
-		then_8769295857749:
+		then_8755101958286:
 		
 		# Allocating String
 		li $v0, 9
@@ -2097,10 +2097,10 @@
 		lw $t0, 24($sp)
 		sw $t0, 84($sp)
 		
-		# Jumping to endif_8769295857749
-		j endif_8769295857749
+		# Jumping to endif_8755101958286
+		j endif_8755101958286
 		
-		else_8769295857749:
+		else_8755101958286:
 		
 		# Allocating String
 		li $v0, 9
@@ -2172,10 +2172,10 @@
 		lw $t0, 8($sp)
 		sw $t0, 84($sp)
 		
-		# Jumping to endif_8769295857749
-		j endif_8769295857749
+		# Jumping to endif_8755101958286
+		j endif_8755101958286
 		
-		endif_8769295857749:
+		endif_8755101958286:
 		
 		# Loading return value in $v1
 		lw $v1, 84($sp)
@@ -2185,7 +2185,7 @@
 		
 		jr $ra
 		
-	function__init__at_Complex:
+	function___init___at_Complex:
 		# Function parameters
 		#   $ra = 12($sp)
 		#   self = 8($sp)
@@ -2348,16 +2348,16 @@
 		lw $t0, 68($sp)
 		sw $t0, 76($sp)
 		
-		# If internal_1 then goto then_8769295857911
+		# If internal_1 then goto then_8755101959503
 		lw $t0, 76($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, then_8769295857911
+		beq $t0, $t1, then_8755101959503
 		
-		# Jumping to else_8769295857911
-		j else_8769295857911
+		# Jumping to else_8755101959503
+		j else_8755101959503
 		
-		then_8769295857911:
+		then_8755101959503:
 		
 		# Allocating Int 5
 		li $v0, 9
@@ -2402,10 +2402,10 @@
 		lw $t0, 64($sp)
 		sw $t0, 80($sp)
 		
-		# Jumping to endif_8769295857911
-		j endif_8769295857911
+		# Jumping to endif_8755101959503
+		j endif_8755101959503
 		
-		else_8769295857911:
+		else_8755101959503:
 		
 		# Allocating Int 5
 		li $v0, 9
@@ -2609,10 +2609,10 @@
 		lw $t0, 8($sp)
 		sw $t0, 80($sp)
 		
-		# Jumping to endif_8769295857911
-		j endif_8769295857911
+		# Jumping to endif_8755101959503
+		j endif_8755101959503
 		
-		endif_8769295857911:
+		endif_8755101959503:
 		
 		# Loading return value in $v1
 		lw $v1, 80($sp)
@@ -3084,16 +3084,16 @@
 		lw $t0, 36($sp)
 		sw $t0, 52($sp)
 		
-		# If internal_1 then goto then_8769295858095
+		# If internal_1 then goto then_8755101960310
 		lw $t0, 52($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, then_8769295858095
+		beq $t0, $t1, then_8755101960310
 		
-		# Jumping to else_8769295858095
-		j else_8769295858095
+		# Jumping to else_8755101960310
+		j else_8755101960310
 		
-		then_8769295858095:
+		then_8755101960310:
 		
 		# Allocating Bool 0
 		li $v0, 9
@@ -3164,16 +3164,16 @@
 		lw $t0, 12($sp)
 		sw $t0, 28($sp)
 		
-		# If internal_7 then goto then_8769295858954
+		# If internal_7 then goto then_8755101960268
 		lw $t0, 28($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, then_8769295858954
+		beq $t0, $t1, then_8755101960268
 		
-		# Jumping to else_8769295858954
-		j else_8769295858954
+		# Jumping to else_8755101960268
+		j else_8755101960268
 		
-		then_8769295858954:
+		then_8755101960268:
 		
 		# Allocating Bool 1
 		li $v0, 9
@@ -3191,10 +3191,10 @@
 		lw $t0, 8($sp)
 		sw $t0, 32($sp)
 		
-		# Jumping to endif_8769295858954
-		j endif_8769295858954
+		# Jumping to endif_8755101960268
+		j endif_8755101960268
 		
-		else_8769295858954:
+		else_8755101960268:
 		
 		# Allocating Bool 0
 		li $v0, 9
@@ -3212,19 +3212,19 @@
 		lw $t0, 4($sp)
 		sw $t0, 32($sp)
 		
-		# Jumping to endif_8769295858954
-		j endif_8769295858954
+		# Jumping to endif_8755101960268
+		j endif_8755101960268
 		
-		endif_8769295858954:
+		endif_8755101960268:
 		
 		# internal_0 = internal_6
 		lw $t0, 32($sp)
 		sw $t0, 56($sp)
 		
-		# Jumping to endif_8769295858095
-		j endif_8769295858095
+		# Jumping to endif_8755101960310
+		j endif_8755101960310
 		
-		else_8769295858095:
+		else_8755101960310:
 		
 		# Allocating Bool 0
 		li $v0, 9
@@ -3242,10 +3242,10 @@
 		lw $t0, 0($sp)
 		sw $t0, 56($sp)
 		
-		# Jumping to endif_8769295858095
-		j endif_8769295858095
+		# Jumping to endif_8755101960310
+		j endif_8755101960310
 		
-		endif_8769295858095:
+		endif_8755101960310:
 		
 		# Loading return value in $v1
 		lw $v1, 56($sp)
@@ -3290,10 +3290,10 @@
 		lw $t0, 20($sp)
 		sw $t0, 0($sp) # Storing internal_0
 		
-		# Calling function function__init__at_Main
-		jal function__init__at_Main
+		# Calling function function___init___at_Main
+		jal function___init___at_Main
 		lw $ra, 4($sp)
-		sw $v1, 20($sp) # internal_0 = result of function__init__at_Main
+		sw $v1, 20($sp) # internal_0 = result of function___init___at_Main
 		addi $sp, $sp, 8 # Freeing space for arguments
 		
 		# Allocating Int 8

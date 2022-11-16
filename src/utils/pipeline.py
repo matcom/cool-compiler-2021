@@ -362,7 +362,7 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
         # write_file(program_file_out, program_result)
         # 1 # temporal breakpoint
         
-        print(CodeBuilder().visit(ast))
+        # print(CodeBuilder().visit(ast))
         new_ast = ExtendedCoolTranslator(context).visit(ast)
         print(CodeBuilder().visit(new_ast))
         

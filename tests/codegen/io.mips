@@ -2,7 +2,7 @@
 	type_Object: .word 24
 	type_Object_inherits_from: .word 0
 	type_Object_name_address: .word type_Object_name_size
-	type_Object__init_: .word function__init__at_Object
+	type_Object___init__: .word function___init___at_Object
 	type_Object_abort: .word function_abort_at_Object
 	type_Object_type_name: .word function_type_name_at_Object
 	type_Object_copy: .word function_copy_at_Object
@@ -10,7 +10,7 @@
 	type_IO: .word 40
 	type_IO_inherits_from: .word type_Object
 	type_IO_name_address: .word type_IO_name_size
-	type_IO__init_: .word function__init__at_IO
+	type_IO___init__: .word function___init___at_IO
 	type_IO_abort: .word function_abort_at_Object
 	type_IO_type_name: .word function_type_name_at_Object
 	type_IO_copy: .word function_copy_at_Object
@@ -22,7 +22,7 @@
 	type_String: .word 36
 	type_String_inherits_from: .word type_Object
 	type_String_name_address: .word type_String_name_size
-	type_String__init_: .word function__init__at_String
+	type_String___init__: .word function___init___at_String
 	type_String_abort: .word function_abort_at_Object
 	type_String_type_name: .word function_type_name_at_Object
 	type_String_copy: .word function_copy_at_Object
@@ -33,7 +33,7 @@
 	type_Int: .word 24
 	type_Int_inherits_from: .word type_Object
 	type_Int_name_address: .word type_Int_name_size
-	type_Int__init_: .word function__init__at_Int
+	type_Int___init__: .word function___init___at_Int
 	type_Int_abort: .word function_abort_at_Object
 	type_Int_type_name: .word function_type_name_at_Object
 	type_Int_copy: .word function_copy_at_Object
@@ -41,7 +41,7 @@
 	type_Bool: .word 24
 	type_Bool_inherits_from: .word type_Object
 	type_Bool_name_address: .word type_Bool_name_size
-	type_Bool__init_: .word function__init__at_Bool
+	type_Bool___init__: .word function___init___at_Bool
 	type_Bool_abort: .word function_abort_at_Object
 	type_Bool_type_name: .word function_type_name_at_Object
 	type_Bool_copy: .word function_copy_at_Object
@@ -49,7 +49,7 @@
 	type_A: .word 32
 	type_A_inherits_from: .word type_Object
 	type_A_name_address: .word type_A_name_size
-	type_A__init_: .word function__init__at_A
+	type_A___init__: .word function___init___at_A
 	type_A_abort: .word function_abort_at_Object
 	type_A_type_name: .word function_type_name_at_Object
 	type_A_copy: .word function_copy_at_Object
@@ -58,7 +58,7 @@
 	type_B: .word 36
 	type_B_inherits_from: .word type_A
 	type_B_name_address: .word type_B_name_size
-	type_B__init_: .word function__init__at_B
+	type_B___init__: .word function___init___at_B
 	type_B_abort: .word function_abort_at_Object
 	type_B_type_name: .word function_type_name_at_Object
 	type_B_copy: .word function_copy_at_Object
@@ -68,7 +68,7 @@
 	type_C: .word 44
 	type_C_inherits_from: .word type_IO
 	type_C_name_address: .word type_C_name_size
-	type_C__init_: .word function__init__at_C
+	type_C___init__: .word function___init___at_C
 	type_C_abort: .word function_abort_at_Object
 	type_C_type_name: .word function_type_name_at_Object
 	type_C_copy: .word function_copy_at_Object
@@ -81,7 +81,7 @@
 	type_D: .word 48
 	type_D_inherits_from: .word type_C
 	type_D_name_address: .word type_D_name_size
-	type_D__init_: .word function__init__at_D
+	type_D___init__: .word function___init___at_D
 	type_D_abort: .word function_abort_at_Object
 	type_D_type_name: .word function_type_name_at_Object
 	type_D_copy: .word function_copy_at_Object
@@ -95,7 +95,7 @@
 	type_Main: .word 44
 	type_Main_inherits_from: .word type_IO
 	type_Main_name_address: .word type_Main_name_size
-	type_Main__init_: .word function__init__at_Main
+	type_Main___init__: .word function___init___at_Main
 	type_Main_abort: .word function_abort_at_Object
 	type_Main_type_name: .word function_type_name_at_Object
 	type_Main_copy: .word function_copy_at_Object
@@ -782,7 +782,7 @@
 		
 		jr $ra
 		
-	function__init__at_Object:
+	function___init___at_Object:
 		# Function parameters
 		#   $ra = 4($sp)
 		#   self = 0($sp)
@@ -1144,7 +1144,7 @@
 		
 		jr $ra
 		
-	function__init__at_IO:
+	function___init___at_IO:
 		# Function parameters
 		#   $ra = 4($sp)
 		#   self = 0($sp)
@@ -1280,7 +1280,7 @@
 		
 		jr $ra
 		
-	function__init__at_String:
+	function___init___at_String:
 		# Function parameters
 		#   $ra = 4($sp)
 		#   self = 0($sp)
@@ -1459,7 +1459,7 @@
 		
 		jr $ra
 		
-	function__init__at_Int:
+	function___init___at_Int:
 		# Function parameters
 		#   $ra = 4($sp)
 		#   self = 0($sp)
@@ -1469,7 +1469,7 @@
 		
 		jr $ra
 		
-	function__init__at_Bool:
+	function___init___at_Bool:
 		# Function parameters
 		#   $ra = 4($sp)
 		#   self = 0($sp)
@@ -1479,7 +1479,7 @@
 		
 		jr $ra
 		
-	function__init__at_A:
+	function___init___at_A:
 		# Function parameters
 		#   $ra = 8($sp)
 		#   self = 4($sp)
@@ -1504,10 +1504,10 @@
 		lw $t0, 8($sp)
 		sw $t0, 0($sp) # Storing internal_0
 		
-		# Calling function function__init__at_IO
-		jal function__init__at_IO
+		# Calling function function___init___at_IO
+		jal function___init___at_IO
 		lw $ra, 4($sp)
-		sw $v1, 8($sp) # internal_0 = result of function__init__at_IO
+		sw $v1, 8($sp) # internal_0 = result of function___init___at_IO
 		addi $sp, $sp, 8 # Freeing space for arguments
 		
 		# Passing function arguments
@@ -1635,7 +1635,7 @@
 		
 		jr $ra
 		
-	function__init__at_B:
+	function___init___at_B:
 		# Function parameters
 		#   $ra = 8($sp)
 		#   self = 4($sp)
@@ -1660,10 +1660,10 @@
 		lw $t0, 8($sp)
 		sw $t0, 0($sp) # Storing internal_0
 		
-		# Calling function function__init__at_IO
-		jal function__init__at_IO
+		# Calling function function___init___at_IO
+		jal function___init___at_IO
 		lw $ra, 4($sp)
-		sw $v1, 8($sp) # internal_0 = result of function__init__at_IO
+		sw $v1, 8($sp) # internal_0 = result of function___init___at_IO
 		addi $sp, $sp, 8 # Freeing space for arguments
 		
 		# Passing function arguments
@@ -1791,7 +1791,7 @@
 		
 		jr $ra
 		
-	function__init__at_C:
+	function___init___at_C:
 		# Function parameters
 		#   $ra = 4($sp)
 		#   self = 0($sp)
@@ -1919,7 +1919,7 @@
 		
 		jr $ra
 		
-	function__init__at_D:
+	function___init___at_D:
 		# Function parameters
 		#   $ra = 4($sp)
 		#   self = 0($sp)
@@ -2047,7 +2047,7 @@
 		
 		jr $ra
 		
-	function__init__at_Main:
+	function___init___at_Main:
 		# Function parameters
 		#   $ra = 4($sp)
 		#   self = 0($sp)
@@ -2082,10 +2082,10 @@
 		lw $t0, 84($sp)
 		sw $t0, 0($sp) # Storing internal_0
 		
-		# Calling function function__init__at_A
-		jal function__init__at_A
+		# Calling function function___init___at_A
+		jal function___init___at_A
 		lw $ra, 4($sp)
-		sw $v1, 84($sp) # internal_0 = result of function__init__at_A
+		sw $v1, 84($sp) # internal_0 = result of function___init___at_A
 		addi $sp, $sp, 8 # Freeing space for arguments
 		
 		# Allocating Int 4
@@ -2143,10 +2143,10 @@
 		lw $t0, 68($sp)
 		sw $t0, 0($sp) # Storing internal_4
 		
-		# Calling function function__init__at_B
-		jal function__init__at_B
+		# Calling function function___init___at_B
+		jal function___init___at_B
 		lw $ra, 4($sp)
-		sw $v1, 68($sp) # internal_4 = result of function__init__at_B
+		sw $v1, 68($sp) # internal_4 = result of function___init___at_B
 		addi $sp, $sp, 8 # Freeing space for arguments
 		
 		# Allocating Int 5
@@ -2204,10 +2204,10 @@
 		lw $t0, 52($sp)
 		sw $t0, 0($sp) # Storing internal_8
 		
-		# Calling function function__init__at_C
-		jal function__init__at_C
+		# Calling function function___init___at_C
+		jal function___init___at_C
 		lw $ra, 4($sp)
-		sw $v1, 52($sp) # internal_8 = result of function__init__at_C
+		sw $v1, 52($sp) # internal_8 = result of function___init___at_C
 		addi $sp, $sp, 8 # Freeing space for arguments
 		
 		# Allocating Int 8
@@ -2265,10 +2265,10 @@
 		lw $t0, 36($sp)
 		sw $t0, 0($sp) # Storing internal_12
 		
-		# Calling function function__init__at_D
-		jal function__init__at_D
+		# Calling function function___init___at_D
+		jal function___init___at_D
 		lw $ra, 4($sp)
-		sw $v1, 36($sp) # internal_12 = result of function__init__at_D
+		sw $v1, 36($sp) # internal_12 = result of function___init___at_D
 		addi $sp, $sp, 8 # Freeing space for arguments
 		
 		# Allocating Int 9
@@ -2413,10 +2413,10 @@
 		lw $t0, 20($sp)
 		sw $t0, 0($sp) # Storing internal_0
 		
-		# Calling function function__init__at_Main
-		jal function__init__at_Main
+		# Calling function function___init___at_Main
+		jal function___init___at_Main
 		lw $ra, 4($sp)
-		sw $v1, 20($sp) # internal_0 = result of function__init__at_Main
+		sw $v1, 20($sp) # internal_0 = result of function___init___at_Main
 		addi $sp, $sp, 8 # Freeing space for arguments
 		
 		# Allocating Int 8

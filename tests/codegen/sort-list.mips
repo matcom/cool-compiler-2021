@@ -2434,16 +2434,16 @@
 		lw $t0, 44($sp)
 		sw $t0, 48($sp)
 		
-		# If internal_1 then goto then_8738835611374
+		# If internal_1 then goto then_8749169335028
 		lw $t0, 48($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, then_8738835611374
+		beq $t0, $t1, then_8749169335028
 		
-		# Jumping to else_8738835611374
-		j else_8738835611374
+		# Jumping to else_8749169335028
+		j else_8749169335028
 		
-		then_8738835611374:
+		then_8749169335028:
 		
 		# Allocating Cons
 		li $v0, 9
@@ -2518,10 +2518,10 @@
 		lw $t0, 36($sp)
 		sw $t0, 52($sp)
 		
-		# Jumping to endif_8738835611374
-		j endif_8738835611374
+		# Jumping to endif_8749169335028
+		j endif_8749169335028
 		
-		else_8738835611374:
+		else_8749169335028:
 		
 		# Allocating Cons
 		li $v0, 9
@@ -2622,10 +2622,10 @@
 		lw $t0, 8($sp)
 		sw $t0, 52($sp)
 		
-		# Jumping to endif_8738835611374
-		j endif_8738835611374
+		# Jumping to endif_8749169335028
+		j endif_8749169335028
 		
-		endif_8738835611374:
+		endif_8749169335028:
 		
 		# Loading return value in $v1
 		lw $v1, 52($sp)
@@ -3226,7 +3226,7 @@
 		# Allocating NUll to internal_3
 		sw $zero, 28($sp) # internal_3 = 0
 		
-		while_start_8738835611844:
+		while_start_8749169335498:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -3246,16 +3246,16 @@
 		sw $v1, 36($sp) # internal_4 = result of function_less_than
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# If internal_4 then goto while_body_8738835611844
+		# If internal_4 then goto while_body_8749169335498
 		lw $t0, 24($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, while_body_8738835611844
+		beq $t0, $t1, while_body_8749169335498
 		
-		# Jumping to while_end_8738835611844
-		j while_end_8738835611844
+		# Jumping to while_end_8749169335498
+		j while_end_8749169335498
 		
-		while_body_8738835611844:
+		while_body_8749169335498:
 		
 		# Allocating Cons
 		li $v0, 9
@@ -3383,10 +3383,10 @@
 		sw $v1, 48($sp) # j = result of function_assign
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# Jumping to while_start_8738835611844
-		j while_start_8738835611844
+		# Jumping to while_start_8749169335498
+		j while_start_8749169335498
 		
-		while_end_8738835611844:
+		while_end_8749169335498:
 		
 		# Freeing space for local variables
 		addi $sp, $sp, 44

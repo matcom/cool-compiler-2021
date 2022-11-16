@@ -2,7 +2,7 @@
 	type_Object: .word 24
 	type_Object_inherits_from: .word 0
 	type_Object_name_address: .word type_Object_name_size
-	type_Object__init_: .word function__init__at_Object
+	type_Object___init__: .word function___init___at_Object
 	type_Object_abort: .word function_abort_at_Object
 	type_Object_type_name: .word function_type_name_at_Object
 	type_Object_copy: .word function_copy_at_Object
@@ -10,7 +10,7 @@
 	type_IO: .word 40
 	type_IO_inherits_from: .word type_Object
 	type_IO_name_address: .word type_IO_name_size
-	type_IO__init_: .word function__init__at_IO
+	type_IO___init__: .word function___init___at_IO
 	type_IO_abort: .word function_abort_at_Object
 	type_IO_type_name: .word function_type_name_at_Object
 	type_IO_copy: .word function_copy_at_Object
@@ -22,7 +22,7 @@
 	type_String: .word 36
 	type_String_inherits_from: .word type_Object
 	type_String_name_address: .word type_String_name_size
-	type_String__init_: .word function__init__at_String
+	type_String___init__: .word function___init___at_String
 	type_String_abort: .word function_abort_at_Object
 	type_String_type_name: .word function_type_name_at_Object
 	type_String_copy: .word function_copy_at_Object
@@ -33,7 +33,7 @@
 	type_Int: .word 24
 	type_Int_inherits_from: .word type_Object
 	type_Int_name_address: .word type_Int_name_size
-	type_Int__init_: .word function__init__at_Int
+	type_Int___init__: .word function___init___at_Int
 	type_Int_abort: .word function_abort_at_Object
 	type_Int_type_name: .word function_type_name_at_Object
 	type_Int_copy: .word function_copy_at_Object
@@ -41,7 +41,7 @@
 	type_Bool: .word 24
 	type_Bool_inherits_from: .word type_Object
 	type_Bool_name_address: .word type_Bool_name_size
-	type_Bool__init_: .word function__init__at_Bool
+	type_Bool___init__: .word function___init___at_Bool
 	type_Bool_abort: .word function_abort_at_Object
 	type_Bool_type_name: .word function_type_name_at_Object
 	type_Bool_copy: .word function_copy_at_Object
@@ -49,7 +49,7 @@
 	type_Book: .word 56
 	type_Book_inherits_from: .word type_IO
 	type_Book_name_address: .word type_Book_name_size
-	type_Book__init_: .word function__init__at_Book
+	type_Book___init__: .word function___init___at_Book
 	type_Book_abort: .word function_abort_at_Object
 	type_Book_type_name: .word function_type_name_at_Object
 	type_Book_copy: .word function_copy_at_Object
@@ -63,7 +63,7 @@
 	type_Article: .word 64
 	type_Article_inherits_from: .word type_Book
 	type_Article_name_address: .word type_Article_name_size
-	type_Article__init_: .word function__init__at_Article
+	type_Article___init__: .word function___init___at_Article
 	type_Article_abort: .word function_abort_at_Object
 	type_Article_type_name: .word function_type_name_at_Object
 	type_Article_copy: .word function_copy_at_Object
@@ -78,7 +78,7 @@
 	type_BookList: .word 60
 	type_BookList_inherits_from: .word type_IO
 	type_BookList_name_address: .word type_BookList_name_size
-	type_BookList__init_: .word function__init__at_BookList
+	type_BookList___init__: .word function___init___at_BookList
 	type_BookList_abort: .word function_abort_at_Object
 	type_BookList_type_name: .word function_type_name_at_Object
 	type_BookList_copy: .word function_copy_at_Object
@@ -95,7 +95,7 @@
 	type_Cons: .word 72
 	type_Cons_inherits_from: .word type_BookList
 	type_Cons_name_address: .word type_Cons_name_size
-	type_Cons__init_: .word function__init__at_Cons
+	type_Cons___init__: .word function___init___at_Cons
 	type_Cons_abort: .word function_abort_at_Object
 	type_Cons_type_name: .word function_type_name_at_Object
 	type_Cons_copy: .word function_copy_at_Object
@@ -113,7 +113,7 @@
 	type_Nil: .word 60
 	type_Nil_inherits_from: .word type_BookList
 	type_Nil_name_address: .word type_Nil_name_size
-	type_Nil__init_: .word function__init__at_Nil
+	type_Nil___init__: .word function___init___at_Nil
 	type_Nil_abort: .word function_abort_at_Object
 	type_Nil_type_name: .word function_type_name_at_Object
 	type_Nil_copy: .word function_copy_at_Object
@@ -130,7 +130,7 @@
 	type_Main: .word 32
 	type_Main_inherits_from: .word type_Object
 	type_Main_name_address: .word type_Main_name_size
-	type_Main__init_: .word function__init__at_Main
+	type_Main___init__: .word function___init___at_Main
 	type_Main_abort: .word function_abort_at_Object
 	type_Main_type_name: .word function_type_name_at_Object
 	type_Main_copy: .word function_copy_at_Object
@@ -816,7 +816,7 @@
 		
 		jr $ra
 		
-	function__init__at_Object:
+	function___init___at_Object:
 		# Function parameters
 		#   $ra = 4($sp)
 		#   self = 0($sp)
@@ -1178,7 +1178,7 @@
 		
 		jr $ra
 		
-	function__init__at_IO:
+	function___init___at_IO:
 		# Function parameters
 		#   $ra = 4($sp)
 		#   self = 0($sp)
@@ -1314,7 +1314,7 @@
 		
 		jr $ra
 		
-	function__init__at_String:
+	function___init___at_String:
 		# Function parameters
 		#   $ra = 4($sp)
 		#   self = 0($sp)
@@ -1493,7 +1493,7 @@
 		
 		jr $ra
 		
-	function__init__at_Int:
+	function___init___at_Int:
 		# Function parameters
 		#   $ra = 4($sp)
 		#   self = 0($sp)
@@ -1503,7 +1503,7 @@
 		
 		jr $ra
 		
-	function__init__at_Bool:
+	function___init___at_Bool:
 		# Function parameters
 		#   $ra = 4($sp)
 		#   self = 0($sp)
@@ -1513,7 +1513,7 @@
 		
 		jr $ra
 		
-	function__init__at_Book:
+	function___init___at_Book:
 		# Function parameters
 		#   $ra = 12($sp)
 		#   self = 8($sp)
@@ -2019,7 +2019,7 @@
 		
 		jr $ra
 		
-	function__init__at_Article:
+	function___init___at_Article:
 		# Function parameters
 		#   $ra = 16($sp)
 		#   self = 12($sp)
@@ -2441,7 +2441,7 @@
 		
 		jr $ra
 		
-	function__init__at_BookList:
+	function___init___at_BookList:
 		# Function parameters
 		#   $ra = 4($sp)
 		#   self = 0($sp)
@@ -2543,10 +2543,10 @@
 		lw $t0, 20($sp)
 		sw $t0, 0($sp) # Storing internal_1
 		
-		# Calling function function__init__at_Cons
-		jal function__init__at_Cons
+		# Calling function function___init___at_Cons
+		jal function___init___at_Cons
 		lw $ra, 4($sp)
-		sw $v1, 20($sp) # internal_1 = result of function__init__at_Cons
+		sw $v1, 20($sp) # internal_1 = result of function___init___at_Cons
 		addi $sp, $sp, 8 # Freeing space for arguments
 		
 		# Passing function arguments
@@ -2684,10 +2684,10 @@
 		lw $t0, 8($sp)
 		sw $t0, 0($sp) # Storing internal_3
 		
-		# Calling function function__init__at_Book
-		jal function__init__at_Book
+		# Calling function function___init___at_Book
+		jal function___init___at_Book
 		lw $ra, 4($sp)
-		sw $v1, 8($sp) # internal_3 = result of function__init__at_Book
+		sw $v1, 8($sp) # internal_3 = result of function___init___at_Book
 		addi $sp, $sp, 8 # Freeing space for arguments
 		
 		# Loading return value in $v1
@@ -2761,10 +2761,10 @@
 		lw $t0, 8($sp)
 		sw $t0, 0($sp) # Storing internal_3
 		
-		# Calling function function__init__at_BookList
-		jal function__init__at_BookList
+		# Calling function function___init___at_BookList
+		jal function___init___at_BookList
 		lw $ra, 4($sp)
-		sw $v1, 8($sp) # internal_3 = result of function__init__at_BookList
+		sw $v1, 8($sp) # internal_3 = result of function___init___at_BookList
 		addi $sp, $sp, 8 # Freeing space for arguments
 		
 		# Loading return value in $v1
@@ -2829,7 +2829,7 @@
 		
 		jr $ra
 		
-	function__init__at_Cons:
+	function___init___at_Cons:
 		# Function parameters
 		#   $ra = 12($sp)
 		#   self = 8($sp)
@@ -3058,7 +3058,7 @@
 		lw $t0, 172($sp)
 		sw $t0, 168($sp)
 		
-		while_start_8781980181200:
+		while_start_8772179732595:
 		
 		# internal_8 = EqualAddress(internal_10, internal_6)
 		lw $t0, 168($sp)
@@ -3067,11 +3067,11 @@
 		lw $t0, 176($sp)
 		sw $t2, 8($t0)
 		
-		# If internal_8 then goto while_end_8781980181200
+		# If internal_8 then goto while_end_8772179732595
 		lw $t0, 176($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, while_end_8781980181200
+		beq $t0, $t1, while_end_8772179732595
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -3096,10 +3096,10 @@
 		lw $t0, 4($t0)
 		sw $t0, 168($sp)
 		
-		# Jumping to while_start_8781980181200
-		j while_start_8781980181200
+		# Jumping to while_start_8772179732595
+		j while_start_8772179732595
 		
-		while_end_8781980181200:
+		while_end_8772179732595:
 		
 		# internal_10 = internal_9
 		lw $t0, 172($sp)
@@ -3140,7 +3140,7 @@
 		sw $t0, 8($v0) # Setting value in the third word of the object
 		sw $v0, 156($sp) # internal_13 = address of allocated object Int
 		
-		foreach_start_8781980181200:
+		foreach_start_8772179732595:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -3160,16 +3160,16 @@
 		sw $v1, 168($sp) # internal_13 = result of function_less_than
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# If internal_13 then goto foreach_body_8781980181200
+		# If internal_13 then goto foreach_body_8772179732595
 		lw $t0, 156($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, foreach_body_8781980181200
+		beq $t0, $t1, foreach_body_8772179732595
 		
-		# Jumping to foreach_end_8781980181200
-		j foreach_end_8781980181200
+		# Jumping to foreach_end_8772179732595
+		j foreach_end_8772179732595
 		
-		foreach_body_8781980181200:
+		foreach_body_8772179732595:
 		
 		# array internal_11[4 * internal_12] = internal_10
 		lw $t0, 160($sp) # $t0 = internal_12
@@ -3205,10 +3205,10 @@
 		sw $v1, 172($sp) # internal_12 = result of function_add
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# Jumping to foreach_start_8781980181200
-		j foreach_start_8781980181200
+		# Jumping to foreach_start_8772179732595
+		j foreach_start_8772179732595
 		
-		foreach_end_8781980181200:
+		foreach_end_8772179732595:
 		
 		# initialize Array [internal_5]
 		lw $t0, 188($sp) # $t0 = internal_5
@@ -3370,7 +3370,7 @@
 		sw $t0, 8($v0) # Setting value in the third word of the object
 		sw $v0, 104($sp) # internal_26 = address of allocated object Int
 		
-		foreach_type_start_8781980181200:
+		foreach_type_start_8772179732595:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -3390,16 +3390,16 @@
 		sw $v1, 136($sp) # internal_21 = result of function_less_than
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# If internal_21 then goto foreach_type_body_8781980181200
+		# If internal_21 then goto foreach_type_body_8772179732595
 		lw $t0, 124($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, foreach_type_body_8781980181200
+		beq $t0, $t1, foreach_type_body_8772179732595
 		
-		# Jumping to foreach_type_end_8781980181200
-		j foreach_type_end_8781980181200
+		# Jumping to foreach_type_end_8772179732595
+		j foreach_type_end_8772179732595
 		
-		foreach_type_body_8781980181200:
+		foreach_type_body_8772179732595:
 		
 		# internal_22 = array internal_14[4 * internal_20]
 		lw $t0, 128($sp) # $t0 = internal_20
@@ -3430,7 +3430,7 @@
 		sw $v1, 128($sp) # internal_23 = result of function_assign
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		foreach_ancestor_start_8781980181200:
+		foreach_ancestor_start_8772179732595:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -3450,16 +3450,16 @@
 		sw $v1, 124($sp) # internal_24 = result of function_less_than
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# If internal_24 then goto foreach_ancestor_body_8781980181200
+		# If internal_24 then goto foreach_ancestor_body_8772179732595
 		lw $t0, 112($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, foreach_ancestor_body_8781980181200
+		beq $t0, $t1, foreach_ancestor_body_8772179732595
 		
-		# Jumping to foreach_ancestor_end_8781980181200
-		j foreach_ancestor_end_8781980181200
+		# Jumping to foreach_ancestor_end_8772179732595
+		j foreach_ancestor_end_8772179732595
 		
-		foreach_ancestor_body_8781980181200:
+		foreach_ancestor_body_8772179732595:
 		
 		# internal_25 = array internal_11[4 * internal_23]
 		lw $t0, 116($sp) # $t0 = internal_23
@@ -3479,11 +3479,11 @@
 		lw $t0, 104($sp)
 		sw $t2, 8($t0)
 		
-		# If internal_26 then goto foreach_ancestor_end_8781980181200
+		# If internal_26 then goto foreach_ancestor_end_8772179732595
 		lw $t0, 104($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, foreach_ancestor_end_8781980181200
+		beq $t0, $t1, foreach_ancestor_end_8772179732595
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -3503,10 +3503,10 @@
 		sw $v1, 128($sp) # internal_23 = result of function_add
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# Jumping to foreach_ancestor_start_8781980181200
-		j foreach_ancestor_start_8781980181200
+		# Jumping to foreach_ancestor_start_8772179732595
+		j foreach_ancestor_start_8772179732595
 		
-		foreach_ancestor_end_8781980181200:
+		foreach_ancestor_end_8772179732595:
 		
 		# array internal_15[4 * internal_20] = internal_23
 		lw $t0, 128($sp) # $t0 = internal_20
@@ -3538,10 +3538,10 @@
 		sw $v1, 140($sp) # internal_20 = result of function_add
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# Jumping to foreach_type_start_8781980181200
-		j foreach_type_start_8781980181200
+		# Jumping to foreach_type_start_8772179732595
+		j foreach_type_start_8772179732595
 		
-		foreach_type_end_8781980181200:
+		foreach_type_end_8772179732595:
 		
 		# Allocating Int 0
 		li $v0, 9
@@ -3621,7 +3621,7 @@
 		sw $v1, 100($sp) # internal_30 = result of function_assign
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		foreach_min_start_8781980181200:
+		foreach_min_start_8772179732595:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -3641,16 +3641,16 @@
 		sw $v1, 96($sp) # internal_31 = result of function_less_than
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# If internal_31 then goto foreach_min_body_8781980181200
+		# If internal_31 then goto foreach_min_body_8772179732595
 		lw $t0, 84($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, foreach_min_body_8781980181200
+		beq $t0, $t1, foreach_min_body_8772179732595
 		
-		# Jumping to foreach_min_end_8781980181200
-		j foreach_min_end_8781980181200
+		# Jumping to foreach_min_end_8772179732595
+		j foreach_min_end_8772179732595
 		
-		foreach_min_body_8781980181200:
+		foreach_min_body_8772179732595:
 		
 		# internal_29 = array internal_15[4 * internal_27]
 		lw $t0, 100($sp) # $t0 = internal_27
@@ -3682,16 +3682,16 @@
 		sw $v1, 96($sp) # internal_31 = result of function_less_than
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# If internal_31 then goto update_min_8781980181200
+		# If internal_31 then goto update_min_8772179732595
 		lw $t0, 84($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, update_min_8781980181200
+		beq $t0, $t1, update_min_8772179732595
 		
-		# Jumping to update_min_end_8781980181200
-		j update_min_end_8781980181200
+		# Jumping to update_min_end_8772179732595
+		j update_min_end_8772179732595
 		
-		update_min_8781980181200:
+		update_min_8772179732595:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -3729,7 +3729,7 @@
 		sw $v1, 108($sp) # internal_28 = result of function_assign
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		update_min_end_8781980181200:
+		update_min_end_8772179732595:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -3749,10 +3749,10 @@
 		sw $v1, 112($sp) # internal_27 = result of function_add
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# Jumping to foreach_min_start_8781980181200
-		j foreach_min_start_8781980181200
+		# Jumping to foreach_min_start_8772179732595
+		j foreach_min_start_8772179732595
 		
-		foreach_min_end_8781980181200:
+		foreach_min_end_8772179732595:
 		
 		# initialize Array [internal_5]
 		lw $t0, 188($sp) # $t0 = internal_5
@@ -3843,11 +3843,11 @@
 		sw $v1, 80($sp) # internal_35 = result of function_equal
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# If internal_35 then goto error_branch_8781980181200
+		# If internal_35 then goto error_branch_8772179732595
 		lw $t0, 68($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, error_branch_8781980181200
+		beq $t0, $t1, error_branch_8772179732595
 		
 		# array internal_32[4 * internal_28] = internal_4
 		lw $t0, 96($sp) # $t0 = internal_28
@@ -3897,11 +3897,11 @@
 		lw $t2, 64($sp) # internal_36 = array internal_32[4 * internal_37]
 		sw $t0, 8($t2)
 		
-		# If internal_36 then goto branch_Book_8781980181200
+		# If internal_36 then goto branch_Book_8772179732595
 		lw $t0, 64($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, branch_Book_8781980181200
+		beq $t0, $t1, branch_Book_8772179732595
 		
 		# Allocating Int 1
 		li $v0, 9
@@ -3927,13 +3927,13 @@
 		lw $t2, 64($sp) # internal_36 = array internal_32[4 * internal_38]
 		sw $t0, 8($t2)
 		
-		# If internal_36 then goto branch_Article_8781980181200
+		# If internal_36 then goto branch_Article_8772179732595
 		lw $t0, 64($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, branch_Article_8781980181200
+		beq $t0, $t1, branch_Article_8772179732595
 		
-		branch_Book_8781980181200:
+		branch_Book_8772179732595:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -4110,10 +4110,10 @@
 		lw $t0, 40($sp)
 		sw $t0, 52($sp)
 		
-		# Jumping to branch_end_8781980181200
-		j branch_end_8781980181200
+		# Jumping to branch_end_8772179732595
+		j branch_end_8772179732595
 		
-		branch_Article_8781980181200:
+		branch_Article_8772179732595:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -4299,12 +4299,12 @@
 		lw $t0, 20($sp)
 		sw $t0, 52($sp)
 		
-		# Jumping to branch_end_8781980181200
-		j branch_end_8781980181200
+		# Jumping to branch_end_8772179732595
+		j branch_end_8772179732595
 		
-		error_branch_8781980181200:
+		error_branch_8772179732595:
 		
-		branch_end_8781980181200:
+		branch_end_8772179732595:
 		
 		# Allocating Int 12
 		li $v0, 9
@@ -4339,7 +4339,7 @@
 		
 		jr $ra
 		
-	function__init__at_Nil:
+	function___init___at_Nil:
 		# Function parameters
 		#   $ra = 4($sp)
 		#   self = 0($sp)
@@ -4405,7 +4405,7 @@
 		
 		jr $ra
 		
-	function__init__at_Main:
+	function___init___at_Main:
 		# Function parameters
 		#   $ra = 8($sp)
 		#   self = 4($sp)
@@ -4461,10 +4461,10 @@
 		lw $t0, 100($sp)
 		sw $t0, 0($sp) # Storing internal_1
 		
-		# Calling function function__init__at_Book
-		jal function__init__at_Book
+		# Calling function function___init___at_Book
+		jal function___init___at_Book
 		lw $ra, 4($sp)
-		sw $v1, 100($sp) # internal_1 = result of function__init__at_Book
+		sw $v1, 100($sp) # internal_1 = result of function___init___at_Book
 		addi $sp, $sp, 8 # Freeing space for arguments
 		
 		# Allocating String
@@ -4776,10 +4776,10 @@
 		lw $t0, 72($sp)
 		sw $t0, 0($sp) # Storing internal_8
 		
-		# Calling function function__init__at_Article
-		jal function__init__at_Article
+		# Calling function function___init___at_Article
+		jal function___init___at_Article
 		lw $ra, 4($sp)
-		sw $v1, 72($sp) # internal_8 = result of function__init__at_Article
+		sw $v1, 72($sp) # internal_8 = result of function___init___at_Article
 		addi $sp, $sp, 8 # Freeing space for arguments
 		
 		# Allocating String
@@ -5023,10 +5023,10 @@
 		lw $t0, 44($sp)
 		sw $t0, 0($sp) # Storing internal_15
 		
-		# Calling function function__init__at_Nil
-		jal function__init__at_Nil
+		# Calling function function___init___at_Nil
+		jal function___init___at_Nil
 		lw $ra, 4($sp)
-		sw $v1, 44($sp) # internal_15 = result of function__init__at_Nil
+		sw $v1, 44($sp) # internal_15 = result of function___init___at_Nil
 		addi $sp, $sp, 8 # Freeing space for arguments
 		
 		# Allocating Int 9
@@ -5179,10 +5179,10 @@
 		lw $t0, 20($sp)
 		sw $t0, 0($sp) # Storing internal_0
 		
-		# Calling function function__init__at_Main
-		jal function__init__at_Main
+		# Calling function function___init___at_Main
+		jal function___init___at_Main
 		lw $ra, 4($sp)
-		sw $v1, 20($sp) # internal_0 = result of function__init__at_Main
+		sw $v1, 20($sp) # internal_0 = result of function___init___at_Main
 		addi $sp, $sp, 8 # Freeing space for arguments
 		
 		# Allocating Int 4
