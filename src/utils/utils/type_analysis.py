@@ -260,11 +260,15 @@ class TypeChecker:
     def visit(self, node: ast.ProgramNode, scope: Scope):
         if scope is None:
             scope = Scope()
+            
+        node.scope = scope
+        
         for item in node.class_list:
             self.visit(item, scope.create_child())
 
     @visitor.when(ast.ClassDecNode)
     def visit(self, node: ast.ClassDecNode, scope: Scope):
+        node.scope = scope
         self.current_type = self.context.get_type(node.name)
         
         attributes = [att for att in node.data if isinstance(att, ast.AttributeDecNode)]
@@ -282,6 +286,7 @@ class TypeChecker:
     
     @visitor.when(ast.AttributeDecNode)
     def visit(self, node: ast.AttributeDecNode, scope: Scope):
+        node.scope = scope
         if node.name == 'self':
             self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - SemanticError: Cannot set "self" as attribute of a class.')
         try:
@@ -300,6 +305,7 @@ class TypeChecker:
     
     @visitor.when(ast.MethodDecNode)
     def visit(self, node: ast.MethodDecNode, scope: Scope):
+        node.scope = scope
         self.current_method = self.current_type.get_method(node.name)
 
         scope.define_variable('self', self.current_type)
@@ -326,6 +332,7 @@ class TypeChecker:
     # expresiones
     @visitor.when(ast.WhileNode)
     def visit(self, node: ast.WhileNode, scope: Scope):
+        node.scope = scope
         cond_type = self.visit(node.cond, scope)
         cond_exp_type = self.context.get_type('Bool')
 
@@ -336,6 +343,7 @@ class TypeChecker:
 
     @visitor.when(ast.LetNode)
     def visit(self, node: ast.LetNode, scope: Scope):
+        node.scope = scope
         for pos, (id_, type_, exp) in enumerate(node.declaration):
             if id_ == 'self':
                 l, lp = node.dec_names_pos[pos]
@@ -374,6 +382,7 @@ class TypeChecker:
 
     @visitor.when(ast.AssignNode)
     def visit(self, node: ast.AssignNode, scope: Scope):
+        node.scope = scope
         var_type = scope.find_variable(node.idx)
         if var_type is None:
             self.error.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - NameError: Variable "{self.idx}" is not defined in "{self.current_method.name}".')
@@ -394,10 +403,12 @@ class TypeChecker:
 
     @visitor.when(ast.ParenthesisNode)
     def visit(self, node: ast.ParenthesisNode, scope: Scope):
+        node.scope = scope
         return self.visit(node.expr, scope)
 
     @visitor.when(ast.BlockNode)
     def visit(self, node: ast.BlockNode, scope: Scope):
+        node.scope = scope
         type_ = ErrorType()
         # sc = scope.create_child()
         # if not node.expr:
@@ -408,6 +419,7 @@ class TypeChecker:
 
     @visitor.when(ast.MethodCallNode)
     def visit(self, node: ast.MethodCallNode, scope: Scope):
+        node.scope = scope
 
         if node.atom is None:
             node.atom = ast.VariableNode('self')
@@ -458,6 +470,7 @@ class TypeChecker:
 
     @visitor.when(ast.ConditionalNode)
     def visit(self, node: ast.ConditionalNode, scope: Scope):
+        node.scope = scope
         if_type = self.visit(node.if_expr, scope)
         if if_type != self.context.get_type('Bool'):
             self.errors.append(f'({node.line}, {self.get_tokencolumn(self.program, node.lexpos)}) - TypeError: Cannot convert "{if_type.name}" into "Bool".')
@@ -469,6 +482,7 @@ class TypeChecker:
         
     @visitor.when(ast.NewNode)
     def visit(self, node: ast.NewNode, scope: Scope):
+        node.scope = scope
         try:
             current_type = self.current_type if node.type == 'SELF_TYPE' else self.context.get_type(node.type) 
         except SemanticError as e:
@@ -479,11 +493,13 @@ class TypeChecker:
 
     @visitor.when(ast.IsVoidNode)
     def visit(self, node: ast.IsVoidNode, scope: Scope):
+        node.scope = scope
         self.visit(node.expr, scope)
         return self.context.get_type('Bool')
 
     @visitor.when(ast.CaseNode)
     def visit(self, node: ast.CaseNode, scope: Scope):
+        node.scope = scope
         return_type = ErrorType()
         if node.expr:
             return_type = self.visit(node.expr, scope)
@@ -520,10 +536,12 @@ class TypeChecker:
     # variable
     @visitor.when(ast.ParamNode)
     def visit(self, node: ast.ParamNode, scope: Scope):
+        node.scope = scope
         scope.define_variable(node.name, node.type)
 
     @visitor.when(ast.VariableNode)
     def visit(self, node: ast.VariableNode, scope: Scope):
+        node.scope = scope
         var_ = scope.find_variable(node.lex)
         if var_ is None:
             if self.current_attribute is not None:
@@ -537,6 +555,7 @@ class TypeChecker:
     # operaciones aritmeticas
     @visitor.when(ast.PlusNode)
     def visit(self, node: ast.PlusNode, scope: Scope):
+        node.scope = scope
         right = self.visit(node.right, scope)
         left = self.visit(node.left, scope)
         int_type = self.context.get_type('Int')
@@ -549,6 +568,7 @@ class TypeChecker:
  
     @visitor.when(ast.MinusNode)
     def visit(self, node: ast.MinusNode, scope: Scope):
+        node.scope = scope
         right = self.visit(node.right, scope)
         left = self.visit(node.left, scope)
         int_type = self.context.get_type('Int')
@@ -561,6 +581,7 @@ class TypeChecker:
 
     @visitor.when(ast.TimesNode)
     def visit(self, node: ast.TimesNode, scope: Scope):
+        node.scope = scope
         right = self.visit(node.right, scope)
         left = self.visit(node.left, scope)
         int_type = self.context.get_type('Int')
@@ -573,6 +594,7 @@ class TypeChecker:
 
     @visitor.when(ast.DivNode)
     def visit(self, node: ast.DivNode, scope: Scope):
+        node.scope = scope
         right = self.visit(node.right, scope)
         left = self.visit(node.left, scope)
         int_type = self.context.get_type('Int')
@@ -587,6 +609,7 @@ class TypeChecker:
     # operaciones logicas
     @visitor.when(ast.LessNode)
     def visit(self, node: ast.LessNode, scope: Scope):
+        node.scope = scope
         right = self.visit(node.right, scope)
         left = self.visit(node.left, scope)
         bool_type = self.context.get_type('Bool')
@@ -600,6 +623,7 @@ class TypeChecker:
 
     @visitor.when(ast.LessEqualNode)
     def visit(self, node: ast.LessEqualNode, scope: Scope):
+        node.scope = scope
         right = self.visit(node.right, scope)
         left = self.visit(node.left, scope)
         bool_type = self.context.get_type('Bool')
@@ -613,6 +637,7 @@ class TypeChecker:
 
     @visitor.when(ast.EqualNode)
     def visit(self, node: ast.EqualNode, scope: Scope):
+        node.scope = scope
         right = self.visit(node.right, scope)
         left = self.visit(node.left, scope)
 
@@ -626,6 +651,7 @@ class TypeChecker:
     # operaciones unarias
     @visitor.when(ast.ComplementNode)
     def visit(self, node: ast.ComplementNode, scope: Scope):
+        node.scope = scope
         type_ = self.visit(node.expr, scope)
         if type_ == self.context.get_type('Int'):
             return type_
@@ -635,6 +661,7 @@ class TypeChecker:
 
     @visitor.when(ast.NegationNode)
     def visit(self, node: ast.NegationNode, scope: Scope):
+        node.scope = scope
         type_ = self.visit(node.expr, scope)
         if type_ == self.context.get_type('Bool'):
             return type_
@@ -646,27 +673,42 @@ class TypeChecker:
     # operaciones atomicas
     @visitor.when(ast.NumberNode)
     def visit(self, node: ast.NumberNode, scope: Scope):
+        node.scope = scope
         node.lex = str(node.lex)
         return self.context.get_type('Int')
 
     @visitor.when(ast.BooleanNode)
     def visit(self, node: ast.BooleanNode, scope: Scope):
+        node.scope = scope
         return self.context.get_type('Bool')
 
     @visitor.when(ast.StringNode)
     def visit(self, node: ast.StringNode, scope: Scope):
+        node.scope = scope
         return self.context.get_type('String')
 
     # Parenthesis
     @visitor.when(ast.ExprParNode)
     def visit(self, node: ast.ExprParNode, scope: Scope):
+        node.scope = scope
         return self.visit(node.expr, scope)
 
       
 class PositionateTokensInAST:
-    def __init__(self, tokens):
+    def __init__(self, tokens, program):
+        self.program = program
         self.position = 0
         self.tokens = tokens
+
+    def get_tokencolumn(self, str, pos):
+        column = 1
+        temp_pos = pos
+        while str[temp_pos] != '\n':
+            if temp_pos == 0: break
+            temp_pos -= 1
+            column += 1
+        return column if column > 1 else 2
+
 
     def inc_position(self, value=1):
         self.position += value
@@ -675,24 +717,24 @@ class PositionateTokensInAST:
         self.visit(node.left)
 
         token = self.tokens[self.position]
-        node.set_position(token.line, token.lexpos)
+        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos))
         self.inc_position() 
 
         self.visit(node.right)
 
     def single_op(self, node: ast.UnaryNode):
         token = self.tokens[self.position]
-        node.operation_position = token.line, token.lexpos
+        node.operation_position = token.line, self.get_tokencolumn(self.program, token.lexpos)
 
         token = self.tokens[self.position + 1]
-        node.set_position(token.line, token.lexpos)
+        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos))
 
         self.inc_position() 
         self.visit(node.expr)
 
     def atom(self, node: ast.Node):
         token = self.tokens[self.position]
-        node.set_position(token.line, token.lexpos)
+        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos))
         self.inc_position() 
 
     @visitor.on("node")
@@ -715,11 +757,11 @@ class PositionateTokensInAST:
         assert (token.value.lower() == "class"), f'Expected "class" instead of "{token.value}" in {node.name}'
 
         token = self.tokens[self.position + 1]
-        node.set_position(token.line, token.lexpos)
+        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos))
 
         if node.parent is not None:
             token = self.tokens[self.position + 3]
-            node.parent_pos = token.line, token.lexpos
+            node.parent_pos = token.line, self.get_tokencolumn(self.program, token.lexpos)
 
         count = 3 if node.parent is None else 5
         self.inc_position(count)
@@ -735,15 +777,15 @@ class PositionateTokensInAST:
     @visitor.when(ast.AttributeDecNode)
     def visit(self, node: ast.AttributeDecNode):
         token = self.tokens[self.position]
-        node.set_position(token.line, token.lexpos)
+        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos))
 
         token = self.tokens[self.position + 2]
-        node.type_pos = token.line, token.lexpos
+        node.type_pos = token.line, self.get_tokencolumn(self.program, token.lexpos)
 
         if node.expr is not None:
             self.inc_position(4)
             token = self.tokens[self.position]
-            node.expr_pos = token.line, token.lexpos
+            node.expr_pos = token.line, self.get_tokencolumn(self.program, token.lexpos)
             self.visit(node.expr)
             token = self.tokens[self.position]
             return
@@ -753,20 +795,20 @@ class PositionateTokensInAST:
     @visitor.when(ast.MethodDecNode)
     def visit(self, node: ast.MethodDecNode):
         token = self.tokens[self.position]
-        node.set_position(token.line, token.lexpos)
+        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos))
         self.inc_position(2)
 
         for i, _ in enumerate(node.params):
             self.inc_position(2)
             token = self.tokens[self.position]
-            node.p_types_pos.append((token.line, token.lexpos))
+            node.p_types_pos.append((token.line, self.get_tokencolumn(self.program, token.lexpos)))
             self.inc_position() 
             if i < len(node.params) - 1:
                 self.inc_position() 
 
         self.inc_position(2) 
         token = self.tokens[self.position]
-        node.r_types_pos = token.line, token.lexpos
+        node.r_types_pos = token.line, self.get_tokencolumn(self.program, token.lexpos)
         self.inc_position(2) 
 
         self.visit(node.expr)
@@ -776,14 +818,14 @@ class PositionateTokensInAST:
     def visit(self, node: ast.LetNode):
         token = self.tokens[self.position]
         
-        node.set_position(token.line, token.lexpos)
+        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos))
         self.inc_position()
 
         for _, _, expr in node.declaration:
             token = self.tokens[self.position]
-            node.dec_names_pos.append((token.line, token.lexpos))
+            node.dec_names_pos.append((token.line, self.get_tokencolumn(self.program, token.lexpos)))
             token = self.tokens[self.position + 2]
-            node.dec_types_pos.append((token.line, token.lexpos))
+            node.dec_types_pos.append((token.line, self.get_tokencolumn(self.program, token.lexpos)))
             if expr is not None:
                 self.inc_position(4) 
                 token = self.tokens[self.position]
@@ -797,7 +839,7 @@ class PositionateTokensInAST:
     @visitor.when(ast.AssignNode)
     def visit(self, node: ast.AssignNode):
         token = self.tokens[self.position]
-        node.set_position(token.line, token.lexpos)
+        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos))
 
         token = self.tokens[self.position + 1]
         assert token.value == "<-", f'Expected "<-" instead of "{token.value}" in assign'
@@ -809,7 +851,7 @@ class PositionateTokensInAST:
     def visit(self, node: ast.BlockNode):
         token = self.tokens[self.position]
         assert token.value == "{", f'Expected "{{" instead of "{token.value}" in block'
-        node.set_position(token.line, token.lexpos)
+        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos))
         self.inc_position() 
 
         for i, expr in enumerate(node.expr, start=1):
@@ -827,7 +869,7 @@ class PositionateTokensInAST:
         # IF
         token = self.tokens[self.position]
         assert (token.value == "if"), f'Expected "if" instead of "{token.value}" in conditional'
-        node.set_position(token.line, token.lexpos)
+        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos))
         self.inc_position() 
         self.visit(node.if_expr)
         # THEN
@@ -848,7 +890,7 @@ class PositionateTokensInAST:
     @visitor.when(ast.WhileNode)
     def visit(self, node: ast.WhileNode):
         token = self.tokens[self.position]
-        node.set_position(token.line, token.lexpos)
+        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos))
         self.inc_position() 
         self.visit(node.cond)
         self.inc_position()  
@@ -858,7 +900,7 @@ class PositionateTokensInAST:
     @visitor.when(ast.CaseNode)
     def visit(self, node: ast.CaseNode):
         token = self.tokens[self.position]
-        node.set_position(token.line, token.lexpos)
+        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos))
         # CASE
         self.inc_position()  
         self.visit(node.expr)
@@ -867,7 +909,7 @@ class PositionateTokensInAST:
         for _, _, expr in node.params:
             self.inc_position(2)
             token = self.tokens[self.position]
-            node.cases_positions.append((token.line, token.lexpos))
+            node.cases_positions.append((token.line, self.get_tokencolumn(self.program, token.lexpos)))
             self.inc_position(2)
             self.visit(expr)
             self.inc_position()
@@ -877,8 +919,8 @@ class PositionateTokensInAST:
     @visitor.when(ast.MethodCallNode)
     def visit(self, node: ast.MethodCallNode):
         token = self.tokens[self.position]
-        node.set_position(token.line, token.lexpos)
-        node.id_position = token.line, token.lexpos
+        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos))
+        node.id_position = token.line, self.get_tokencolumn(self.program, token.lexpos)
 
         _atom = node.atom is not None
         _type = node.type is not None
@@ -891,21 +933,21 @@ class PositionateTokensInAST:
             self.inc_position()
 
             token = self.tokens[self.position]
-            node.id_position = token.line, token.lexpos
+            node.id_position = token.line, self.get_tokencolumn(self.program, token.lexpos)
 
         if _type:
             token = self.tokens[self.position]
-            node.type_position = token.line, token.lexpos
+            node.type_position = token.line, self.get_tokencolumn(self.program, token.lexpos)
             self.inc_position(2)
             token = self.tokens[self.position]
-            node.id_position = token.line, token.lexpos
+            node.id_position = token.line, self.get_tokencolumn(self.program, token.lexpos)
 
         self.inc_position(2) 
         token = self.tokens[self.position]
         if node.exprlist:
             for exp in node.exprlist:
                 token = self.tokens[self.position]
-                node.exprlist_positions.append((token.line, token.lexpos))
+                node.exprlist_positions.append((token.line, self.get_tokencolumn(self.program, token.lexpos)))
                 self.visit(exp)
                 token = self.tokens[self.position]
                 assert token.value in (",", ")"), f"Expected ',' or ')' instead of {token.value}"
@@ -932,9 +974,9 @@ class PositionateTokensInAST:
     @visitor.when(ast.NewNode)
     def visit(self, node: ast.NewNode):
         token = self.tokens[self.position]
-        node.set_position(token.line, token.lexpos)
+        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos))
         token = self.tokens[self.position + 1]
-        node.type_position = token.line, token.lexpos
+        node.type_position = token.line, self.get_tokencolumn(self.program, token.lexpos)
         self.inc_position(2) 
 
     @visitor.when(ast.NegationNode)

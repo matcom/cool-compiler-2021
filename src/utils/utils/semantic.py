@@ -175,6 +175,9 @@ class Type:
         return (name in self.attributes or self.parent is not None and self.parent.contains_attribute(name))
 
 
+    def contains_method(self, name):
+        return name in self.methods or (self.parent is not None and self.parent.contains_method(name))
+
 class ErrorType(Type):
     def __init__(self):
         Type.__init__(self, '<error>')
@@ -249,6 +252,9 @@ class Context:
 
     def __repr__(self):
         return str(self)
+    
+    def __iter__(self):
+        return iter(self.types.values())
 
 
 class VariableInfo:
@@ -273,6 +279,41 @@ class Scope:
     def __len__(self):
         return len(self.local_variable)
 
+    def scope_to_string(self, tab: int = 0):
+        s = "    " * tab + "{\n"
+        for local in self.local_variable:
+            s += "    " * (tab + 1) + f"name: {local.name}, type: {local.type.name}\n"
+
+        s += "    " * (tab + 1) + f"children ({len(self.children)}): [\n"
+
+        for child in self.children:
+            s += child.scope_to_string(tab + 2) + "\n"
+
+        s += "    " * (tab + 1) + f"]\n"
+
+        s += "    " * tab + "}"
+        return s
+
+
+    def __str__(self):
+        return self.scope_to_string()
+        # return f'\nlocals: {self.local_variable}\nchildren ({len(self.children)}): , {self.children}'
+
+    # def scope_to_string(self, tab: int = 0):
+    #     s = "    " * tab + "{"
+    #     for local in self.local_variable:
+    #         s += "\n" + "    " * (tab + 1) + f"{local.name}: {local.type.name}"
+
+    #     s += "\n" + "    " * (tab + 1) + f"children ({len(self.children)}): [\n"
+
+    #     for child in self.children:
+    #         s += child.scope_to_string(tab + 2) + ",\n"
+
+    #     s += "\n" + "    " * (tab + 1) + f"]"
+
+    #     s += "\n" + "    " * tab + "}"
+    #     return s
+
     def create_child(self):
         child = Scope(self)
         self.children.append(child)
@@ -296,14 +337,14 @@ class Scope:
     def is_local_variable(self, vname):
         return any(True for x in self.local_variable if x.name == vname)
 
-    def __str__(self):
-        s = ""
-        scope = self
-        while scope != None:
-            for v in scope.local_variable:
-                s += v.name + '\n'
-            scope = scope.parent if scope.parent is not None else None
-        return s
+    # def __str__(self):
+    #     s = "escoup"
+    #     scope = self
+    #     while scope != None:
+    #         for v in scope.local_variable:
+    #             s += v.name + '\n'
+    #         scope = scope.parent if scope.parent is not None else None
+    #     return s
     
     def find_all_variables_with_name(self, var_name):
         vars = []

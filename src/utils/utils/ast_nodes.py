@@ -126,7 +126,9 @@ class ExprParNode(ExprNode):
 
 class AtomicNode(ExprNode):
     def __init__(self, lex):
+        # super().__init__()
         self.lex: str = lex
+        self.scope = None
 
 class UnaryNode(ExprNode):
     def __init__(self, expr):

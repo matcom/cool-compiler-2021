@@ -1924,16 +1924,16 @@
 		lw $t0, 88($sp)
 		sw $t0, 92($sp)
 		
-		# If internal_1 then goto then_8767014207892
+		# If internal_1 then goto then_8771191748009
 		lw $t0, 92($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, then_8767014207892
+		beq $t0, $t1, then_8771191748009
 		
-		# Jumping to else_8767014207892
-		j else_8767014207892
+		# Jumping to else_8771191748009
+		j else_8771191748009
 		
-		then_8767014207892:
+		then_8771191748009:
 		
 		# Allocating String
 		li $v0, 9
@@ -1999,10 +1999,10 @@
 		lw $t0, 72($sp)
 		sw $t0, 96($sp)
 		
-		# Jumping to endif_8767014207892
-		j endif_8767014207892
+		# Jumping to endif_8771191748009
+		j endif_8771191748009
 		
-		else_8767014207892:
+		else_8771191748009:
 		
 		# Allocating Int 5
 		li $v0, 9
@@ -2228,10 +2228,10 @@
 		lw $t0, 8($sp)
 		sw $t0, 96($sp)
 		
-		# Jumping to endif_8767014207892
-		j endif_8767014207892
+		# Jumping to endif_8771191748009
+		j endif_8771191748009
 		
-		endif_8767014207892:
+		endif_8771191748009:
 		
 		# Loading return value in $v1
 		lw $v1, 96($sp)
@@ -2557,7 +2557,7 @@
 		# Allocating NUll to internal_21
 		sw $zero, 44($sp) # internal_21 = 0
 		
-		while_start_8767014208555:
+		while_start_8771191748160:
 		
 		# Allocating Int 4
 		li $v0, 9
@@ -2626,16 +2626,16 @@
 		sw $v1, 36($sp) # internal_26 = result of function_xor
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# If internal_26 then goto while_body_8767014208555
+		# If internal_26 then goto while_body_8771191748160
 		lw $t0, 24($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, while_body_8767014208555
+		beq $t0, $t1, while_body_8771191748160
 		
-		# Jumping to while_end_8767014208555
-		j while_end_8767014208555
+		# Jumping to while_end_8771191748160
+		j while_end_8771191748160
 		
-		while_body_8767014208555:
+		while_body_8771191748160:
 		
 		# Allocating Int 8
 		li $v0, 9
@@ -2713,10 +2713,10 @@
 		# Calling function function_assign
 		jal function_assign
 		lw $ra, 8($sp)
-		# Jumping to while_start_8767014208555
-		j while_start_8767014208555
+		# Jumping to while_start_8771191748160
+		j while_start_8771191748160
 		
-		while_end_8767014208555:
+		while_end_8771191748160:
 		
 		# Loading return value in $v1
 		lw $v1, 44($sp)

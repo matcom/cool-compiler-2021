@@ -7,11 +7,11 @@ from cool_grammar import parser, errors as parser_errors
 from cool_lexer import lexer, lexer_errors
 from utils.ast_nodes import Token
 from utils.cyclic_dependency import CyclicDependency_, MethodChecker, cyclicDependency
-from utils.formatter import Formatter, CodeBuilder
+from utils.formatter import Formatter, CodeBuilder, PrintingScope
 from utils.semantic import Context, Scope
 from utils.inference import InferenceTypeChecker
 from utils.instance import Execution
-from utils.type_analysis import TypeBuilder, TypeChecker, TypeCollector, PositionateTokensInAST, TypeBuilderFeature
+from utils.type_analysis import PositionateTokensInAST #, TypeBuilder, TypeChecker, TypeCollector, , TypeBuilderFeature
 from utils.auxiliar_methods import erase_multiline_comment
 from utils.cool_to_cil import COOLToCILVisitor
 from utils.collect_dec import CollectDeclarationsDict, get_declarations_dict
@@ -19,6 +19,8 @@ from utils.code_generation import COOLwithNULL, COOLwithNULL_Type
 from utils.cil_to_mips import CILToMIPSVisitor, MipsFormatter
 # from utils.cooltocil import ExtendedCoolTranslator, ExtendedCoolTypeChecker, CoolToCilTranslator
 from utils.cool_cil_mips import CoolToCilTranslator, CilToMipsTranslator, MipsFormatter1, ExtendedCoolTranslator, ExtendedCoolTypeChecker
+from utils.semantic_type_checker import  TypeCollector, TypeBuilderForInheritance, topological_sorting, TypeBuilderForFeatures, OverriddenMethodChecker, InferenceChecker, TypeChecker
+
 
 app = typer.Typer()
 
@@ -52,7 +54,7 @@ def check_semantics(program: str, debug: bool = False):
         errors = ['Syntactic Error']
     else:
         TypeCollector(context, errors).visit(ast)
-        TypeBuilder(context, errors).visit(ast)
+        # TypeBuilder(context, errors).visit(ast)
         # CyclicDependency(context, errors)
         if not errors:
             TypeChecker(context, errors).visit(ast, scope)
@@ -175,7 +177,7 @@ def test_context(program_file: str, debug: bool = False):
 
     ast = parse(program, debug)
     TypeCollector(context, errors).visit(ast)
-    TypeBuilder(context, errors).visit(ast)
+    # TypeBuilder(context, errors).visit(ast)
     # CyclicDependency(context, errors)
     if not errors:
         print(context)
@@ -195,7 +197,7 @@ def test_inference(program_file: str, debug: bool = False):
         errors.append('Syntactic Errors')
     else:
         TypeCollector(context, errors).visit(ast)
-        TypeBuilder(context, errors).visit(ast)
+        # TypeBuilder(context, errors).visit(ast)
         # CyclicDependency(context, errors)
         if not errors:
             InferenceTypeChecker(context, errors).visit(ast, Scope())
@@ -217,7 +219,7 @@ def test_execution(program_file: str, debug: bool = False):
         errors.append('Syntactic Errors')
     else:
         TypeCollector(context, errors).visit(ast)
-        TypeBuilder(context, errors).visit(ast)
+        # TypeBuilder(context, errors).visit(ast)
         # CyclicDependency(context, errors)
         if not errors:
             InferenceTypeChecker(context, errors).visit(ast, Scope())
@@ -289,13 +291,14 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
             col = get_tokencolumn(program, lexpos) if get_tokencolumn(program, lexpos) > 1 else 2
             print_errors(f'({current_line}, {col-1}) - SyntacticError: ERROR at or near "{value}"')
         exit(1)
-
+     
     ##############
     ## SEMANTIC ##
     ##############
     
     else:
-        PositionateTokensInAST(tokens).visit(ast)
+        PositionateTokensInAST(tokens, program).visit(ast)
+        '''
         TypeCollector(context, errors, program).visit(ast)
 
         if errors:
@@ -320,7 +323,7 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
             
         # CyclicDependency(context, errors)
         MethodChecker(context, errors, program).visit(ast)
-        InferenceTypeChecker(context, errors, program).visit(ast, scope)
+        InferenceTypeChecker(context, errors, program).visit(ast, Scope())
 
         TypeChecker(context, errors, program).visit(ast, scope)
         
@@ -328,7 +331,23 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
             for item in errors:
                 print_errors(item)
             exit(1)
-
+        '''
+        
+        TypeCollector(context, errors).visit(ast)
+        TypeBuilderForInheritance(context, errors).visit(ast)
+        topological_sorting(ast, context, errors)
+        if not errors:
+            TypeBuilderForFeatures(context, errors).visit(ast)
+            OverriddenMethodChecker(context, errors).visit(ast)
+            InferenceChecker(context, errors).visit(ast, Scope())
+            TypeChecker(context, errors).visit(ast, scope)
+        # return ast, scope, context, errors
+        
+        if errors:
+            for item in errors:
+                print_errors(item)
+            exit(1)
+        
         #######################
         ### CODE GENERATION ###  
         #######################
@@ -364,14 +383,21 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
         
         # print(CodeBuilder().visit(ast))
         new_ast = ExtendedCoolTranslator(context).visit(ast)
-        print(CodeBuilder().visit(new_ast))
+        
+        # print(PrintingScope().printing(scope))
         
         scope = Scope()
         ExtendedCoolTypeChecker(context, errors).visit(new_ast, scope)
+        import os
+        write_file('ast_yas.txt',CodeBuilder().visit(new_ast))
+        # print(CodeBuilder().visit(new_ast))
+        
+        # print(PrintingScope().printing(scope))
+        
         
         cil_ast = CoolToCilTranslator(context).visit(new_ast, scope)
         1 # temporal breakpoint
-       
+        
         mips_ast = CilToMipsTranslator(context).visit(cil_ast)
         1 # temporal breakpoint
         

@@ -1,5 +1,6 @@
 import utils.ast_nodes as ast
 import utils.visitor as visitor
+from utils.semantic import Scope
 from utils.code_generation import NullNode 
 
 
@@ -131,6 +132,19 @@ class CodeBuilder:
         return '    ' * tabs + f'{node.lex}'
 
 
+class PrintingScope:
+    
+    def printing(self, scope: Scope, tabs=0):
+        print(tabs * '    ', "parent: ", scope.parent)
+        print(tabs * '    ', "variables locales:", type(scope.local_variable), scope.local_variable)
+        
+        if scope.children:
+            print(tabs * '    ', f'childrens: ({len(scope.children)})')
+            for item in scope.children:
+                self.printing(item, tabs+1)
+            
+        return "end"
+    
 class Formatter:
     @visitor.on('node')
     def visit(self, node, tabs):
