@@ -319,7 +319,7 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
         if errors:
             for item in errors:
                 print_errors(item)
-            exit(1)
+            exit(1)cac
             
         # CyclicDependency(context, errors)
         MethodChecker(context, errors, program).visit(ast)

@@ -12,13 +12,6 @@ from utils.semantic import Context, ErrorType, Method, Scope, SemanticError, Typ
 #### Colector de tipos inicial ####
 
 class TypeCollector:
-    """Visitor to collect the class in the program, and the basic classes as Object, Int, String, IO and Bool
-
-    Params
-    ----------
-    - syntactic_and_semantic_errors: List[str] is a list of syntactic_and_semantic_errors detected in the ast travel
-    - context: Context the context for keeping the classes"""
-
     def __init__(self, context: Context = Context(), errors: List[str] = []):
         self.errors: List[str] = errors
         self.context: Context = context
@@ -73,14 +66,6 @@ class TypeCollector:
 #### colector de tipos para la herencia ####
 
 class TypeBuilderForInheritance:
-    """This visitor collect all the attributes and methods in classes and set the parent to the current class
-
-    Params
-    ------
-    - syntactic_and_semantic_errors: List[str] is a list of syntactic_and_semantic_errors detected in the ast travel
-    - context: Context the context for keeping the classes
-    - current_type: Optional[Type] is the current type in the building process"""
-
     def __init__(self, context: Context, errors: List[str]):
         self.context: Context = context
         self.current_type: Optional[Type] = None
@@ -127,14 +112,6 @@ class TypeBuilderForInheritance:
 #### chequeo de tipos para los features ####
 
 class TypeBuilderForFeatures:
-    """This visitor collect all the attributes and methods in classes and set the parent to the current class
-
-    Params
-    ------
-    - syntactic_and_semantic_errors: List[str] is a list of syntactic_and_semantic_errors detected in the ast travel
-    - context: Context the context for keeping the classes
-    - current_type: Optional[Type] is the current type in the building process"""
-
     def __init__(self, context: Context, errors: List[str]):
         self.context: Context = context
         self.current_type: Optional[Type] = None
@@ -215,17 +192,6 @@ class TypeBuilderForFeatures:
 #### override zone  y orden topologico #####
 
 def topological_sorting(program_node: cool.ProgramNode, context: Context, errors: List[str]) :
-    """Set an order in the program node of de ast such that for all class A with parent B, class B is before A in the
-    list, if in the process is detected a cycle an error is added to the `error` parameter
-
-    :param program_node: Root of the first AST of the program
-
-    :param context: Context With all collected and building types
-
-    :param errors: The error list
-
-    :return: a new AST where all declared class are in topological order"""
-
     types = context.types
 
     contains_dependency_errors = False
@@ -273,14 +239,6 @@ def topological_sorting(program_node: cool.ProgramNode, context: Context, errors
     return contains_dependency_errors
 
 class OverriddenMethodChecker:
-    """This visitor for validate the signature of the overridden methods
-
-    Params
-    ------
-    - syntactic_and_semantic_errors: List[str] is a list of syntactic_and_semantic_errors detected in the ast travel
-    - context: Context the context for keeping the classes
-    - current_type: Optional[Type] is the current type in the building process"""
-
     def __init__(self, context: Context, errors: List[str]):
         self.context: Context = context
         self.current_type: Optional[Type] = None
@@ -625,11 +583,7 @@ class InferenceChecker:
         scope.define_variable("self", self.current_type)
 
         # Solve the expression of the attribute
-        expr_node = (
-            self.visit(node.expr, scope.create_child())
-            if node.expr is not None
-            else None
-        )
+        expr_node = (self.visit(node.expr, scope.create_child()) if node.expr is not None else None)
 
         try:
             # Define attribute in the scope
@@ -711,9 +665,7 @@ class InferenceChecker:
                 var_info.type, var_info
             )
 
-            expr_node = (
-                self.visit(_expr, scope.create_child()) if _expr is not None else None
-            )
+            expr_node = (self.visit(_expr, scope.create_child()) if _expr is not None else None)
 
             if var_info.type.name == "AUTO_TYPE":
                 # Create an edge or add an new node only if it is AutoType
@@ -758,7 +710,7 @@ class InferenceChecker:
     @visitor.when(cool.ExprParNode)
     def visit(self, node: cool.ExprParNode, scope: Scope):
         scope = node.scope
-        return self.visit(node.expr)
+        return self.visit(node.expr, scope)
     
 
     @visitor.when(cool.BlockNode)
@@ -1253,10 +1205,6 @@ class TypeChecker:
         self.current_method = self.current_type.get_method(node.name)
         self.current_attribute = None
 
-        # Parameters can hide the attribute declaration, that's why we are not checking if there is defined,
-        # instead we are checking for local declaration. Also it is checked that the static type of a parameter is
-        # different of SELF_TYPE.
-
         scope.define_variable("self", self.current_type)
 
         for param_name, param_type in zip(
@@ -1295,6 +1243,11 @@ class TypeChecker:
                 err.INCOMPATIBLE_TYPES
                 % (node.line, node.lexpos, expr_type.name, return_type.name)
             )
+
+    # @visitor.when(cool.LetNode)
+    # def visit(self, node: cool.LetNode, scope: Scope):
+    #     node.scope = scope
+    #     return self.visit(node.expr, scope)    
 
     @visitor.when(cool.LetNode)
     def visit(self, node: cool.LetNode, scope: Scope):

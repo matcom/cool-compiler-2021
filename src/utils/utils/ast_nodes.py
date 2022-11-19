@@ -4,6 +4,7 @@ class Token:
     def __init__(self, type, value, line, lexpos):
         self.type = type
         self.value = value
+        
         self.line = line
         self.lexpos = lexpos
 
@@ -45,6 +46,7 @@ class AttributeDecNode(DeclarationNode):
         self.name = name
         self._type = _type
         self.expr = expr
+        
         self.type_pos = (-1, -1)
         self.expr_pos = (-1, -1)
         
@@ -119,16 +121,16 @@ class NewNode(ExprNode):
         self.type = type_
         self.type_position = (-1, -1)
 
-class ExprParNode(ExprNode):
-    def __init__(self, expr):
-        self.expr = expr
-        self.expr_pos = (-1, -1)
-
 class AtomicNode(ExprNode):
     def __init__(self, lex):
         # super().__init__()
         self.lex: str = lex
         self.scope = None
+
+class ExprParNode(ExprNode):
+    def __init__(self, expr):
+        self.expr = expr
+        self.expr_pos = (-1, -1)
 
 class UnaryNode(ExprNode):
     def __init__(self, expr):
