@@ -3,7 +3,7 @@ from .semantic import SemanticError
 from .semantic import Type
 from .semantic import VoidType, ErrorType
 from .semantic import Context, Scope 
-from utils import ast_nodes as ast
+import utils.ast_nodes as ast
 from utils import visitor
 
 class TypeCollector(object):
@@ -693,7 +693,7 @@ class TypeChecker:
         node.scope = scope
         return self.visit(node.expr, scope)
 
-      
+'''  
 class PositionateTokensInAST:
     def __init__(self, tokens, program):
         self.program = program
@@ -717,7 +717,7 @@ class PositionateTokensInAST:
         self.visit(node.left)
 
         token = self.tokens[self.position]
-        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos))
+        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos) - 1)
         self.inc_position() 
 
         self.visit(node.right)
@@ -727,14 +727,14 @@ class PositionateTokensInAST:
         node.operation_position = token.line, self.get_tokencolumn(self.program, token.lexpos)
 
         token = self.tokens[self.position + 1]
-        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos))
+        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos) - 1)
 
         self.inc_position() 
         self.visit(node.expr)
 
     def atom(self, node: ast.Node):
         token = self.tokens[self.position]
-        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos))
+        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos) - 1)
         self.inc_position() 
 
     @visitor.on("node")
@@ -749,7 +749,7 @@ class PositionateTokensInAST:
 
         # there is always at least a class declaration
         first_declaration = node.class_list[0] 
-        node.set_position(first_declaration.line, first_declaration.lexpos)
+        node.set_position(first_declaration.line, first_declaration.lexpos - 1)
 
     @visitor.when(ast.ClassDecNode)
     def visit(self, node: ast.ClassDecNode):
@@ -757,7 +757,7 @@ class PositionateTokensInAST:
         assert (token.value.lower() == "class"), f'Expected "class" instead of "{token.value}" in {node.name}'
 
         token = self.tokens[self.position + 1]
-        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos))
+        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos) - 1)
 
         if node.parent is not None:
             token = self.tokens[self.position + 3]
@@ -777,7 +777,7 @@ class PositionateTokensInAST:
     @visitor.when(ast.AttributeDecNode)
     def visit(self, node: ast.AttributeDecNode):
         token = self.tokens[self.position]
-        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos))
+        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos) - 1)
 
         token = self.tokens[self.position + 2]
         node.type_pos = token.line, self.get_tokencolumn(self.program, token.lexpos)
@@ -795,13 +795,13 @@ class PositionateTokensInAST:
     @visitor.when(ast.MethodDecNode)
     def visit(self, node: ast.MethodDecNode):
         token = self.tokens[self.position]
-        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos))
+        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos) - 1)
         self.inc_position(2)
 
         for i, _ in enumerate(node.params):
             self.inc_position(2)
             token = self.tokens[self.position]
-            node.p_types_pos.append((token.line, self.get_tokencolumn(self.program, token.lexpos)))
+            node.p_types_pos.append((token.line, self.get_tokencolumn(self.program, token.lexpos) - 1))
             self.inc_position() 
             if i < len(node.params) - 1:
                 self.inc_position() 
@@ -818,14 +818,14 @@ class PositionateTokensInAST:
     def visit(self, node: ast.LetNode):
         token = self.tokens[self.position]
         
-        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos))
+        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos) - 1)
         self.inc_position()
 
         for _, _, expr in node.declaration:
             token = self.tokens[self.position]
-            node.dec_names_pos.append((token.line, self.get_tokencolumn(self.program, token.lexpos)))
+            node.dec_names_pos.append((token.line, self.get_tokencolumn(self.program, token.lexpos) - 1))
             token = self.tokens[self.position + 2]
-            node.dec_types_pos.append((token.line, self.get_tokencolumn(self.program, token.lexpos)))
+            node.dec_types_pos.append((token.line, self.get_tokencolumn(self.program, token.lexpos) - 1))
             if expr is not None:
                 self.inc_position(4) 
                 token = self.tokens[self.position]
@@ -839,7 +839,7 @@ class PositionateTokensInAST:
     @visitor.when(ast.AssignNode)
     def visit(self, node: ast.AssignNode):
         token = self.tokens[self.position]
-        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos))
+        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos) - 1)
 
         token = self.tokens[self.position + 1]
         assert token.value == "<-", f'Expected "<-" instead of "{token.value}" in assign'
@@ -850,8 +850,9 @@ class PositionateTokensInAST:
     @visitor.when(ast.BlockNode)
     def visit(self, node: ast.BlockNode):
         token = self.tokens[self.position]
+        t = [token.value for token in self.tokens]
         assert token.value == "{", f'Expected "{{" instead of "{token.value}" in block'
-        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos))
+        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos) - 1)
         self.inc_position() 
 
         for i, expr in enumerate(node.expr, start=1):
@@ -869,7 +870,7 @@ class PositionateTokensInAST:
         # IF
         token = self.tokens[self.position]
         assert (token.value == "if"), f'Expected "if" instead of "{token.value}" in conditional'
-        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos))
+        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos) - 1)
         self.inc_position() 
         self.visit(node.if_expr)
         # THEN
@@ -890,7 +891,7 @@ class PositionateTokensInAST:
     @visitor.when(ast.WhileNode)
     def visit(self, node: ast.WhileNode):
         token = self.tokens[self.position]
-        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos))
+        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos) - 1)
         self.inc_position() 
         self.visit(node.cond)
         self.inc_position()  
@@ -900,7 +901,7 @@ class PositionateTokensInAST:
     @visitor.when(ast.CaseNode)
     def visit(self, node: ast.CaseNode):
         token = self.tokens[self.position]
-        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos))
+        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos) - 1)
         # CASE
         self.inc_position()  
         self.visit(node.expr)
@@ -919,7 +920,7 @@ class PositionateTokensInAST:
     @visitor.when(ast.MethodCallNode)
     def visit(self, node: ast.MethodCallNode):
         token = self.tokens[self.position]
-        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos))
+        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos) - 1)
         node.id_position = token.line, self.get_tokencolumn(self.program, token.lexpos)
 
         _atom = node.atom is not None
@@ -974,7 +975,7 @@ class PositionateTokensInAST:
     @visitor.when(ast.NewNode)
     def visit(self, node: ast.NewNode):
         token = self.tokens[self.position]
-        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos))
+        node.set_position(token.line, self.get_tokencolumn(self.program, token.lexpos) - 1)
         token = self.tokens[self.position + 1]
         node.type_position = token.line, self.get_tokencolumn(self.program, token.lexpos)
         self.inc_position(2) 
@@ -1031,5 +1032,798 @@ class PositionateTokensInAST:
         assert token.value == ")", f'Expected ")" instead of "{token.value}" in parenthesis expression'
         self.inc_position()
 
+ 
+
+class PositionateTokensInAST:
+    def __init__(self, tokens, program):
+        self.program = program
+        self.position = 0
+        self.tokens = tokens
 
 
+    def inc_position(self, value=1):
+        self.position += value
+
+    def binary_op(self, node: ast.BinaryNode):
+        self.visit(node.left)
+
+        token = self.tokens[self.position]
+        node.set_position(token.line, token.lexpos)
+        self.inc_position() 
+
+        self.visit(node.right)
+
+    def single_op(self, node: ast.UnaryNode):
+        token = self.tokens[self.position]
+        node.operation_position = token.line, self.get_tokencolumn(self.program, token.lexpos)
+
+        token = self.tokens[self.position + 1]
+        node.set_position(token.line, token.lexpos)
+
+        self.inc_position() 
+        self.visit(node.expr)
+
+    def atom(self, node: ast.Node):
+        token = self.tokens[self.position]
+        node.set_position(token.line, token.lexpos)
+        self.inc_position() 
+
+    @visitor.on("node")
+    def visit(self, node):
+        pass
+
+    @visitor.when(ast.ProgramNode)
+    def visit(self, node: ast.ProgramNode):
+        for cl in node.class_list:
+            self.visit(cl)
+            self.inc_position()
+
+        # there is always at least a class declaration
+        first_declaration = node.class_list[0] 
+        node.set_position(first_declaration.line, first_declaration.lexpos)
+
+    @visitor.when(ast.ClassDecNode)
+    def visit(self, node: ast.ClassDecNode):
+        token = self.tokens[self.position]
+        assert (token.value.lower() == "class"), f'Expected "class" instead of "{token.value}" in {node.name}'
+
+        token = self.tokens[self.position + 1]
+        node.set_position(token.line, token.lexpos)
+
+        if node.parent is not None:
+            token = self.tokens[self.position + 3]
+            node.parent_pos = token.line, self.get_tokencolumn(self.program, token.lexpos)
+
+        count = 3 if node.parent is None else 5
+        self.inc_position(count)
+
+        for d in node.data:
+            self.visit(d)
+            token = self.tokens[self.position]
+            assert (token.value == ";"), f'Expected ";" instead of "{token.value}" in {d.name} of class {node.name}'
+            self.inc_position()
+
+        self.inc_position()
+
+    @visitor.when(ast.AttributeDecNode)
+    def visit(self, node: ast.AttributeDecNode):
+        token = self.tokens[self.position]
+        node.set_position(token.line, token.lexpos)
+
+        token = self.tokens[self.position + 2]
+        node.type_pos = token.line, self.get_tokencolumn(self.program, token.lexpos)
+
+        if node.expr is not None:
+            self.inc_position(4)
+            token = self.tokens[self.position]
+            node.expr_pos = token.line, self.get_tokencolumn(self.program, token.lexpos)
+            self.visit(node.expr)
+            token = self.tokens[self.position]
+            return
+
+        self.inc_position(3)
+
+    @visitor.when(ast.MethodDecNode)
+    def visit(self, node: ast.MethodDecNode):
+        token = self.tokens[self.position]
+        node.set_position(token.line, token.lexpos)
+        self.inc_position(2)
+
+        for i, _ in enumerate(node.params):
+            self.inc_position(2)
+            token = self.tokens[self.position]
+            node.p_types_pos.append((token.line, token.lexpos))
+            self.inc_position() 
+            if i < len(node.params) - 1:
+                self.inc_position() 
+
+        self.inc_position(2) 
+        token = self.tokens[self.position]
+        node.r_types_pos = token.line, self.get_tokencolumn(self.program, token.lexpos)
+        self.inc_position(2) 
+
+        self.visit(node.expr)
+        self.inc_position() 
+
+    @visitor.when(ast.LetNode)
+    def visit(self, node: ast.LetNode):
+        token = self.tokens[self.position]
+        
+        node.set_position(token.line, token.lexpos)
+        self.inc_position()
+
+        for _, _, expr in node.declaration:
+            token = self.tokens[self.position]
+            node.dec_names_pos.append((token.line, token.lexpos))
+            token = self.tokens[self.position + 2]
+            node.dec_types_pos.append((token.line, token.lexpos))
+            if expr is not None:
+                self.inc_position(4) 
+                token = self.tokens[self.position]
+                self.visit(expr)
+                self.inc_position()
+            else:
+                self.inc_position(4) 
+
+        self.visit(node.expr)
+
+    @visitor.when(ast.AssignNode)
+    def visit(self, node: ast.AssignNode):
+        token = self.tokens[self.position]
+        node.set_position(token.line, token.lexpos)
+
+        token = self.tokens[self.position + 1]
+        assert token.value == "<-", f'Expected "<-" instead of "{token.value}" in assign'
+
+        self.inc_position(2)  # ends after `<-`
+        self.visit(node.expr)
+
+    @visitor.when(ast.BlockNode)
+    def visit(self, node: ast.BlockNode):
+        token = self.tokens[self.position]
+        t = [token.value for token in self.tokens]
+        assert token.value == "{", f'Expected "{{" instead of "{token.value}" in block'
+        node.set_position(token.line, token.lexpos)
+        self.inc_position() 
+
+        for i, expr in enumerate(node.expr, start=1):
+            self.visit(expr)
+            token = self.tokens[self.position]
+            assert (token.value == ";"), f'Expected ";" instead of "{token.value}" in instruction {i} of a block'
+            self.inc_position() 
+
+        token = self.tokens[self.position]
+        assert (token.value == "}"), f'Expected "}}" instead of "{token.value}" at the end of a block'
+        self.inc_position()
+
+    @visitor.when(ast.ConditionalNode)
+    def visit(self, node: ast.ConditionalNode):
+        # IF
+        token = self.tokens[self.position]
+        assert (token.value == "if"), f'Expected "if" instead of "{token.value}" in conditional'
+        node.set_position(token.line, token.lexpos)
+        self.inc_position() 
+        self.visit(node.if_expr)
+        # THEN
+        token = self.tokens[self.position]
+        assert (token.value == "then"), f'Expected "then" instead of "{token.value}" in conditional'
+        self.inc_position() 
+        self.visit(node.then_expr)
+        # ELSE
+        token = self.tokens[self.position]
+        assert (token.value == "else"), f'Expected "else" instead of "{token.value}" in conditional'
+        self.inc_position() 
+        self.visit(node.else_expr)
+        # FI
+        token = self.tokens[self.position]
+        assert (token.value == "fi"), f'Expected "fi" instead of "{token.value}" in conditional'
+        self.inc_position() 
+
+    @visitor.when(ast.WhileNode)
+    def visit(self, node: ast.WhileNode):
+        token = self.tokens[self.position]
+        node.set_position(token.line, token.lexpos)
+        self.inc_position() 
+        self.visit(node.cond)
+        self.inc_position()  
+        self.visit(node.data)
+        self.inc_position()  
+
+    @visitor.when(ast.CaseNode)
+    def visit(self, node: ast.CaseNode):
+        token = self.tokens[self.position]
+        node.set_position(token.line, token.lexpos)
+        # CASE
+        self.inc_position()  
+        self.visit(node.expr)
+        # OF
+        self.inc_position()
+        for _, _, expr in node.params:
+            self.inc_position(2)
+            token = self.tokens[self.position]
+            node.cases_positions.append((token.line, self.get_tokencolumn(self.program, token.lexpos)))
+            self.inc_position(2)
+            self.visit(expr)
+            self.inc_position()
+        # ESAC
+        self.inc_position()
+
+    @visitor.when(ast.MethodCallNode)
+    def visit(self, node: ast.MethodCallNode):
+        token = self.tokens[self.position]
+        node.set_position(token.line, token.lexpos)
+        node.id_position = token.line, self.get_tokencolumn(self.program, token.lexpos)
+
+        _atom = node.atom is not None
+        _type = node.type is not None
+
+        if _atom:
+            self.visit(node.atom)
+
+            token = self.tokens[self.position]
+            assert token.value in ("@","."), f"Expected '.' or '@' instead of {token.value}"
+            self.inc_position()
+
+            token = self.tokens[self.position]
+            node.id_position = token.line, self.get_tokencolumn(self.program, token.lexpos)
+
+        if _type:
+            token = self.tokens[self.position]
+            node.type_position = token.line, self.get_tokencolumn(self.program, token.lexpos)
+            self.inc_position(2)
+            token = self.tokens[self.position]
+            node.id_position = token.line, self.get_tokencolumn(self.program, token.lexpos)
+
+        self.inc_position(2) 
+        token = self.tokens[self.position]
+        if node.exprlist:
+            for exp in node.exprlist:
+                token = self.tokens[self.position]
+                node.exprlist_positions.append((token.line, self.get_tokencolumn(self.program, token.lexpos)))
+                self.visit(exp)
+                token = self.tokens[self.position]
+                assert token.value in (",", ")"), f"Expected ',' or ')' instead of {token.value}"
+                self.inc_position()  
+        else:
+            self.inc_position()
+
+    @visitor.when(ast.NumberNode)
+    def visit(self, node: ast.NumberNode):
+        self.atom(node)
+
+    @visitor.when(ast.StringNode)
+    def visit(self, node: ast.StringNode):
+        self.atom(node)
+
+    @visitor.when(ast.BooleanNode)
+    def visit(self, node: ast.BooleanNode):
+        self.atom(node)
+
+    @visitor.when(ast.VariableNode)
+    def visit(self, node: ast.VariableNode):
+        self.atom(node)
+
+    @visitor.when(ast.NewNode)
+    def visit(self, node: ast.NewNode):
+        token = self.tokens[self.position]
+        node.set_position(token.line, token.lexpos)
+        token = self.tokens[self.position + 1]
+        node.type_position = token.line, self.get_tokencolumn(self.program, token.lexpos)
+        self.inc_position(2) 
+
+    @visitor.when(ast.NegationNode)
+    def visit(self, node: ast.NegationNode):
+        self.single_op(node)
+
+    @visitor.when(ast.ComplementNode)
+    def visit(self, node: ast.ComplementNode):
+        self.single_op(node)
+
+    @visitor.when(ast.IsVoidNode)
+    def visit(self, node: ast.IsVoidNode):
+        self.single_op(node)
+
+    @visitor.when(ast.PlusNode)
+    def visit(self, node: ast.PlusNode):
+        self.binary_op(node)
+
+    @visitor.when(ast.MinusNode)
+    def visit(self, node: ast.MinusNode):
+        self.binary_op(node)
+
+    @visitor.when(ast.TimesNode)
+    def visit(self, node: ast.TimesNode):
+        self.binary_op(node)
+
+    @visitor.when(ast.DivNode)
+    def visit(self, node: ast.DivNode):
+        self.binary_op(node)
+
+    @visitor.when(ast.LessEqualNode)
+    def visit(self, node: ast.LessEqualNode):
+        self.binary_op(node)
+
+    @visitor.when(ast.LessNode)
+    def visit(self, node: ast.LessNode):
+        self.binary_op(node)
+
+    @visitor.when(ast.EqualNode)
+    def visit(self, node: ast.EqualNode):
+        self.binary_op(node)
+
+    @visitor.when(ast.ExprParNode)
+    def visit(self, node: ast.ExprParNode):
+        token = self.tokens[self.position]
+        assert token.value == "(", f'Expected "(" instead of "{token.value}" in parenthesis expression'
+        self.inc_position()
+
+        self.visit(node.expr)
+
+        token = self.tokens[self.position]
+        assert token.value == ")", f'Expected ")" instead of "{token.value}" in parenthesis expression'
+        self.inc_position()
+
+''' 
+
+
+class PositionAssigner:
+    def __init__(self, tokens):
+        self.position = 0
+        self.tokens = tokens
+
+        self.opar = 0
+
+    def inc_position(self, count: int = 1):
+        self.position += count
+
+    @visitor.on("node")
+    def visit(self, node):
+        pass
+
+    @visitor.when(ast.ProgramNode)
+    def visit(self, node: ast.ProgramNode):
+
+        for declaration in node.class_list:
+            self.visit(declaration)
+            self.inc_position()
+
+        first_declaration = node.class_list[
+            0
+        ]  # There is always one or more declarations
+        node.set_position(first_declaration.line, first_declaration.lexpos)
+
+    @visitor.when(ast.ClassDecNode)
+    def visit(self, node: ast.ClassDecNode):
+        token = self.tokens[self.position]
+        assert (
+            token.value.lower() == "class"
+        ), f'{token.line, token.lexpos} Expected "class" instead of "{token.lex}" in {node.id}'
+
+        token = self.tokens[self.position + 1]
+        node.set_position(token.line, token.lexpos)
+
+        if node.parent is not None:
+            token = self.tokens[self.position + 3]
+            node.parent_position = token.line, token.lexpos
+
+        count = 3 if node.parent is None else 5
+        self.inc_position(count)
+
+        for feature in node.data:
+            self.visit(feature)
+
+            token = self.tokens[self.position]
+            assert (
+                token.value == ";"
+            ), f'Expected ";" instead of "{token.lex}" in {feature.id} of class {node.id}'
+
+            self.inc_position()  # ends after `;`
+
+        self.inc_position()  # ends after `}`
+
+    @visitor.when(ast.AttributeDecNode)
+    def visit(self, node: ast.AttributeDecNode):
+        """
+        *
+        id : type [<- expr]
+        """
+        token = self.tokens[self.position]
+        node.set_position(token.line, token.lexpos)
+
+        token = self.tokens[self.position + 2]
+        node.type_position = token.line, token.lexpos
+
+        if node.expr is not None:
+            self.inc_position(4)  # ends after `<-`
+
+            token = self.tokens[self.position]
+            node.expr_position = token.line, token.lexpos
+
+            self.visit(node.expr)
+
+            token = self.tokens[self.position]
+            return
+
+        self.inc_position(3)
+
+    @visitor.when(ast.MethodDecNode)
+    def visit(self, node: ast.MethodDecNode):
+        """
+        *
+        id ( [params] ) : type { expr }
+        """
+        token = self.tokens[self.position]
+        node.set_position(token.line, token.lexpos)
+
+        self.inc_position(2)  # ends after `(`
+
+        for i, _ in enumerate(node.params):
+            # *
+            # id : type ,
+            self.inc_position(2)  # ends in `type`
+
+            token = self.tokens[self.position]
+            node.p_types_pos.append((token.line, token.lexpos))
+
+            self.inc_position()  # ends in `,`
+
+            if i < len(node.params) - 1:
+                self.inc_position()  # ends in `,`
+        # ends in `)`
+
+        self.inc_position(2)  # ends in `type`
+        token = self.tokens[self.position]
+        node.r_types_pos = token.line, token.lexpos
+        self.inc_position(2)  # ends after `{`
+
+        self.visit(node.expr)
+        self.inc_position()  # ends after `}`
+
+    @visitor.when(ast.LetNode)
+    def visit(self, node: ast.LetNode):
+        token = self.tokens[self.position]
+
+        counter, token = self._skip_open_parentheses()
+
+        node.set_position(token.line, token.lexpos)
+
+        self.inc_position()
+
+        for _, _, expr in node.declaration:
+            # *
+            # id : type [<- expr] ,
+
+            token = self.tokens[self.position]
+            node.dec_names_pos.append((token.line, token.lexpos))
+
+            token = self.tokens[self.position + 2]
+            node.dec_types_pos.append((token.line, token.lexpos))
+
+            if expr is not None:
+                self.inc_position(4)  # ends after `<-`
+
+                token = self.tokens[self.position]
+                self.visit(expr)
+                self.inc_position()  # ends after `,`
+            else:
+                self.inc_position(4)  # ends after `,` or `in` if last
+        # ends after `in`
+
+        self.visit(node.expr)
+
+        self._skip_closed_parentheses()
+
+    @visitor.when(ast.AssignNode)
+    def visit(self, node: ast.AssignNode):
+        """
+        *
+        id <- expr
+        """
+
+        token = self.tokens[self.position]
+        node.set_position(token.line, token.lexpos)
+
+        token = self.tokens[self.position + 1]
+        assert token.value == "<-", f'Expected "<-" instead of "{token.lex}" in assign'
+
+        self.inc_position(2)  # ends after `<-`
+        self.visit(node.expr)
+
+    @visitor.when(ast.BlockNode)
+    def visit(self, node: ast.BlockNode):
+        """
+        *
+        { block }
+        """
+        self._skip_open_parentheses()
+
+        token = self.tokens[self.position]
+        assert token.value == "{", f'{token.line, token.lexpos} Expected "{{" instead of "{token.lex}" in block'
+
+        node.set_position(token.line, token.lexpos)
+        self.inc_position()  # edns after `{`
+
+        for i, expr in enumerate(node.expr, start=1):
+            # *
+            # expr ;
+            self.visit(expr)
+
+            token = self.tokens[self.position]
+            assert (
+                token.value == ";"
+            ), f'Expected ";" instead of "{token.lex}" in instruction {i} of a block'
+
+            self.inc_position()  # ends after `;`
+
+        token = self.tokens[self.position]
+        assert (
+            token.value == "}"
+        ), f'Expected "}}" instead of "{token.lex}" at the end of a block'
+
+        self.inc_position()  # ends after `}`
+        self._skip_closed_parentheses()
+
+    @visitor.when(ast.ConditionalNode)
+    def visit(self, node: ast.ConditionalNode):
+        """
+        *
+        if expr then expr else expr fi
+        """
+
+        token = self.tokens[self.position]
+        assert (
+            token.value == "if"
+        ), f'Expected "if" instead of "{token.lex}" in conditional'
+        node.set_position(token.line, token.lexpos)
+        self.inc_position()  # ends after `if`
+        self.visit(node.if_expr)
+
+        token = self.tokens[self.position]
+        assert (
+            token.value == "then"
+        ), f'Expected "then" instead of "{token.lex}" in conditional'
+        self.inc_position()  # ends after `then`
+        self.visit(node.then_expr)
+
+        token = self.tokens[self.position]
+        assert (
+            token.value == "else"
+        ), f'Expected "else" instead of "{token.lex}" in conditional'
+        self.inc_position()  # ends after `else`
+        self.visit(node.else_expr)
+
+        token = self.tokens[self.position]
+        assert (
+            token.value == "fi"
+        ), f'Expected "fi" instead of "{token.lex}" in conditional'
+        self.inc_position()  # ends after `fi`
+
+    @visitor.when(ast.WhileNode)
+    def visit(self, node: ast.WhileNode):
+        """
+        *
+        while expr loop expr pool
+        """
+
+        token = self.tokens[self.position]
+        node.set_position(token.line, token.lexpos)
+
+        self.inc_position()  # ends after `while`
+        self.visit(node.cond)
+
+        self.inc_position()  # ends after `loop`
+        self.visit(node.data)
+
+        self.inc_position()  # ends after `pool`
+
+    @visitor.when(ast.CaseNode)
+    def visit(self, node: ast.CaseNode):
+        """
+        *
+        case expr of case-list esac
+        """
+
+        token = self.tokens[self.position]
+        node.set_position(token.line, token.lexpos)
+
+        self.inc_position()  # ends afte `case`
+        self.visit(node.expr)
+
+        self.inc_position()  # ends after `of`
+        for _, _, expr in node.params:
+            # *
+            # id : type => expr ;
+            self.inc_position(2)  # ends in `type`
+
+            token = self.tokens[self.position]
+            node.cases_positions.append((token.line, token.lexpos))
+
+            self.inc_position(2)  # ends after `=>`
+            self.visit(expr)
+            self.inc_position()  # ends after `;`
+
+        self.inc_position()  # ends afte `esac`
+
+    @visitor.when(ast.MethodCallNode)
+    def visit(self, node: ast.MethodCallNode):
+        token = self.tokens[self.position]
+
+        counter, token = self._skip_open_parentheses()
+
+        node.set_position(token.line, token.lexpos)
+        node.id_position = token.line, token.lexpos
+
+        obj_not_none = node.atom is not None
+        type_not_none = node.type is not None
+
+        if obj_not_none:
+            self.visit(node.atom)
+
+            token = self.tokens[self.position]
+            assert token.value in (
+                ".",
+                "@",
+            ), f"{token.line, token.lexpos, counter} Expected '.' or '@' instead of {token.lex}"
+
+            self.inc_position()  # ends after `.` or `@`
+            token = self.tokens[self.position]
+            node.id_position = token.line, token.lexpos
+
+        if type_not_none:
+            token = self.tokens[self.position]
+            node.type_position = token.line, token.lexpos
+
+            self.inc_position(2)  # ends after `.`
+            token = self.tokens[self.position]
+            node.id_position = token.line, token.lexpos
+
+        self.inc_position(2)  # ends after `(`
+
+        token = self.tokens[self.position]
+        if node.exprlist:
+            for arg in node.exprlist:
+                # *
+                # expr , expr-list
+                token = self.tokens[self.position]
+                node.exprlist_positions.append((token.line, token.lexpos))
+
+                self.visit(arg)
+
+                token = self.tokens[self.position]
+                # assert token.value in (
+                #     "," ")"
+                # ), f"{token.line, token.lexpos} Expected ',' or ')' instead of {token.lex}"
+                if token.value == ",":
+                    self.inc_position()  # ends after `,` or `)`
+            # ends after `)`
+        else:
+            self.inc_position()
+        
+        self._skip_closed_parentheses()  # ends after `)`
+
+    @visitor.when(ast.NumberNode)
+    def visit(self, node: ast.NumberNode):
+        self._atom_node(node)
+
+    @visitor.when(ast.StringNode)
+    def visit(self, node: ast.StringNode):
+        self._atom_node(node)
+
+    @visitor.when(ast.BooleanNode)
+    def visit(self, node: ast.BooleanNode):
+        self._atom_node(node)
+
+    @visitor.when(ast.VariableNode)
+    def visit(self, node: ast.VariableNode):
+        self._atom_node(node)
+
+    @visitor.when(ast.NewNode)
+    def visit(self, node: ast.NewNode):
+        """
+        *
+        new type
+        """
+        token = self.tokens[self.position]
+        _, token = self._skip_open_parentheses()
+        node.set_position(token.line, token.lexpos)
+
+        token = self.tokens[self.position + 1]
+        node.type_position = token.line, token.lexpos
+        self.inc_position(2)  # ends after `type`
+
+        _, token = self._skip_closed_parentheses()
+
+    @visitor.when(ast.NegationNode)
+    def visit(self, node: ast.NegationNode):
+        self._check_unary_operation(node)
+
+    @visitor.when(ast.ComplementNode)
+    def visit(self, node: ast.ComplementNode):
+        self._check_unary_operation(node)
+
+    @visitor.when(ast.IsVoidNode)
+    def visit(self, node: ast.IsVoidNode):
+        self._check_unary_operation(node)
+
+    @visitor.when(ast.PlusNode)
+    def visit(self, node: ast.PlusNode):
+        self._check_binary_operation(node)
+
+    @visitor.when(ast.MinusNode)
+    def visit(self, node: ast.MinusNode):
+        self._check_binary_operation(node)
+
+    @visitor.when(ast.TimesNode)
+    def visit(self, node: ast.TimesNode):
+        self._check_binary_operation(node)
+
+    @visitor.when(ast.DivNode)
+    def visit(self, node: ast.DivNode):
+        self._check_binary_operation(node)
+
+    @visitor.when(ast.LessEqualNode)
+    def visit(self, node: ast.LessEqualNode):
+        self._check_binary_operation(node)
+
+    @visitor.when(ast.LessNode)
+    def visit(self, node: ast.LessNode):
+        self._check_binary_operation(node)
+
+    @visitor.when(ast.EqualNode)
+    def visit(self, node: ast.EqualNode):
+        self._check_binary_operation(node)
+
+    def _check_binary_operation(self, node: ast.BinaryNode):
+        """
+        expr operation expr
+        """
+        self._skip_open_parentheses()
+        
+        self.visit(node.left)
+
+        token = self.tokens[self.position]
+        node.set_position(token.line, token.lexpos)
+        self.inc_position()  # ends after `operation`
+
+        self.visit(node.right)
+        self._skip_closed_parentheses()
+
+    def _check_unary_operation(self, node: ast.UnaryNode):
+        """
+        operation expr
+        """
+        self._skip_open_parentheses()
+        token = self.tokens[self.position]
+        node.operation_position = token.line, token.lexpos
+
+        token = self.tokens[self.position + 1]
+        node.set_position(token.line, token.lexpos)
+
+        self.inc_position()  # ends after `operation`
+        self.visit(node.expr)
+        self._skip_closed_parentheses()
+
+    def _atom_node(self, node: ast.Node):
+        token = self.tokens[self.position]
+        node.set_position(token.line, token.lexpos)
+        self.inc_position()  # ends after `atom`
+
+    def _skip_open_parentheses(self):
+        token = self.tokens[self.position]
+        while token.value == "(":
+            self.opar += 1
+            self.inc_position()
+            token = self.tokens[self.position]
+        
+        return self.opar, token
+    
+    def _skip_closed_parentheses(self):
+        token = self.tokens[self.position]
+        while token.value == ")":
+            self.opar -= 1
+            self.inc_position()
+            token = self.tokens[self.position]
+
+        return self.opar, token
+    
+    

@@ -138,16 +138,8 @@ class ExtendedCoolTypeChecker:
         node.scope = scope
         self.current_type = self.context.get_type(node.name)
 
-        attrs = [
-            feature
-            for feature in node.data
-            if isinstance(feature, cool.AttributeDecNode)
-        ]
-        methods = [
-            feature
-            for feature in node.data
-            if isinstance(feature, cool.MethodDecNode)
-        ]
+        attrs = [feature for feature in node.data if isinstance(feature, cool.AttributeDecNode)]
+        methods = [feature for feature in node.data if isinstance(feature, cool.MethodDecNode)]
 
         for attr, attr_owner in self.current_type.all_attributes():
             if attr_owner != self.current_type:
@@ -166,11 +158,8 @@ class ExtendedCoolTypeChecker:
             'error'
 
         try:
-            attr_type = (
-                self.context.get_type(node._type)
-                if node._type != "SELF_TYPE"
-                else self.current_type
-            )
+            attr_type = (self.context.get_type(node._type) \
+                if node._type != "SELF_TYPE" else self.current_type)
         except SemanticError:
             attr_type = ErrorType()
 
@@ -185,9 +174,8 @@ class ExtendedCoolTypeChecker:
             expr_type = self.visit(node.expr, scope.create_child())
             if not expr_type.conforms_to(attr_type):
                 line, column = node.expr_position
-                self.errors.append(
-                    'error'
-                )
+                self.errors.append('error')
+        
         scope.define_variable(node.name, attr_type)
 
     @visitor.when(cool.ExprParNode)
@@ -1053,7 +1041,7 @@ class CoolToCilTranslator(BaseCoolToCilVisitor):
         self.current_function = self.register_function(function_name)
 
         self.current_function.params = [cil.ParamNode("self")] + [
-            cil.ParamNode(param_name.name) for param_name in node.params
+            cil.ParamNode(param_name[0]) for param_name in node.params
         ]
 
         source, _ = self.visit(node.expr, scope)

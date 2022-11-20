@@ -27,7 +27,7 @@ class CodeBuilder:
 
     @visitor.when(ast.MethodDecNode)
     def visit(self, node: ast.MethodDecNode, tabs: int = 0):
-        params = ', '.join(': '.join([param.name, param.type]) for param in node.params)
+        params = ', '.join(': '.join([param[0], param[1]]) for param in node.params)
         ans = '    ' * tabs + f'{node.name} ({params}): {node.type}'
         body = self.visit(node.expr, tabs + 1)
         return f'{ans} {{\n{body}\n    }};'

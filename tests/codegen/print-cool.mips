@@ -1765,7 +1765,7 @@
 		sw $t0, 8($v0) # Setting value in the third word of the object
 		sw $v0, 20($sp) # internal_23 = address of allocated object Int
 		
-		# Get method out_string of IO
+		# Get method out_string of Main
 		lw $t0, 76($sp)
 		lw $t0, 0($t0)
 		addi $t0, $t0, 12

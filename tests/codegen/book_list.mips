@@ -1732,7 +1732,7 @@
 		sw $t0, 8($v0) # Setting value in the third word of the object
 		sw $v0, 64($sp) # internal_5 = address of allocated object Int
 		
-		# Get method out_string of IO
+		# Get method out_string of Book
 		lw $t0, 80($sp)
 		lw $t0, 0($t0)
 		addi $t0, $t0, 12
@@ -1789,7 +1789,7 @@
 		sw $t0, 8($v0) # Setting value in the third word of the object
 		sw $v0, 48($sp) # internal_9 = address of allocated object Int
 		
-		# Get method out_string of IO
+		# Get method out_string of Book
 		lw $t0, 68($sp)
 		lw $t0, 0($t0)
 		addi $t0, $t0, 12
@@ -1924,7 +1924,7 @@
 		sw $t0, 8($v0) # Setting value in the third word of the object
 		sw $v0, 20($sp) # internal_16 = address of allocated object Int
 		
-		# Get method out_string of IO
+		# Get method out_string of Book
 		lw $t0, 36($sp)
 		lw $t0, 0($t0)
 		addi $t0, $t0, 12
@@ -1981,7 +1981,7 @@
 		sw $t0, 8($v0) # Setting value in the third word of the object
 		sw $v0, 4($sp) # internal_20 = address of allocated object Int
 		
-		# Get method out_string of IO
+		# Get method out_string of Book
 		lw $t0, 24($sp)
 		lw $t0, 0($t0)
 		addi $t0, $t0, 12
@@ -2346,7 +2346,7 @@
 		sw $t0, 8($v0) # Setting value in the third word of the object
 		sw $v0, 20($sp) # internal_8 = address of allocated object Int
 		
-		# Get method out_string of IO
+		# Get method out_string of Article
 		lw $t0, 36($sp)
 		lw $t0, 0($t0)
 		addi $t0, $t0, 12
@@ -2403,7 +2403,7 @@
 		sw $t0, 8($v0) # Setting value in the third word of the object
 		sw $v0, 4($sp) # internal_12 = address of allocated object Int
 		
-		# Get method out_string of IO
+		# Get method out_string of Article
 		lw $t0, 24($sp)
 		lw $t0, 0($t0)
 		addi $t0, $t0, 12
@@ -3058,7 +3058,7 @@
 		lw $t0, 172($sp)
 		sw $t0, 168($sp)
 		
-		while_start_8786609826687:
+		while_start_8791518929104:
 		
 		# internal_8 = EqualAddress(internal_10, internal_6)
 		lw $t0, 168($sp)
@@ -3067,11 +3067,11 @@
 		lw $t0, 176($sp)
 		sw $t2, 8($t0)
 		
-		# If internal_8 then goto while_end_8786609826687
+		# If internal_8 then goto while_end_8791518929104
 		lw $t0, 176($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, while_end_8786609826687
+		beq $t0, $t1, while_end_8791518929104
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -3096,10 +3096,10 @@
 		lw $t0, 4($t0)
 		sw $t0, 168($sp)
 		
-		# Jumping to while_start_8786609826687
-		j while_start_8786609826687
+		# Jumping to while_start_8791518929104
+		j while_start_8791518929104
 		
-		while_end_8786609826687:
+		while_end_8791518929104:
 		
 		# internal_10 = internal_9
 		lw $t0, 172($sp)
@@ -3140,7 +3140,7 @@
 		sw $t0, 8($v0) # Setting value in the third word of the object
 		sw $v0, 156($sp) # internal_13 = address of allocated object Int
 		
-		foreach_start_8786609826687:
+		foreach_start_8791518929104:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -3160,16 +3160,16 @@
 		sw $v1, 168($sp) # internal_13 = result of function_less_than
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# If internal_13 then goto foreach_body_8786609826687
+		# If internal_13 then goto foreach_body_8791518929104
 		lw $t0, 156($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, foreach_body_8786609826687
+		beq $t0, $t1, foreach_body_8791518929104
 		
-		# Jumping to foreach_end_8786609826687
-		j foreach_end_8786609826687
+		# Jumping to foreach_end_8791518929104
+		j foreach_end_8791518929104
 		
-		foreach_body_8786609826687:
+		foreach_body_8791518929104:
 		
 		# array internal_11[4 * internal_12] = internal_10
 		lw $t0, 160($sp) # $t0 = internal_12
@@ -3205,10 +3205,10 @@
 		sw $v1, 172($sp) # internal_12 = result of function_add
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# Jumping to foreach_start_8786609826687
-		j foreach_start_8786609826687
+		# Jumping to foreach_start_8791518929104
+		j foreach_start_8791518929104
 		
-		foreach_end_8786609826687:
+		foreach_end_8791518929104:
 		
 		# initialize Array [internal_5]
 		lw $t0, 188($sp) # $t0 = internal_5
@@ -3370,7 +3370,7 @@
 		sw $t0, 8($v0) # Setting value in the third word of the object
 		sw $v0, 104($sp) # internal_26 = address of allocated object Int
 		
-		foreach_type_start_8786609826687:
+		foreach_type_start_8791518929104:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -3390,16 +3390,16 @@
 		sw $v1, 136($sp) # internal_21 = result of function_less_than
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# If internal_21 then goto foreach_type_body_8786609826687
+		# If internal_21 then goto foreach_type_body_8791518929104
 		lw $t0, 124($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, foreach_type_body_8786609826687
+		beq $t0, $t1, foreach_type_body_8791518929104
 		
-		# Jumping to foreach_type_end_8786609826687
-		j foreach_type_end_8786609826687
+		# Jumping to foreach_type_end_8791518929104
+		j foreach_type_end_8791518929104
 		
-		foreach_type_body_8786609826687:
+		foreach_type_body_8791518929104:
 		
 		# internal_22 = array internal_14[4 * internal_20]
 		lw $t0, 128($sp) # $t0 = internal_20
@@ -3430,7 +3430,7 @@
 		sw $v1, 128($sp) # internal_23 = result of function_assign
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		foreach_ancestor_start_8786609826687:
+		foreach_ancestor_start_8791518929104:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -3450,16 +3450,16 @@
 		sw $v1, 124($sp) # internal_24 = result of function_less_than
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# If internal_24 then goto foreach_ancestor_body_8786609826687
+		# If internal_24 then goto foreach_ancestor_body_8791518929104
 		lw $t0, 112($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, foreach_ancestor_body_8786609826687
+		beq $t0, $t1, foreach_ancestor_body_8791518929104
 		
-		# Jumping to foreach_ancestor_end_8786609826687
-		j foreach_ancestor_end_8786609826687
+		# Jumping to foreach_ancestor_end_8791518929104
+		j foreach_ancestor_end_8791518929104
 		
-		foreach_ancestor_body_8786609826687:
+		foreach_ancestor_body_8791518929104:
 		
 		# internal_25 = array internal_11[4 * internal_23]
 		lw $t0, 116($sp) # $t0 = internal_23
@@ -3479,11 +3479,11 @@
 		lw $t0, 104($sp)
 		sw $t2, 8($t0)
 		
-		# If internal_26 then goto foreach_ancestor_end_8786609826687
+		# If internal_26 then goto foreach_ancestor_end_8791518929104
 		lw $t0, 104($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, foreach_ancestor_end_8786609826687
+		beq $t0, $t1, foreach_ancestor_end_8791518929104
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -3503,10 +3503,10 @@
 		sw $v1, 128($sp) # internal_23 = result of function_add
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# Jumping to foreach_ancestor_start_8786609826687
-		j foreach_ancestor_start_8786609826687
+		# Jumping to foreach_ancestor_start_8791518929104
+		j foreach_ancestor_start_8791518929104
 		
-		foreach_ancestor_end_8786609826687:
+		foreach_ancestor_end_8791518929104:
 		
 		# array internal_15[4 * internal_20] = internal_23
 		lw $t0, 128($sp) # $t0 = internal_20
@@ -3538,10 +3538,10 @@
 		sw $v1, 140($sp) # internal_20 = result of function_add
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# Jumping to foreach_type_start_8786609826687
-		j foreach_type_start_8786609826687
+		# Jumping to foreach_type_start_8791518929104
+		j foreach_type_start_8791518929104
 		
-		foreach_type_end_8786609826687:
+		foreach_type_end_8791518929104:
 		
 		# Allocating Int 0
 		li $v0, 9
@@ -3621,7 +3621,7 @@
 		sw $v1, 100($sp) # internal_30 = result of function_assign
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		foreach_min_start_8786609826687:
+		foreach_min_start_8791518929104:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -3641,16 +3641,16 @@
 		sw $v1, 96($sp) # internal_31 = result of function_less_than
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# If internal_31 then goto foreach_min_body_8786609826687
+		# If internal_31 then goto foreach_min_body_8791518929104
 		lw $t0, 84($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, foreach_min_body_8786609826687
+		beq $t0, $t1, foreach_min_body_8791518929104
 		
-		# Jumping to foreach_min_end_8786609826687
-		j foreach_min_end_8786609826687
+		# Jumping to foreach_min_end_8791518929104
+		j foreach_min_end_8791518929104
 		
-		foreach_min_body_8786609826687:
+		foreach_min_body_8791518929104:
 		
 		# internal_29 = array internal_15[4 * internal_27]
 		lw $t0, 100($sp) # $t0 = internal_27
@@ -3682,16 +3682,16 @@
 		sw $v1, 96($sp) # internal_31 = result of function_less_than
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# If internal_31 then goto update_min_8786609826687
+		# If internal_31 then goto update_min_8791518929104
 		lw $t0, 84($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, update_min_8786609826687
+		beq $t0, $t1, update_min_8791518929104
 		
-		# Jumping to update_min_end_8786609826687
-		j update_min_end_8786609826687
+		# Jumping to update_min_end_8791518929104
+		j update_min_end_8791518929104
 		
-		update_min_8786609826687:
+		update_min_8791518929104:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -3729,7 +3729,7 @@
 		sw $v1, 108($sp) # internal_28 = result of function_assign
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		update_min_end_8786609826687:
+		update_min_end_8791518929104:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -3749,10 +3749,10 @@
 		sw $v1, 112($sp) # internal_27 = result of function_add
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# Jumping to foreach_min_start_8786609826687
-		j foreach_min_start_8786609826687
+		# Jumping to foreach_min_start_8791518929104
+		j foreach_min_start_8791518929104
 		
-		foreach_min_end_8786609826687:
+		foreach_min_end_8791518929104:
 		
 		# initialize Array [internal_5]
 		lw $t0, 188($sp) # $t0 = internal_5
@@ -3843,11 +3843,11 @@
 		sw $v1, 80($sp) # internal_35 = result of function_equal
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# If internal_35 then goto error_branch_8786609826687
+		# If internal_35 then goto error_branch_8791518929104
 		lw $t0, 68($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, error_branch_8786609826687
+		beq $t0, $t1, error_branch_8791518929104
 		
 		# array internal_32[4 * internal_28] = internal_4
 		lw $t0, 96($sp) # $t0 = internal_28
@@ -3897,11 +3897,11 @@
 		lw $t2, 64($sp) # internal_36 = array internal_32[4 * internal_37]
 		sw $t0, 8($t2)
 		
-		# If internal_36 then goto branch_Book_8786609826687
+		# If internal_36 then goto branch_Book_8791518929104
 		lw $t0, 64($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, branch_Book_8786609826687
+		beq $t0, $t1, branch_Book_8791518929104
 		
 		# Allocating Int 1
 		li $v0, 9
@@ -3927,13 +3927,13 @@
 		lw $t2, 64($sp) # internal_36 = array internal_32[4 * internal_38]
 		sw $t0, 8($t2)
 		
-		# If internal_36 then goto branch_Article_8786609826687
+		# If internal_36 then goto branch_Article_8791518929104
 		lw $t0, 64($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, branch_Article_8786609826687
+		beq $t0, $t1, branch_Article_8791518929104
 		
-		branch_Book_8786609826687:
+		branch_Book_8791518929104:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -4110,10 +4110,10 @@
 		lw $t0, 40($sp)
 		sw $t0, 52($sp)
 		
-		# Jumping to branch_end_8786609826687
-		j branch_end_8786609826687
+		# Jumping to branch_end_8791518929104
+		j branch_end_8791518929104
 		
-		branch_Article_8786609826687:
+		branch_Article_8791518929104:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -4299,12 +4299,12 @@
 		lw $t0, 20($sp)
 		sw $t0, 52($sp)
 		
-		# Jumping to branch_end_8786609826687
-		j branch_end_8786609826687
+		# Jumping to branch_end_8791518929104
+		j branch_end_8791518929104
 		
-		error_branch_8786609826687:
+		error_branch_8791518929104:
 		
-		branch_end_8786609826687:
+		branch_end_8791518929104:
 		
 		# Allocating Int 12
 		li $v0, 9

@@ -11,7 +11,7 @@ from utils.formatter import Formatter, CodeBuilder, PrintingScope
 from utils.semantic import Context, Scope
 from utils.inference import InferenceTypeChecker
 from utils.instance import Execution
-from utils.type_analysis import PositionateTokensInAST #, TypeBuilder, TypeChecker, TypeCollector, , TypeBuilderFeature
+from utils.type_analysis import PositionAssigner #, TypeBuilder, TypeChecker, TypeCollector, , TypeBuilderFeature
 from utils.auxiliar_methods import erase_multiline_comment
 from utils.cool_to_cil import COOLToCILVisitor
 from utils.collect_dec import CollectDeclarationsDict, get_declarations_dict
@@ -110,7 +110,7 @@ def tokenize(program_file: str, debug: bool = False, verbose=False):
         if not t:
             break
         # tokens.append(Token(t[0], t[1], t[2], t[3]))
-        tokens.append(Token(t.type, t.value, t.lineno, t.lexpos))
+        tokens.append(Token(t.type, t.value, t.lineno, t.lexpos, program))
         if type(t) == tuple:
             column = 1
             current_pos = t[2]
@@ -264,11 +264,10 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
     
     errors, program, tokens = tokenize(program_file, debug, verbose)
 
-
     if errors or lexer_errors:
-        for (_, line, lexpos, value) in lexer_errors:
+        for (_, line, col, value) in lexer_errors:
             totallines = program.count('\n')
-            col = get_tokencolumn(program, lexpos) if get_tokencolumn(program, lexpos) > 1 else 2
+            col = get_tokencolumn(program, col) if get_tokencolumn(program, col) > 1 else 2
             print_errors(f'({line}, {col - 1}) - LexicographicError: ERROR \"{value}\"')
         for e in errors:
             print_errors(e)
@@ -297,8 +296,8 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
     ##############
     
     else:
-        PositionateTokensInAST(tokens, program).visit(ast)
         '''
+        PositionateTokensInAST(tokens, program).visit(ast)
         TypeCollector(context, errors, program).visit(ast)
 
         if errors:
@@ -333,6 +332,7 @@ def final_execution(program_file, program_file_out, debug: bool = False, verbose
             exit(1)
         '''
         
+        PositionAssigner(tokens).visit(ast)
         TypeCollector(context, errors).visit(ast)
         TypeBuilderForInheritance(context, errors).visit(ast)
         topological_sorting(ast, context, errors)

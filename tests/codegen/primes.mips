@@ -1636,7 +1636,7 @@
 		# Allocating NUll to internal_7
 		sw $zero, 164($sp) # internal_7 = 0
 		
-		while_start_8751408831865:
+		while_start_8750563524789:
 		
 		# Allocating Bool 1
 		li $v0, 9
@@ -1650,16 +1650,16 @@
 		sw $t0, 8($v0) # Setting value in the third word of the object
 		sw $v0, 160($sp) # internal_8 = address of allocated object Int
 		
-		# If internal_8 then goto while_body_8751408831865
+		# If internal_8 then goto while_body_8750563524789
 		lw $t0, 160($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, while_body_8751408831865
+		beq $t0, $t1, while_body_8750563524789
 		
-		# Jumping to while_end_8751408831865
-		j while_end_8751408831865
+		# Jumping to while_end_8750563524789
+		j while_end_8750563524789
 		
-		while_body_8751408831865:
+		while_body_8750563524789:
 		
 		# Allocating Int 1
 		li $v0, 9
@@ -1727,7 +1727,7 @@
 		# Allocating NUll to internal_12
 		sw $zero, 144($sp) # internal_12 = 0
 		
-		while_start_8751408838807:
+		while_start_8750563526093:
 		
 		# Allocating Bool 0
 		li $v0, 9
@@ -1772,16 +1772,16 @@
 		lw $t0, 128($sp)
 		sw $t0, 136($sp)
 		
-		# If internal_14 then goto then_8751408838819
+		# If internal_14 then goto then_8750563526105
 		lw $t0, 136($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, then_8751408838819
+		beq $t0, $t1, then_8750563526105
 		
-		# Jumping to else_8751408838819
-		j else_8751408838819
+		# Jumping to else_8750563526105
+		j else_8750563526105
 		
-		then_8751408838819:
+		then_8750563526105:
 		
 		# Allocating Bool 0
 		li $v0, 9
@@ -1799,10 +1799,10 @@
 		lw $t0, 124($sp)
 		sw $t0, 140($sp)
 		
-		# Jumping to endif_8751408838819
-		j endif_8751408838819
+		# Jumping to endif_8750563526105
+		j endif_8750563526105
 		
-		else_8751408838819:
+		else_8750563526105:
 		
 		# Allocating Bool 0
 		li $v0, 9
@@ -1892,16 +1892,16 @@
 		lw $t0, 96($sp)
 		sw $t0, 116($sp)
 		
-		# If internal_19 then goto then_8751408838870
+		# If internal_19 then goto then_8750563526937
 		lw $t0, 116($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, then_8751408838870
+		beq $t0, $t1, then_8750563526937
 		
-		# Jumping to else_8751408838870
-		j else_8751408838870
+		# Jumping to else_8750563526937
+		j else_8750563526937
 		
-		then_8751408838870:
+		then_8750563526937:
 		
 		# Allocating Bool 0
 		li $v0, 9
@@ -1919,10 +1919,10 @@
 		lw $t0, 92($sp)
 		sw $t0, 120($sp)
 		
-		# Jumping to endif_8751408838870
-		j endif_8751408838870
+		# Jumping to endif_8750563526937
+		j endif_8750563526937
 		
-		else_8751408838870:
+		else_8750563526937:
 		
 		# Allocating Bool 1
 		li $v0, 9
@@ -1940,30 +1940,30 @@
 		lw $t0, 88($sp)
 		sw $t0, 120($sp)
 		
-		# Jumping to endif_8751408838870
-		j endif_8751408838870
+		# Jumping to endif_8750563526937
+		j endif_8750563526937
 		
-		endif_8751408838870:
+		endif_8750563526937:
 		
 		# internal_13 = internal_18
 		lw $t0, 120($sp)
 		sw $t0, 140($sp)
 		
-		# Jumping to endif_8751408838819
-		j endif_8751408838819
+		# Jumping to endif_8750563526105
+		j endif_8750563526105
 		
-		endif_8751408838819:
+		endif_8750563526105:
 		
-		# If internal_13 then goto while_body_8751408838807
+		# If internal_13 then goto while_body_8750563526093
 		lw $t0, 140($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, while_body_8751408838807
+		beq $t0, $t1, while_body_8750563526093
 		
-		# Jumping to while_end_8751408838807
-		j while_end_8751408838807
+		# Jumping to while_end_8750563526093
+		j while_end_8750563526093
 		
-		while_body_8751408838807:
+		while_body_8750563526093:
 		
 		# Allocating Int 1
 		li $v0, 9
@@ -2004,10 +2004,10 @@
 		# Calling function function_assign
 		jal function_assign
 		lw $ra, 8($sp)
-		# Jumping to while_start_8751408838807
-		j while_start_8751408838807
+		# Jumping to while_start_8750563526093
+		j while_start_8750563526093
 		
-		while_end_8751408838807:
+		while_end_8750563526093:
 		
 		# Allocating Bool 0
 		li $v0, 9
@@ -2052,16 +2052,16 @@
 		lw $t0, 64($sp)
 		sw $t0, 72($sp)
 		
-		# If internal_30 then goto then_8751408838876
+		# If internal_30 then goto then_8750563526943
 		lw $t0, 72($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, then_8751408838876
+		beq $t0, $t1, then_8750563526943
 		
-		# Jumping to else_8751408838876
-		j else_8751408838876
+		# Jumping to else_8750563526943
+		j else_8750563526943
 		
-		then_8751408838876:
+		then_8750563526943:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -2205,10 +2205,10 @@
 		lw $t0, 44($sp)
 		sw $t0, 76($sp)
 		
-		# Jumping to endif_8751408838876
-		j endif_8751408838876
+		# Jumping to endif_8750563526943
+		j endif_8750563526943
 		
-		else_8751408838876:
+		else_8750563526943:
 		
 		# Allocating Int 0
 		li $v0, 9
@@ -2226,10 +2226,10 @@
 		lw $t0, 32($sp)
 		sw $t0, 76($sp)
 		
-		# Jumping to endif_8751408838876
-		j endif_8751408838876
+		# Jumping to endif_8750563526943
+		j endif_8750563526943
 		
-		endif_8751408838876:
+		endif_8750563526943:
 		
 		# Allocating Bool 0
 		li $v0, 9
@@ -2259,16 +2259,16 @@
 		lw $t0, 20($sp)
 		sw $t0, 24($sp)
 		
-		# If internal_42 then goto then_8751408840253
+		# If internal_42 then goto then_8750563527039
 		lw $t0, 24($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, then_8751408840253
+		beq $t0, $t1, then_8750563527039
 		
-		# Jumping to else_8751408840253
-		j else_8751408840253
+		# Jumping to else_8750563527039
+		j else_8750563527039
 		
-		then_8751408840253:
+		then_8750563527039:
 		
 		# Allocating String
 		li $v0, 9
@@ -2339,10 +2339,10 @@
 		lw $t0, 12($sp)
 		sw $t0, 28($sp)
 		
-		# Jumping to endif_8751408840253
-		j endif_8751408840253
+		# Jumping to endif_8750563527039
+		j endif_8750563527039
 		
-		else_8751408840253:
+		else_8750563527039:
 		
 		# Allocating String
 		li $v0, 9
@@ -2387,15 +2387,15 @@
 		lw $t0, 0($sp)
 		sw $t0, 28($sp)
 		
-		# Jumping to endif_8751408840253
-		j endif_8751408840253
+		# Jumping to endif_8750563527039
+		j endif_8750563527039
 		
-		endif_8751408840253:
+		endif_8750563527039:
 		
-		# Jumping to while_start_8751408831865
-		j while_start_8751408831865
+		# Jumping to while_start_8750563524789
+		j while_start_8750563524789
 		
-		while_end_8751408831865:
+		while_end_8750563524789:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments

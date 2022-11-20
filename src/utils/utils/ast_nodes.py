@@ -1,12 +1,21 @@
 from .semantic import Scope
 
 class Token:
-    def __init__(self, type, value, line, lexpos):
+    def __init__(self, type, value, line, lexpos, program):
         self.type = type
         self.value = value
         
         self.line = line
-        self.lexpos = lexpos
+        self.lexpos = self.get_tokencolumn(program, lexpos) - 1
+    
+    def get_tokencolumn(self, str, pos):
+        column = 1
+        temp_pos = pos
+        while str[temp_pos] != '\n':
+            if temp_pos == 0: break
+            temp_pos -= 1
+            column += 1
+        return column if column > 1 else 2
 
 class Node:
     line: int
@@ -127,7 +136,7 @@ class AtomicNode(ExprNode):
         self.lex: str = lex
         self.scope = None
 
-class ExprParNode(ExprNode):
+class ExprParNode(AtomicNode):
     def __init__(self, expr):
         self.expr = expr
         self.expr_pos = (-1, -1)

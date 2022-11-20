@@ -86,14 +86,14 @@ class TypeBuilderForInheritance:
 
         if node.parent is not None:
             if node.parent in ("Int", "String", "Bool", "SELF_TYPE"):
-                line, column = node.parent_pos
+                line, column = node.parent_position
                 self.errors.append(err.INVALID_PARENT_TYPE % (line, column, node.name, node.parent))
 
             try:
                 parent_type = self.context.get_type(node.parent)
             except SemanticError:
                 parent_type = self.context.get_type("Object")
-                line, column = node.parent_pos
+                line, column = node.parent_position
                 self.errors.append(err.PARENT_UNDEFINED % (line, column, node.name, node.parent))
 
             try:
@@ -139,7 +139,7 @@ class TypeBuilderForFeatures:
             attr_type = self.context.get_type(node._type)
         except SemanticError:
             attr_type = ErrorType()
-            line, column = node.type_pos
+            line, column = node.type_position
             self.errors.append(
                 err.UNDEFINED_ATTRIBUTE_TYPE
                 % (line, column, node._type, node.name, self.current_type.name)
@@ -155,8 +155,8 @@ class TypeBuilderForFeatures:
         param_names = []
         param_types = []
 
-        for i, item in enumerate(node.params):
-            name, typex = item.name, item.type
+        for i, (name, _type) in enumerate(node.params):
+            name, typex = name, _type
             param_names.append(name)
             try:
                 param_types.append(self.context.get_type(typex))
@@ -229,7 +229,7 @@ def topological_sorting(program_node: cool.ProgramNode, context: Context, errors
 
         # Select the last declared class that belongs to the cycle
         reference_class = max(exclude_type_names, key=lambda x: declarations[x].line)
-        line, column = declarations[reference_class].parent_pos
+        line, column = declarations[reference_class].parent_position
         errors.append(
             err.CYCLIC_DEPENDENCY % (line, column, reference_class, reference_class)
         )
@@ -1018,8 +1018,8 @@ class InferenceTypeSubstitute:
         except SemanticError:
             return_type = None
 
-        for i, item in enumerate(node.params):
-            name, _ = item.name, item.type
+        for i, (name, _type) in enumerate(node.params):
+            name, _ = name, _type
             variable_info = scope.find_variable(name)
             if variable_info.type == self.context.get_type("AUTO_TYPE"):
                 self.errors.append(
@@ -1192,7 +1192,7 @@ class TypeChecker:
         if node.expr is not None:
             expr_type = self.visit(node.expr, scope.create_child())
             if not expr_type.conforms_to(attr_type):
-                line, column = node.expr_pos
+                line, column = node.expr_position
                 self.errors.append(
                     err.INCOMPATIBLE_TYPES
                     % (line, column, expr_type.name, attr_type.name)

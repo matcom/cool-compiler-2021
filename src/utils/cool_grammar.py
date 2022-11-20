@@ -71,9 +71,9 @@ def p_param_list(p):
     '''param_list : ID COLON TYPE
                   | ID COLON TYPE COMA param_list'''
     if len(p) == 4:
-        p[0] = [ast.ParamNode(p[1], p[3])]
+        p[0] = [(p[1], p[3])]
     elif len(p) == 6:
-        p[0] = [ast.ParamNode(p[1], p[3])] + p[5]
+        p[0] = [(p[1], p[3])] + p[5]
 
 
 def p_expr(p):
@@ -178,8 +178,8 @@ def p_atom(p):
             | IF expr THEN expr ELSE expr FI'''
 
     if len(p) == 4:
-        p[0] = ast.ExprParNode(p[2])
-        # p[0] = p[2]
+        # p[0] = ast.ExprParNode(p[2])
+        p[0] = p[2]
     elif len(p) == 3:
         p[0] = ast.NewNode(p[2])
     elif len(p) == 2:
