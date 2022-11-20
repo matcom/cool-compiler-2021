@@ -1444,17 +1444,17 @@
 		# Set attribute i of self
 		lw $t0, 4($sp) # $t0 = self
 		lw $t1, 0($sp) # $t1 = internal_0
-		beq $t1, $zero, object_set_attribute_8785171898441
+		beq $t1, $zero, object_set_attribute_8746329078504
 		lw $t2, 0($t1)
 		la $t3, type_Int
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_set_attribute_8785171898441
+		beq $t6, $t5, int_set_attribute_8746329078504
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_set_attribute_8785171898441
-		j object_set_attribute_8785171898441
-		int_set_attribute_8785171898441:
+		beq $t6, $t5, bool_set_attribute_8746329078504
+		j object_set_attribute_8746329078504
+		int_set_attribute_8746329078504:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -1463,8 +1463,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 8($t0) # self.i = internal_0
-		j end_set_attribute_8785171898441
-		bool_set_attribute_8785171898441:
+		j end_set_attribute_8746329078504
+		bool_set_attribute_8746329078504:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -1473,10 +1473,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 8($t0) # self.i = internal_0
-		j end_set_attribute_8785171898441
-		object_set_attribute_8785171898441:
+		j end_set_attribute_8746329078504
+		object_set_attribute_8746329078504:
 		sw $t1, 8($t0) # self.i = internal_0
-		end_set_attribute_8785171898441:
+		end_set_attribute_8746329078504:
 		
 		# Loading return value in $v1
 		lw $v1, 4($sp)
@@ -1569,17 +1569,17 @@
 		# Set attribute i of self
 		lw $t0, 36($sp) # $t0 = self
 		lw $t1, 16($sp) # $t1 = internal_4
-		beq $t1, $zero, object_set_attribute_8785171898483
+		beq $t1, $zero, object_set_attribute_8746329080342
 		lw $t2, 0($t1)
 		la $t3, type_Int
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_set_attribute_8785171898483
+		beq $t6, $t5, int_set_attribute_8746329080342
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_set_attribute_8785171898483
-		j object_set_attribute_8785171898483
-		int_set_attribute_8785171898483:
+		beq $t6, $t5, bool_set_attribute_8746329080342
+		j object_set_attribute_8746329080342
+		int_set_attribute_8746329080342:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -1588,8 +1588,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 8($t0) # self.i = internal_4
-		j end_set_attribute_8785171898483
-		bool_set_attribute_8785171898483:
+		j end_set_attribute_8746329080342
+		bool_set_attribute_8746329080342:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -1598,10 +1598,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 8($t0) # self.i = internal_4
-		j end_set_attribute_8785171898483
-		object_set_attribute_8785171898483:
+		j end_set_attribute_8746329080342
+		object_set_attribute_8746329080342:
 		sw $t1, 8($t0) # self.i = internal_4
-		end_set_attribute_8785171898483:
+		end_set_attribute_8746329080342:
 		
 		# Allocating String
 		li $v0, 9

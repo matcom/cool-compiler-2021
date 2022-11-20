@@ -1539,17 +1539,17 @@
 		# Set attribute title of self
 		lw $t0, 8($sp) # $t0 = self
 		lw $t1, 4($sp) # $t1 = internal_0
-		beq $t1, $zero, object_set_attribute_8729443416564
+		beq $t1, $zero, object_set_attribute_8763762120825
 		lw $t2, 0($t1)
 		la $t3, type_Int
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_set_attribute_8729443416564
+		beq $t6, $t5, int_set_attribute_8763762120825
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_set_attribute_8729443416564
-		j object_set_attribute_8729443416564
-		int_set_attribute_8729443416564:
+		beq $t6, $t5, bool_set_attribute_8763762120825
+		j object_set_attribute_8763762120825
+		int_set_attribute_8763762120825:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -1558,8 +1558,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 8($t0) # self.title = internal_0
-		j end_set_attribute_8729443416564
-		bool_set_attribute_8729443416564:
+		j end_set_attribute_8763762120825
+		bool_set_attribute_8763762120825:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -1568,10 +1568,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 8($t0) # self.title = internal_0
-		j end_set_attribute_8729443416564
-		object_set_attribute_8729443416564:
+		j end_set_attribute_8763762120825
+		object_set_attribute_8763762120825:
 		sw $t1, 8($t0) # self.title = internal_0
-		end_set_attribute_8729443416564:
+		end_set_attribute_8763762120825:
 		
 		# Allocating String
 		li $v0, 9
@@ -1591,17 +1591,17 @@
 		# Set attribute author of self
 		lw $t0, 8($sp) # $t0 = self
 		lw $t1, 0($sp) # $t1 = internal_1
-		beq $t1, $zero, object_set_attribute_8729443417875
+		beq $t1, $zero, object_set_attribute_8763762120849
 		lw $t2, 0($t1)
 		la $t3, type_Int
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_set_attribute_8729443417875
+		beq $t6, $t5, int_set_attribute_8763762120849
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_set_attribute_8729443417875
-		j object_set_attribute_8729443417875
-		int_set_attribute_8729443417875:
+		beq $t6, $t5, bool_set_attribute_8763762120849
+		j object_set_attribute_8763762120849
+		int_set_attribute_8763762120849:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -1610,8 +1610,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 12($t0) # self.author = internal_1
-		j end_set_attribute_8729443417875
-		bool_set_attribute_8729443417875:
+		j end_set_attribute_8763762120849
+		bool_set_attribute_8763762120849:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -1620,10 +1620,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 12($t0) # self.author = internal_1
-		j end_set_attribute_8729443417875
-		object_set_attribute_8729443417875:
+		j end_set_attribute_8763762120849
+		object_set_attribute_8763762120849:
 		sw $t1, 12($t0) # self.author = internal_1
-		end_set_attribute_8729443417875:
+		end_set_attribute_8763762120849:
 		
 		# Loading return value in $v1
 		lw $v1, 8($sp)
@@ -1643,17 +1643,17 @@
 		# Set attribute title of self
 		lw $t0, 8($sp) # $t0 = self
 		lw $t1, 4($sp) # $t1 = title_p
-		beq $t1, $zero, object_set_attribute_8729443417926
+		beq $t1, $zero, object_set_attribute_8763762120903
 		lw $t2, 0($t1)
 		la $t3, type_Int
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_set_attribute_8729443417926
+		beq $t6, $t5, int_set_attribute_8763762120903
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_set_attribute_8729443417926
-		j object_set_attribute_8729443417926
-		int_set_attribute_8729443417926:
+		beq $t6, $t5, bool_set_attribute_8763762120903
+		j object_set_attribute_8763762120903
+		int_set_attribute_8763762120903:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -1662,8 +1662,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 8($t0) # self.title = title_p
-		j end_set_attribute_8729443417926
-		bool_set_attribute_8729443417926:
+		j end_set_attribute_8763762120903
+		bool_set_attribute_8763762120903:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -1672,25 +1672,25 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 8($t0) # self.title = title_p
-		j end_set_attribute_8729443417926
-		object_set_attribute_8729443417926:
+		j end_set_attribute_8763762120903
+		object_set_attribute_8763762120903:
 		sw $t1, 8($t0) # self.title = title_p
-		end_set_attribute_8729443417926:
+		end_set_attribute_8763762120903:
 		
 		# Set attribute author of self
 		lw $t0, 8($sp) # $t0 = self
 		lw $t1, 0($sp) # $t1 = author_p
-		beq $t1, $zero, object_set_attribute_8729443417938
+		beq $t1, $zero, object_set_attribute_8763762120915
 		lw $t2, 0($t1)
 		la $t3, type_Int
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_set_attribute_8729443417938
+		beq $t6, $t5, int_set_attribute_8763762120915
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_set_attribute_8729443417938
-		j object_set_attribute_8729443417938
-		int_set_attribute_8729443417938:
+		beq $t6, $t5, bool_set_attribute_8763762120915
+		j object_set_attribute_8763762120915
+		int_set_attribute_8763762120915:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -1699,8 +1699,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 12($t0) # self.author = author_p
-		j end_set_attribute_8729443417938
-		bool_set_attribute_8729443417938:
+		j end_set_attribute_8763762120915
+		bool_set_attribute_8763762120915:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -1709,10 +1709,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 12($t0) # self.author = author_p
-		j end_set_attribute_8729443417938
-		object_set_attribute_8729443417938:
+		j end_set_attribute_8763762120915
+		object_set_attribute_8763762120915:
 		sw $t1, 12($t0) # self.author = author_p
-		end_set_attribute_8729443417938:
+		end_set_attribute_8763762120915:
 		
 		# Loading return value in $v1
 		lw $v1, 8($sp)
@@ -1828,11 +1828,11 @@
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_get_attribute_8729443418061
+		beq $t6, $t5, int_get_attribute_8763762089298
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_get_attribute_8729443418061
-		j object_get_attribute_8729443418061
-		int_get_attribute_8729443418061:
+		beq $t6, $t5, bool_get_attribute_8763762089298
+		j object_get_attribute_8763762089298
+		int_get_attribute_8763762089298:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -1841,8 +1841,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 76($sp) # internal_4 = self.title
-		j end_get_attribute_8729443418061
-		bool_get_attribute_8729443418061:
+		j end_get_attribute_8763762089298
+		bool_get_attribute_8763762089298:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -1851,10 +1851,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 76($sp) # internal_4 = self.title
-		j end_get_attribute_8729443418061
-		object_get_attribute_8729443418061:
+		j end_get_attribute_8763762089298
+		object_get_attribute_8763762089298:
 		sw $t1, 76($sp) # internal_4 = self.title
-		end_get_attribute_8729443418061:
+		end_get_attribute_8763762089298:
 		
 		# Allocating Int 4
 		li $v0, 9
@@ -2059,11 +2059,11 @@
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_get_attribute_8729443419269
+		beq $t6, $t5, int_get_attribute_8763762090506
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_get_attribute_8729443419269
-		j object_get_attribute_8729443419269
-		int_get_attribute_8729443419269:
+		beq $t6, $t5, bool_get_attribute_8763762090506
+		j object_get_attribute_8763762090506
+		int_get_attribute_8763762090506:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2072,8 +2072,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 28($sp) # internal_16 = self.author
-		j end_get_attribute_8729443419269
-		bool_get_attribute_8729443419269:
+		j end_get_attribute_8763762090506
+		bool_get_attribute_8763762090506:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2082,10 +2082,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 28($sp) # internal_16 = self.author
-		j end_get_attribute_8729443419269
-		object_get_attribute_8729443419269:
+		j end_get_attribute_8763762090506
+		object_get_attribute_8763762090506:
 		sw $t1, 28($sp) # internal_16 = self.author
-		end_get_attribute_8729443419269:
+		end_get_attribute_8763762090506:
 		
 		# Allocating Int 4
 		li $v0, 9
@@ -2223,17 +2223,17 @@
 		# Set attribute title of self
 		lw $t0, 12($sp) # $t0 = self
 		lw $t1, 8($sp) # $t1 = internal_0
-		beq $t1, $zero, object_set_attribute_8729443419380
+		beq $t1, $zero, object_set_attribute_8763762090617
 		lw $t2, 0($t1)
 		la $t3, type_Int
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_set_attribute_8729443419380
+		beq $t6, $t5, int_set_attribute_8763762090617
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_set_attribute_8729443419380
-		j object_set_attribute_8729443419380
-		int_set_attribute_8729443419380:
+		beq $t6, $t5, bool_set_attribute_8763762090617
+		j object_set_attribute_8763762090617
+		int_set_attribute_8763762090617:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2242,8 +2242,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 8($t0) # self.title = internal_0
-		j end_set_attribute_8729443419380
-		bool_set_attribute_8729443419380:
+		j end_set_attribute_8763762090617
+		bool_set_attribute_8763762090617:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2252,10 +2252,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 8($t0) # self.title = internal_0
-		j end_set_attribute_8729443419380
-		object_set_attribute_8729443419380:
+		j end_set_attribute_8763762090617
+		object_set_attribute_8763762090617:
 		sw $t1, 8($t0) # self.title = internal_0
-		end_set_attribute_8729443419380:
+		end_set_attribute_8763762090617:
 		
 		# Allocating String
 		li $v0, 9
@@ -2275,17 +2275,17 @@
 		# Set attribute author of self
 		lw $t0, 12($sp) # $t0 = self
 		lw $t1, 4($sp) # $t1 = internal_1
-		beq $t1, $zero, object_set_attribute_8729443418387
+		beq $t1, $zero, object_set_attribute_8763762090641
 		lw $t2, 0($t1)
 		la $t3, type_Int
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_set_attribute_8729443418387
+		beq $t6, $t5, int_set_attribute_8763762090641
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_set_attribute_8729443418387
-		j object_set_attribute_8729443418387
-		int_set_attribute_8729443418387:
+		beq $t6, $t5, bool_set_attribute_8763762090641
+		j object_set_attribute_8763762090641
+		int_set_attribute_8763762090641:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2294,8 +2294,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 12($t0) # self.author = internal_1
-		j end_set_attribute_8729443418387
-		bool_set_attribute_8729443418387:
+		j end_set_attribute_8763762090641
+		bool_set_attribute_8763762090641:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2304,10 +2304,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 12($t0) # self.author = internal_1
-		j end_set_attribute_8729443418387
-		object_set_attribute_8729443418387:
+		j end_set_attribute_8763762090641
+		object_set_attribute_8763762090641:
 		sw $t1, 12($t0) # self.author = internal_1
-		end_set_attribute_8729443418387:
+		end_set_attribute_8763762090641:
 		
 		# Allocating String
 		li $v0, 9
@@ -2327,17 +2327,17 @@
 		# Set attribute per_title of self
 		lw $t0, 12($sp) # $t0 = self
 		lw $t1, 0($sp) # $t1 = internal_2
-		beq $t1, $zero, object_set_attribute_8729443418408
+		beq $t1, $zero, object_set_attribute_8763762090665
 		lw $t2, 0($t1)
 		la $t3, type_Int
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_set_attribute_8729443418408
+		beq $t6, $t5, int_set_attribute_8763762090665
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_set_attribute_8729443418408
-		j object_set_attribute_8729443418408
-		int_set_attribute_8729443418408:
+		beq $t6, $t5, bool_set_attribute_8763762090665
+		j object_set_attribute_8763762090665
+		int_set_attribute_8763762090665:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2346,8 +2346,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 16($t0) # self.per_title = internal_2
-		j end_set_attribute_8729443418408
-		bool_set_attribute_8729443418408:
+		j end_set_attribute_8763762090665
+		bool_set_attribute_8763762090665:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2356,10 +2356,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 16($t0) # self.per_title = internal_2
-		j end_set_attribute_8729443418408
-		object_set_attribute_8729443418408:
+		j end_set_attribute_8763762090665
+		object_set_attribute_8763762090665:
 		sw $t1, 16($t0) # self.per_title = internal_2
-		end_set_attribute_8729443418408:
+		end_set_attribute_8763762090665:
 		
 		# Loading return value in $v1
 		lw $v1, 12($sp)
@@ -2429,17 +2429,17 @@
 		# Set attribute per_title of self
 		lw $t0, 24($sp) # $t0 = self
 		lw $t1, 12($sp) # $t1 = per_title_p
-		beq $t1, $zero, object_set_attribute_8729443418522
+		beq $t1, $zero, object_set_attribute_8763762090783
 		lw $t2, 0($t1)
 		la $t3, type_Int
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_set_attribute_8729443418522
+		beq $t6, $t5, int_set_attribute_8763762090783
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_set_attribute_8729443418522
-		j object_set_attribute_8729443418522
-		int_set_attribute_8729443418522:
+		beq $t6, $t5, bool_set_attribute_8763762090783
+		j object_set_attribute_8763762090783
+		int_set_attribute_8763762090783:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2448,8 +2448,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 16($t0) # self.per_title = per_title_p
-		j end_set_attribute_8729443418522
-		bool_set_attribute_8729443418522:
+		j end_set_attribute_8763762090783
+		bool_set_attribute_8763762090783:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2458,10 +2458,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 16($t0) # self.per_title = per_title_p
-		j end_set_attribute_8729443418522
-		object_set_attribute_8729443418522:
+		j end_set_attribute_8763762090783
+		object_set_attribute_8763762090783:
 		sw $t1, 16($t0) # self.per_title = per_title_p
-		end_set_attribute_8729443418522:
+		end_set_attribute_8763762090783:
 		
 		# Loading return value in $v1
 		lw $v1, 24($sp)
@@ -2620,11 +2620,11 @@
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_get_attribute_8729443420739
+		beq $t6, $t5, int_get_attribute_8763762090948
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_get_attribute_8729443420739
-		j object_get_attribute_8729443420739
-		int_get_attribute_8729443420739:
+		beq $t6, $t5, bool_get_attribute_8763762090948
+		j object_get_attribute_8763762090948
+		int_get_attribute_8763762090948:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2633,8 +2633,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 28($sp) # internal_7 = self.per_title
-		j end_get_attribute_8729443420739
-		bool_get_attribute_8729443420739:
+		j end_get_attribute_8763762090948
+		bool_get_attribute_8763762090948:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2643,10 +2643,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 28($sp) # internal_7 = self.per_title
-		j end_get_attribute_8729443420739
-		object_get_attribute_8729443420739:
+		j end_get_attribute_8763762090948
+		object_get_attribute_8763762090948:
 		sw $t1, 28($sp) # internal_7 = self.per_title
-		end_get_attribute_8729443420739:
+		end_get_attribute_8763762090948:
 		
 		# Allocating Int 4
 		li $v0, 9
@@ -3160,17 +3160,17 @@
 		# Set attribute xcar of self
 		lw $t0, 8($sp) # $t0 = self
 		lw $t1, 4($sp) # $t1 = internal_0
-		beq $t1, $zero, object_set_attribute_8729443389058
+		beq $t1, $zero, object_set_attribute_8763762093069
 		lw $t2, 0($t1)
 		la $t3, type_Int
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_set_attribute_8729443389058
+		beq $t6, $t5, int_set_attribute_8763762093069
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_set_attribute_8729443389058
-		j object_set_attribute_8729443389058
-		int_set_attribute_8729443389058:
+		beq $t6, $t5, bool_set_attribute_8763762093069
+		j object_set_attribute_8763762093069
+		int_set_attribute_8763762093069:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3179,8 +3179,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 8($t0) # self.xcar = internal_0
-		j end_set_attribute_8729443389058
-		bool_set_attribute_8729443389058:
+		j end_set_attribute_8763762093069
+		bool_set_attribute_8763762093069:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3189,10 +3189,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 8($t0) # self.xcar = internal_0
-		j end_set_attribute_8729443389058
-		object_set_attribute_8729443389058:
+		j end_set_attribute_8763762093069
+		object_set_attribute_8763762093069:
 		sw $t1, 8($t0) # self.xcar = internal_0
-		end_set_attribute_8729443389058:
+		end_set_attribute_8763762093069:
 		
 		# Allocating NUll to internal_1
 		sw $zero, 0($sp) # internal_1 = 0
@@ -3200,17 +3200,17 @@
 		# Set attribute xcdr of self
 		lw $t0, 8($sp) # $t0 = self
 		lw $t1, 0($sp) # $t1 = internal_1
-		beq $t1, $zero, object_set_attribute_8729443389082
+		beq $t1, $zero, object_set_attribute_8763762093093
 		lw $t2, 0($t1)
 		la $t3, type_Int
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_set_attribute_8729443389082
+		beq $t6, $t5, int_set_attribute_8763762093093
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_set_attribute_8729443389082
-		j object_set_attribute_8729443389082
-		int_set_attribute_8729443389082:
+		beq $t6, $t5, bool_set_attribute_8763762093093
+		j object_set_attribute_8763762093093
+		int_set_attribute_8763762093093:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3219,8 +3219,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 12($t0) # self.xcdr = internal_1
-		j end_set_attribute_8729443389082
-		bool_set_attribute_8729443389082:
+		j end_set_attribute_8763762093093
+		bool_set_attribute_8763762093093:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3229,10 +3229,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 12($t0) # self.xcdr = internal_1
-		j end_set_attribute_8729443389082
-		object_set_attribute_8729443389082:
+		j end_set_attribute_8763762093093
+		object_set_attribute_8763762093093:
 		sw $t1, 12($t0) # self.xcdr = internal_1
-		end_set_attribute_8729443389082:
+		end_set_attribute_8763762093093:
 		
 		# Loading return value in $v1
 		lw $v1, 8($sp)
@@ -3280,17 +3280,17 @@
 		# Set attribute xcar of self
 		lw $t0, 8($sp) # $t0 = self
 		lw $t1, 4($sp) # $t1 = hd
-		beq $t1, $zero, object_set_attribute_8729443389166
+		beq $t1, $zero, object_set_attribute_8763762093177
 		lw $t2, 0($t1)
 		la $t3, type_Int
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_set_attribute_8729443389166
+		beq $t6, $t5, int_set_attribute_8763762093177
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_set_attribute_8729443389166
-		j object_set_attribute_8729443389166
-		int_set_attribute_8729443389166:
+		beq $t6, $t5, bool_set_attribute_8763762093177
+		j object_set_attribute_8763762093177
+		int_set_attribute_8763762093177:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3299,8 +3299,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 8($t0) # self.xcar = hd
-		j end_set_attribute_8729443389166
-		bool_set_attribute_8729443389166:
+		j end_set_attribute_8763762093177
+		bool_set_attribute_8763762093177:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3309,25 +3309,25 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 8($t0) # self.xcar = hd
-		j end_set_attribute_8729443389166
-		object_set_attribute_8729443389166:
+		j end_set_attribute_8763762093177
+		object_set_attribute_8763762093177:
 		sw $t1, 8($t0) # self.xcar = hd
-		end_set_attribute_8729443389166:
+		end_set_attribute_8763762093177:
 		
 		# Set attribute xcdr of self
 		lw $t0, 8($sp) # $t0 = self
 		lw $t1, 0($sp) # $t1 = tl
-		beq $t1, $zero, object_set_attribute_8729443389175
+		beq $t1, $zero, object_set_attribute_8763762093189
 		lw $t2, 0($t1)
 		la $t3, type_Int
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_set_attribute_8729443389175
+		beq $t6, $t5, int_set_attribute_8763762093189
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_set_attribute_8729443389175
-		j object_set_attribute_8729443389175
-		int_set_attribute_8729443389175:
+		beq $t6, $t5, bool_set_attribute_8763762093189
+		j object_set_attribute_8763762093189
+		int_set_attribute_8763762093189:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3336,8 +3336,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 12($t0) # self.xcdr = tl
-		j end_set_attribute_8729443389175
-		bool_set_attribute_8729443389175:
+		j end_set_attribute_8763762093189
+		bool_set_attribute_8763762093189:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3346,10 +3346,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 12($t0) # self.xcdr = tl
-		j end_set_attribute_8729443389175
-		object_set_attribute_8729443389175:
+		j end_set_attribute_8763762093189
+		object_set_attribute_8763762093189:
 		sw $t1, 12($t0) # self.xcdr = tl
-		end_set_attribute_8729443389175:
+		end_set_attribute_8763762093189:
 		
 		# Loading return value in $v1
 		lw $v1, 8($sp)
@@ -3372,11 +3372,11 @@
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_get_attribute_8729443389706
+		beq $t6, $t5, int_get_attribute_8763762093201
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_get_attribute_8729443389706
-		j object_get_attribute_8729443389706
-		int_get_attribute_8729443389706:
+		beq $t6, $t5, bool_get_attribute_8763762093201
+		j object_get_attribute_8763762093201
+		int_get_attribute_8763762093201:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3385,8 +3385,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 0($sp) # internal_0 = self.xcar
-		j end_get_attribute_8729443389706
-		bool_get_attribute_8729443389706:
+		j end_get_attribute_8763762093201
+		bool_get_attribute_8763762093201:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3395,10 +3395,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 0($sp) # internal_0 = self.xcar
-		j end_get_attribute_8729443389706
-		object_get_attribute_8729443389706:
+		j end_get_attribute_8763762093201
+		object_get_attribute_8763762093201:
 		sw $t1, 0($sp) # internal_0 = self.xcar
-		end_get_attribute_8729443389706:
+		end_get_attribute_8763762093201:
 		
 		# Loading return value in $v1
 		lw $v1, 0($sp)
@@ -3424,11 +3424,11 @@
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_get_attribute_8729443389736
+		beq $t6, $t5, int_get_attribute_8763762093231
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_get_attribute_8729443389736
-		j object_get_attribute_8729443389736
-		int_get_attribute_8729443389736:
+		beq $t6, $t5, bool_get_attribute_8763762093231
+		j object_get_attribute_8763762093231
+		int_get_attribute_8763762093231:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3437,8 +3437,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 0($sp) # internal_0 = self.xcdr
-		j end_get_attribute_8729443389736
-		bool_get_attribute_8729443389736:
+		j end_get_attribute_8763762093231
+		bool_get_attribute_8763762093231:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3447,10 +3447,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 0($sp) # internal_0 = self.xcdr
-		j end_get_attribute_8729443389736
-		object_get_attribute_8729443389736:
+		j end_get_attribute_8763762093231
+		object_get_attribute_8763762093231:
 		sw $t1, 0($sp) # internal_0 = self.xcdr
-		end_get_attribute_8729443389736:
+		end_get_attribute_8763762093231:
 		
 		# Loading return value in $v1
 		lw $v1, 0($sp)
@@ -3476,11 +3476,11 @@
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_get_attribute_8729443389817
+		beq $t6, $t5, int_get_attribute_8763762093572
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_get_attribute_8729443389817
-		j object_get_attribute_8729443389817
-		int_get_attribute_8729443389817:
+		beq $t6, $t5, bool_get_attribute_8763762093572
+		j object_get_attribute_8763762093572
+		int_get_attribute_8763762093572:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3489,8 +3489,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 216($sp) # internal_0 = self.xcar
-		j end_get_attribute_8729443389817
-		bool_get_attribute_8729443389817:
+		j end_get_attribute_8763762093572
+		bool_get_attribute_8763762093572:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3499,10 +3499,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 216($sp) # internal_0 = self.xcar
-		j end_get_attribute_8729443389817
-		object_get_attribute_8729443389817:
+		j end_get_attribute_8763762093572
+		object_get_attribute_8763762093572:
 		sw $t1, 216($sp) # internal_0 = self.xcar
-		end_get_attribute_8729443389817:
+		end_get_attribute_8763762093572:
 		
 		# Allocating Int 9
 		li $v0, 9
@@ -3614,7 +3614,7 @@
 		lw $t0, 176($sp)
 		sw $t0, 172($sp)
 		
-		while_start_8729443431030:
+		while_start_8763762136757:
 		
 		# internal_9 = EqualAddress(internal_11, internal_7)
 		lw $t0, 172($sp)
@@ -3623,11 +3623,11 @@
 		lw $t0, 180($sp)
 		sw $t2, 8($t0)
 		
-		# If internal_9 then goto while_end_8729443431030
+		# If internal_9 then goto while_end_8763762136757
 		lw $t0, 180($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, while_end_8729443431030
+		beq $t0, $t1, while_end_8763762136757
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -3652,10 +3652,10 @@
 		lw $t0, 4($t0)
 		sw $t0, 172($sp)
 		
-		# Jumping to while_start_8729443431030
-		j while_start_8729443431030
+		# Jumping to while_start_8763762136757
+		j while_start_8763762136757
 		
-		while_end_8729443431030:
+		while_end_8763762136757:
 		
 		# internal_11 = internal_10
 		lw $t0, 176($sp)
@@ -3696,7 +3696,7 @@
 		sw $t0, 8($v0) # Setting value in the third word of the object
 		sw $v0, 160($sp) # internal_14 = address of allocated object Int
 		
-		foreach_start_8729443431030:
+		foreach_start_8763762136757:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -3716,16 +3716,16 @@
 		sw $v1, 172($sp) # internal_14 = result of function_less_than
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# If internal_14 then goto foreach_body_8729443431030
+		# If internal_14 then goto foreach_body_8763762136757
 		lw $t0, 160($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, foreach_body_8729443431030
+		beq $t0, $t1, foreach_body_8763762136757
 		
-		# Jumping to foreach_end_8729443431030
-		j foreach_end_8729443431030
+		# Jumping to foreach_end_8763762136757
+		j foreach_end_8763762136757
 		
-		foreach_body_8729443431030:
+		foreach_body_8763762136757:
 		
 		# array internal_12[4 * internal_13] = internal_11
 		lw $t0, 164($sp) # $t0 = internal_13
@@ -3761,10 +3761,10 @@
 		sw $v1, 176($sp) # internal_13 = result of function_add
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# Jumping to foreach_start_8729443431030
-		j foreach_start_8729443431030
+		# Jumping to foreach_start_8763762136757
+		j foreach_start_8763762136757
 		
-		foreach_end_8729443431030:
+		foreach_end_8763762136757:
 		
 		# initialize Array [internal_6]
 		lw $t0, 192($sp) # $t0 = internal_6
@@ -3926,7 +3926,7 @@
 		sw $t0, 8($v0) # Setting value in the third word of the object
 		sw $v0, 108($sp) # internal_27 = address of allocated object Int
 		
-		foreach_type_start_8729443431030:
+		foreach_type_start_8763762136757:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -3946,16 +3946,16 @@
 		sw $v1, 140($sp) # internal_22 = result of function_less_than
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# If internal_22 then goto foreach_type_body_8729443431030
+		# If internal_22 then goto foreach_type_body_8763762136757
 		lw $t0, 128($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, foreach_type_body_8729443431030
+		beq $t0, $t1, foreach_type_body_8763762136757
 		
-		# Jumping to foreach_type_end_8729443431030
-		j foreach_type_end_8729443431030
+		# Jumping to foreach_type_end_8763762136757
+		j foreach_type_end_8763762136757
 		
-		foreach_type_body_8729443431030:
+		foreach_type_body_8763762136757:
 		
 		# internal_23 = array internal_15[4 * internal_21]
 		lw $t0, 132($sp) # $t0 = internal_21
@@ -3986,7 +3986,7 @@
 		sw $v1, 132($sp) # internal_24 = result of function_assign
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		foreach_ancestor_start_8729443431030:
+		foreach_ancestor_start_8763762136757:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -4006,16 +4006,16 @@
 		sw $v1, 128($sp) # internal_25 = result of function_less_than
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# If internal_25 then goto foreach_ancestor_body_8729443431030
+		# If internal_25 then goto foreach_ancestor_body_8763762136757
 		lw $t0, 116($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, foreach_ancestor_body_8729443431030
+		beq $t0, $t1, foreach_ancestor_body_8763762136757
 		
-		# Jumping to foreach_ancestor_end_8729443431030
-		j foreach_ancestor_end_8729443431030
+		# Jumping to foreach_ancestor_end_8763762136757
+		j foreach_ancestor_end_8763762136757
 		
-		foreach_ancestor_body_8729443431030:
+		foreach_ancestor_body_8763762136757:
 		
 		# internal_26 = array internal_12[4 * internal_24]
 		lw $t0, 120($sp) # $t0 = internal_24
@@ -4035,11 +4035,11 @@
 		lw $t0, 108($sp)
 		sw $t2, 8($t0)
 		
-		# If internal_27 then goto foreach_ancestor_end_8729443431030
+		# If internal_27 then goto foreach_ancestor_end_8763762136757
 		lw $t0, 108($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, foreach_ancestor_end_8729443431030
+		beq $t0, $t1, foreach_ancestor_end_8763762136757
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -4059,10 +4059,10 @@
 		sw $v1, 132($sp) # internal_24 = result of function_add
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# Jumping to foreach_ancestor_start_8729443431030
-		j foreach_ancestor_start_8729443431030
+		# Jumping to foreach_ancestor_start_8763762136757
+		j foreach_ancestor_start_8763762136757
 		
-		foreach_ancestor_end_8729443431030:
+		foreach_ancestor_end_8763762136757:
 		
 		# array internal_16[4 * internal_21] = internal_24
 		lw $t0, 132($sp) # $t0 = internal_21
@@ -4094,10 +4094,10 @@
 		sw $v1, 144($sp) # internal_21 = result of function_add
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# Jumping to foreach_type_start_8729443431030
-		j foreach_type_start_8729443431030
+		# Jumping to foreach_type_start_8763762136757
+		j foreach_type_start_8763762136757
 		
-		foreach_type_end_8729443431030:
+		foreach_type_end_8763762136757:
 		
 		# Allocating Int 0
 		li $v0, 9
@@ -4177,7 +4177,7 @@
 		sw $v1, 104($sp) # internal_31 = result of function_assign
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		foreach_min_start_8729443431030:
+		foreach_min_start_8763762136757:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -4197,16 +4197,16 @@
 		sw $v1, 100($sp) # internal_32 = result of function_less_than
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# If internal_32 then goto foreach_min_body_8729443431030
+		# If internal_32 then goto foreach_min_body_8763762136757
 		lw $t0, 88($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, foreach_min_body_8729443431030
+		beq $t0, $t1, foreach_min_body_8763762136757
 		
-		# Jumping to foreach_min_end_8729443431030
-		j foreach_min_end_8729443431030
+		# Jumping to foreach_min_end_8763762136757
+		j foreach_min_end_8763762136757
 		
-		foreach_min_body_8729443431030:
+		foreach_min_body_8763762136757:
 		
 		# internal_30 = array internal_16[4 * internal_28]
 		lw $t0, 104($sp) # $t0 = internal_28
@@ -4238,16 +4238,16 @@
 		sw $v1, 100($sp) # internal_32 = result of function_less_than
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# If internal_32 then goto update_min_8729443431030
+		# If internal_32 then goto update_min_8763762136757
 		lw $t0, 88($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, update_min_8729443431030
+		beq $t0, $t1, update_min_8763762136757
 		
-		# Jumping to update_min_end_8729443431030
-		j update_min_end_8729443431030
+		# Jumping to update_min_end_8763762136757
+		j update_min_end_8763762136757
 		
-		update_min_8729443431030:
+		update_min_8763762136757:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -4285,7 +4285,7 @@
 		sw $v1, 112($sp) # internal_29 = result of function_assign
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		update_min_end_8729443431030:
+		update_min_end_8763762136757:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -4305,10 +4305,10 @@
 		sw $v1, 116($sp) # internal_28 = result of function_add
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# Jumping to foreach_min_start_8729443431030
-		j foreach_min_start_8729443431030
+		# Jumping to foreach_min_start_8763762136757
+		j foreach_min_start_8763762136757
 		
-		foreach_min_end_8729443431030:
+		foreach_min_end_8763762136757:
 		
 		# initialize Array [internal_6]
 		lw $t0, 192($sp) # $t0 = internal_6
@@ -4399,11 +4399,11 @@
 		sw $v1, 84($sp) # internal_36 = result of function_equal
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# If internal_36 then goto error_branch_8729443431030
+		# If internal_36 then goto error_branch_8763762136757
 		lw $t0, 72($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, error_branch_8729443431030
+		beq $t0, $t1, error_branch_8763762136757
 		
 		# array internal_33[4 * internal_29] = internal_5
 		lw $t0, 100($sp) # $t0 = internal_29
@@ -4453,11 +4453,11 @@
 		lw $t2, 68($sp) # internal_37 = array internal_33[4 * internal_38]
 		sw $t0, 8($t2)
 		
-		# If internal_37 then goto branch_Book_8729443431030
+		# If internal_37 then goto branch_Book_8763762136757
 		lw $t0, 68($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, branch_Book_8729443431030
+		beq $t0, $t1, branch_Book_8763762136757
 		
 		# Allocating Int 1
 		li $v0, 9
@@ -4483,13 +4483,13 @@
 		lw $t2, 68($sp) # internal_37 = array internal_33[4 * internal_39]
 		sw $t0, 8($t2)
 		
-		# If internal_37 then goto branch_Article_8729443431030
+		# If internal_37 then goto branch_Article_8763762136757
 		lw $t0, 68($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, branch_Article_8729443431030
+		beq $t0, $t1, branch_Article_8763762136757
 		
-		branch_Book_8729443431030:
+		branch_Book_8763762136757:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -4666,10 +4666,10 @@
 		lw $t0, 44($sp)
 		sw $t0, 56($sp)
 		
-		# Jumping to branch_end_8729443431030
-		j branch_end_8729443431030
+		# Jumping to branch_end_8763762136757
+		j branch_end_8763762136757
 		
-		branch_Article_8729443431030:
+		branch_Article_8763762136757:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -4855,12 +4855,12 @@
 		lw $t0, 24($sp)
 		sw $t0, 56($sp)
 		
-		# Jumping to branch_end_8729443431030
-		j branch_end_8729443431030
+		# Jumping to branch_end_8763762136757
+		j branch_end_8763762136757
 		
-		error_branch_8729443431030:
+		error_branch_8763762136757:
 		
-		branch_end_8729443431030:
+		branch_end_8763762136757:
 		
 		# Get attribute xcdr of self
 		lw $t0, 220($sp) # Get the address of self
@@ -4870,11 +4870,11 @@
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_get_attribute_8729443392991
+		beq $t6, $t5, int_get_attribute_8763762097770
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_get_attribute_8729443392991
-		j object_get_attribute_8729443392991
-		int_get_attribute_8729443392991:
+		beq $t6, $t5, bool_get_attribute_8763762097770
+		j object_get_attribute_8763762097770
+		int_get_attribute_8763762097770:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -4883,8 +4883,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 12($sp) # internal_51 = self.xcdr
-		j end_get_attribute_8729443392991
-		bool_get_attribute_8729443392991:
+		j end_get_attribute_8763762097770
+		bool_get_attribute_8763762097770:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -4893,10 +4893,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 12($sp) # internal_51 = self.xcdr
-		j end_get_attribute_8729443392991
-		object_get_attribute_8729443392991:
+		j end_get_attribute_8763762097770
+		object_get_attribute_8763762097770:
 		sw $t1, 12($sp) # internal_51 = self.xcdr
-		end_get_attribute_8729443392991:
+		end_get_attribute_8763762097770:
 		
 		# Allocating Int 12
 		li $v0, 9
@@ -5024,17 +5024,17 @@
 		# Set attribute books of self
 		lw $t0, 4($sp) # $t0 = self
 		lw $t1, 0($sp) # $t1 = internal_0
-		beq $t1, $zero, object_set_attribute_8729443393398
+		beq $t1, $zero, object_set_attribute_8763762097911
 		lw $t2, 0($t1)
 		la $t3, type_Int
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_set_attribute_8729443393398
+		beq $t6, $t5, int_set_attribute_8763762097911
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_set_attribute_8729443393398
-		j object_set_attribute_8729443393398
-		int_set_attribute_8729443393398:
+		beq $t6, $t5, bool_set_attribute_8763762097911
+		j object_set_attribute_8763762097911
+		int_set_attribute_8763762097911:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -5043,8 +5043,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 8($t0) # self.books = internal_0
-		j end_set_attribute_8729443393398
-		bool_set_attribute_8729443393398:
+		j end_set_attribute_8763762097911
+		bool_set_attribute_8763762097911:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -5053,10 +5053,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 8($t0) # self.books = internal_0
-		j end_set_attribute_8729443393398
-		object_set_attribute_8729443393398:
+		j end_set_attribute_8763762097911
+		object_set_attribute_8763762097911:
 		sw $t1, 8($t0) # self.books = internal_0
-		end_set_attribute_8729443393398:
+		end_set_attribute_8763762097911:
 		
 		# Loading return value in $v1
 		lw $v1, 4($sp)
@@ -5746,17 +5746,17 @@
 		# Set attribute books of self
 		lw $t0, 104($sp) # $t0 = self
 		lw $t1, 24($sp) # $t1 = internal_19
-		beq $t1, $zero, object_set_attribute_8729443395048
+		beq $t1, $zero, object_set_attribute_8763762098035
 		lw $t2, 0($t1)
 		la $t3, type_Int
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_set_attribute_8729443395048
+		beq $t6, $t5, int_set_attribute_8763762098035
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_set_attribute_8729443395048
-		j object_set_attribute_8729443395048
-		int_set_attribute_8729443395048:
+		beq $t6, $t5, bool_set_attribute_8763762098035
+		j object_set_attribute_8763762098035
+		int_set_attribute_8763762098035:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -5765,8 +5765,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 8($t0) # self.books = internal_19
-		j end_set_attribute_8729443395048
-		bool_set_attribute_8729443395048:
+		j end_set_attribute_8763762098035
+		bool_set_attribute_8763762098035:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -5775,10 +5775,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 8($t0) # self.books = internal_19
-		j end_set_attribute_8729443395048
-		object_set_attribute_8729443395048:
+		j end_set_attribute_8763762098035
+		object_set_attribute_8763762098035:
 		sw $t1, 8($t0) # self.books = internal_19
-		end_set_attribute_8729443395048:
+		end_set_attribute_8763762098035:
 		
 		# Get attribute books of self
 		lw $t0, 104($sp) # Get the address of self
@@ -5788,11 +5788,11 @@
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_get_attribute_8729443395199
+		beq $t6, $t5, int_get_attribute_8763762098954
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_get_attribute_8729443395199
-		j object_get_attribute_8729443395199
-		int_get_attribute_8729443395199:
+		beq $t6, $t5, bool_get_attribute_8763762098954
+		j object_get_attribute_8763762098954
+		int_get_attribute_8763762098954:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -5801,8 +5801,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 12($sp) # internal_22 = self.books
-		j end_get_attribute_8729443395199
-		bool_get_attribute_8729443395199:
+		j end_get_attribute_8763762098954
+		bool_get_attribute_8763762098954:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -5811,10 +5811,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 12($sp) # internal_22 = self.books
-		j end_get_attribute_8729443395199
-		object_get_attribute_8729443395199:
+		j end_get_attribute_8763762098954
+		object_get_attribute_8763762098954:
 		sw $t1, 12($sp) # internal_22 = self.books
-		end_get_attribute_8729443395199:
+		end_get_attribute_8763762098954:
 		
 		# Allocating Int 12
 		li $v0, 9

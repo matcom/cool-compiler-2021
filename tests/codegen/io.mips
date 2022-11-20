@@ -1513,17 +1513,17 @@
 		# Set attribute io of self
 		lw $t0, 4($sp) # $t0 = self
 		lw $t1, 0($sp) # $t1 = internal_0
-		beq $t1, $zero, object_set_attribute_8784098478376
+		beq $t1, $zero, object_set_attribute_8782624196003
 		lw $t2, 0($t1)
 		la $t3, type_Int
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_set_attribute_8784098478376
+		beq $t6, $t5, int_set_attribute_8782624196003
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_set_attribute_8784098478376
-		j object_set_attribute_8784098478376
-		int_set_attribute_8784098478376:
+		beq $t6, $t5, bool_set_attribute_8782624196003
+		j object_set_attribute_8782624196003
+		int_set_attribute_8782624196003:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -1532,8 +1532,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 8($t0) # self.io = internal_0
-		j end_set_attribute_8784098478376
-		bool_set_attribute_8784098478376:
+		j end_set_attribute_8782624196003
+		bool_set_attribute_8782624196003:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -1542,10 +1542,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 8($t0) # self.io = internal_0
-		j end_set_attribute_8784098478376
-		object_set_attribute_8784098478376:
+		j end_set_attribute_8782624196003
+		object_set_attribute_8782624196003:
 		sw $t1, 8($t0) # self.io = internal_0
-		end_set_attribute_8784098478376:
+		end_set_attribute_8782624196003:
 		
 		# Loading return value in $v1
 		lw $v1, 4($sp)
@@ -1571,11 +1571,11 @@
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_get_attribute_8784098478427
+		beq $t6, $t5, int_get_attribute_8782624196054
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_get_attribute_8784098478427
-		j object_get_attribute_8784098478427
-		int_get_attribute_8784098478427:
+		beq $t6, $t5, bool_get_attribute_8782624196054
+		j object_get_attribute_8782624196054
+		int_get_attribute_8782624196054:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -1584,8 +1584,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 16($sp) # internal_0 = self.io
-		j end_get_attribute_8784098478427
-		bool_get_attribute_8784098478427:
+		j end_get_attribute_8782624196054
+		bool_get_attribute_8782624196054:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -1594,10 +1594,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 16($sp) # internal_0 = self.io
-		j end_get_attribute_8784098478427
-		object_get_attribute_8784098478427:
+		j end_get_attribute_8782624196054
+		object_get_attribute_8782624196054:
 		sw $t1, 16($sp) # internal_0 = self.io
-		end_get_attribute_8784098478427:
+		end_get_attribute_8782624196054:
 		
 		# Allocating String
 		li $v0, 9
@@ -1743,17 +1743,17 @@
 		# Set attribute io of self
 		lw $t0, 4($sp) # $t0 = self
 		lw $t1, 0($sp) # $t1 = internal_0
-		beq $t1, $zero, object_set_attribute_8784098478526
+		beq $t1, $zero, object_set_attribute_8782624197181
 		lw $t2, 0($t1)
 		la $t3, type_Int
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_set_attribute_8784098478526
+		beq $t6, $t5, int_set_attribute_8782624197181
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_set_attribute_8784098478526
-		j object_set_attribute_8784098478526
-		int_set_attribute_8784098478526:
+		beq $t6, $t5, bool_set_attribute_8782624197181
+		j object_set_attribute_8782624197181
+		int_set_attribute_8782624197181:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -1762,8 +1762,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 8($t0) # self.io = internal_0
-		j end_set_attribute_8784098478526
-		bool_set_attribute_8784098478526:
+		j end_set_attribute_8782624197181
+		bool_set_attribute_8782624197181:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -1772,10 +1772,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 8($t0) # self.io = internal_0
-		j end_set_attribute_8784098478526
-		object_set_attribute_8784098478526:
+		j end_set_attribute_8782624197181
+		object_set_attribute_8782624197181:
 		sw $t1, 8($t0) # self.io = internal_0
-		end_set_attribute_8784098478526:
+		end_set_attribute_8782624197181:
 		
 		# Loading return value in $v1
 		lw $v1, 4($sp)
@@ -1801,11 +1801,11 @@
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_get_attribute_8784098478577
+		beq $t6, $t5, int_get_attribute_8782624197232
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_get_attribute_8784098478577
-		j object_get_attribute_8784098478577
-		int_get_attribute_8784098478577:
+		beq $t6, $t5, bool_get_attribute_8782624197232
+		j object_get_attribute_8782624197232
+		int_get_attribute_8782624197232:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -1814,8 +1814,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 16($sp) # internal_0 = self.io
-		j end_get_attribute_8784098478577
-		bool_get_attribute_8784098478577:
+		j end_get_attribute_8782624197232
+		bool_get_attribute_8782624197232:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -1824,10 +1824,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 16($sp) # internal_0 = self.io
-		j end_get_attribute_8784098478577
-		object_get_attribute_8784098478577:
+		j end_get_attribute_8782624197232
+		object_get_attribute_8782624197232:
 		sw $t1, 16($sp) # internal_0 = self.io
-		end_get_attribute_8784098478577:
+		end_get_attribute_8782624197232:
 		
 		# Allocating String
 		li $v0, 9

@@ -59,11 +59,7 @@ class ExtendedCoolTranslator:
                 continue
 
             visited.add(ancestor.name)
-            attrs += [
-                feature
-                for feature in ancestor.data
-                if isinstance(feature, cool.AttributeDecNode)
-            ]
+            attrs += [feature for feature in ancestor.data if isinstance(feature, cool.AttributeDecNode) ]
 
         expressions: List[cool.ExprNode] = []
         for attr in attrs:
@@ -78,16 +74,8 @@ class ExtendedCoolTranslator:
         self.current_type.define_method("__init__", [], [], self.current_type)
         self.current_type.methods_dict.move_to_end("__init__", last=False)
 
-        attrs = [
-            feature
-            for feature in node.data
-            if isinstance(feature, cool.AttributeDecNode)
-        ]
-        methods = [
-            feature
-            for feature in node.data
-            if isinstance(feature, cool.MethodDecNode)
-        ]
+        attrs = [feature for feature in node.data if isinstance(feature, cool.AttributeDecNode)]
+        methods = [feature for feature in node.data if isinstance(feature, cool.MethodDecNode)]
 
         features = attrs + [constructor] + methods
 

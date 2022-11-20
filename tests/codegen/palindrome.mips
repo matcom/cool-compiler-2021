@@ -1445,17 +1445,17 @@
 		# Set attribute i of self
 		lw $t0, 4($sp) # $t0 = self
 		lw $t1, 0($sp) # $t1 = internal_0
-		beq $t1, $zero, object_set_attribute_8738584853902
+		beq $t1, $zero, object_set_attribute_8736736377363
 		lw $t2, 0($t1)
 		la $t3, type_Int
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_set_attribute_8738584853902
+		beq $t6, $t5, int_set_attribute_8736736377363
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_set_attribute_8738584853902
-		j object_set_attribute_8738584853902
-		int_set_attribute_8738584853902:
+		beq $t6, $t5, bool_set_attribute_8736736377363
+		j object_set_attribute_8736736377363
+		int_set_attribute_8736736377363:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -1464,8 +1464,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 8($t0) # self.i = internal_0
-		j end_set_attribute_8738584853902
-		bool_set_attribute_8738584853902:
+		j end_set_attribute_8736736377363
+		bool_set_attribute_8736736377363:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -1474,10 +1474,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 8($t0) # self.i = internal_0
-		j end_set_attribute_8738584853902
-		object_set_attribute_8738584853902:
+		j end_set_attribute_8736736377363
+		object_set_attribute_8736736377363:
 		sw $t1, 8($t0) # self.i = internal_0
-		end_set_attribute_8738584853902:
+		end_set_attribute_8736736377363:
 		
 		# Loading return value in $v1
 		lw $v1, 4($sp)
@@ -1580,16 +1580,16 @@
 		lw $t0, 156($sp)
 		sw $t0, 176($sp)
 		
-		# If internal_1 then goto then_8738584872656
+		# If internal_1 then goto then_8736736395677
 		lw $t0, 176($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, then_8738584872656
+		beq $t0, $t1, then_8736736395677
 		
-		# Jumping to else_8738584872656
-		j else_8738584872656
+		# Jumping to else_8736736395677
+		j else_8736736395677
 		
-		then_8738584872656:
+		then_8736736395677:
 		
 		# Allocating Bool 1
 		li $v0, 9
@@ -1607,10 +1607,10 @@
 		lw $t0, 152($sp)
 		sw $t0, 180($sp)
 		
-		# Jumping to endif_8738584872656
-		j endif_8738584872656
+		# Jumping to endif_8736736395677
+		j endif_8736736395677
 		
-		else_8738584872656:
+		else_8736736395677:
 		
 		# Allocating Bool 0
 		li $v0, 9
@@ -1696,16 +1696,16 @@
 		lw $t0, 124($sp)
 		sw $t0, 144($sp)
 		
-		# If internal_9 then goto then_8738584873479
+		# If internal_9 then goto then_8736736395734
 		lw $t0, 144($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, then_8738584873479
+		beq $t0, $t1, then_8736736395734
 		
-		# Jumping to else_8738584873479
-		j else_8738584873479
+		# Jumping to else_8736736395734
+		j else_8736736395734
 		
-		then_8738584873479:
+		then_8736736395734:
 		
 		# Allocating Bool 1
 		li $v0, 9
@@ -1723,10 +1723,10 @@
 		lw $t0, 120($sp)
 		sw $t0, 148($sp)
 		
-		# Jumping to endif_8738584873479
-		j endif_8738584873479
+		# Jumping to endif_8736736395734
+		j endif_8736736395734
 		
-		else_8738584873479:
+		else_8736736395734:
 		
 		# Allocating Bool 0
 		li $v0, 9
@@ -1958,16 +1958,16 @@
 		lw $t0, 52($sp)
 		sw $t0, 112($sp)
 		
-		# If internal_17 then goto then_8738584873575
+		# If internal_17 then goto then_8736736415419
 		lw $t0, 112($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, then_8738584873575
+		beq $t0, $t1, then_8736736415419
 		
-		# Jumping to else_8738584873575
-		j else_8738584873575
+		# Jumping to else_8736736415419
+		j else_8736736415419
 		
-		then_8738584873575:
+		then_8736736415419:
 		
 		# Allocating Int 1
 		li $v0, 9
@@ -2141,10 +2141,10 @@
 		lw $t0, 12($sp)
 		sw $t0, 116($sp)
 		
-		# Jumping to endif_8738584873575
-		j endif_8738584873575
+		# Jumping to endif_8736736415419
+		j endif_8736736415419
 		
-		else_8738584873575:
+		else_8736736415419:
 		
 		# Allocating Bool 0
 		li $v0, 9
@@ -2162,28 +2162,28 @@
 		lw $t0, 0($sp)
 		sw $t0, 116($sp)
 		
-		# Jumping to endif_8738584873575
-		j endif_8738584873575
+		# Jumping to endif_8736736415419
+		j endif_8736736415419
 		
-		endif_8738584873575:
+		endif_8736736415419:
 		
 		# internal_8 = internal_16
 		lw $t0, 116($sp)
 		sw $t0, 148($sp)
 		
-		# Jumping to endif_8738584873479
-		j endif_8738584873479
+		# Jumping to endif_8736736395734
+		j endif_8736736395734
 		
-		endif_8738584873479:
+		endif_8736736395734:
 		
 		# internal_0 = internal_8
 		lw $t0, 148($sp)
 		sw $t0, 180($sp)
 		
-		# Jumping to endif_8738584872656
-		j endif_8738584872656
+		# Jumping to endif_8736736395677
+		j endif_8736736395677
 		
-		endif_8738584872656:
+		endif_8736736395677:
 		
 		# Loading return value in $v1
 		lw $v1, 180($sp)
@@ -2288,17 +2288,17 @@
 		# Set attribute i of self
 		lw $t0, 96($sp) # $t0 = self
 		lw $t1, 80($sp) # $t1 = internal_3
-		beq $t1, $zero, object_set_attribute_8738584857510
+		beq $t1, $zero, object_set_attribute_8736736380459
 		lw $t2, 0($t1)
 		la $t3, type_Int
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_set_attribute_8738584857510
+		beq $t6, $t5, int_set_attribute_8736736380459
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_set_attribute_8738584857510
-		j object_set_attribute_8738584857510
-		int_set_attribute_8738584857510:
+		beq $t6, $t5, bool_set_attribute_8736736380459
+		j object_set_attribute_8736736380459
+		int_set_attribute_8736736380459:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2307,8 +2307,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 8($t0) # self.i = internal_3
-		j end_set_attribute_8738584857510
-		bool_set_attribute_8738584857510:
+		j end_set_attribute_8736736380459
+		bool_set_attribute_8736736380459:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2317,10 +2317,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 8($t0) # self.i = internal_3
-		j end_set_attribute_8738584857510
-		object_set_attribute_8738584857510:
+		j end_set_attribute_8736736380459
+		object_set_attribute_8736736380459:
 		sw $t1, 8($t0) # self.i = internal_3
-		end_set_attribute_8738584857510:
+		end_set_attribute_8736736380459:
 		
 		# Allocating String
 		li $v0, 9
@@ -2520,16 +2520,16 @@
 		lw $t0, 40($sp)
 		sw $t0, 56($sp)
 		
-		# If internal_9 then goto then_8738584873710
+		# If internal_9 then goto then_8736736415428
 		lw $t0, 56($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, then_8738584873710
+		beq $t0, $t1, then_8736736415428
 		
-		# Jumping to else_8738584873710
-		j else_8738584873710
+		# Jumping to else_8736736415428
+		j else_8736736415428
 		
-		then_8738584873710:
+		then_8736736415428:
 		
 		# Allocating String
 		li $v0, 9
@@ -2658,10 +2658,10 @@
 		lw $t0, 24($sp)
 		sw $t0, 60($sp)
 		
-		# Jumping to endif_8738584873710
-		j endif_8738584873710
+		# Jumping to endif_8736736415428
+		j endif_8736736415428
 		
-		else_8738584873710:
+		else_8736736415428:
 		
 		# Allocating String
 		li $v0, 9
@@ -2802,10 +2802,10 @@
 		lw $t0, 8($sp)
 		sw $t0, 60($sp)
 		
-		# Jumping to endif_8738584873710
-		j endif_8738584873710
+		# Jumping to endif_8736736415428
+		j endif_8736736415428
 		
-		endif_8738584873710:
+		endif_8736736415428:
 		
 		# Loading return value in $v1
 		lw $v1, 60($sp)
