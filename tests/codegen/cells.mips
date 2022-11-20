@@ -1463,18 +1463,43 @@
 		
 		sw $v0, 0($sp) # internal_0 = ""
 		
-		# Passing function arguments
-		addi $sp, $sp, -12 # Reserving space for arguments
-		sw $ra, 8($sp) # Storing return address
+		# Set attribute population_map of self
+		lw $t0, 4($sp) # $t0 = self
+		lw $t1, 0($sp) # $t1 = internal_0
+		beq $t1, $zero, object_set_attribute_8738373639208
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8738373639208
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8738373639208
+		j object_set_attribute_8738373639208
+		int_set_attribute_8738373639208:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0) # self.population_map = internal_0
+		j end_set_attribute_8738373639208
+		bool_set_attribute_8738373639208:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0) # self.population_map = internal_0
+		j end_set_attribute_8738373639208
+		object_set_attribute_8738373639208:
+		sw $t1, 8($t0) # self.population_map = internal_0
+		end_set_attribute_8738373639208:
 		
-		# Argument population_map
-		# Argument internal_0
-		lw $t0, 12($sp)
-		sw $t0, 0($sp) # Storing internal_0
-		
-		# Calling function function_assign
-		jal function_assign
-		lw $ra, 8($sp)
 		# Loading return value in $v1
 		lw $v1, 4($sp)
 		
@@ -1489,18 +1514,43 @@
 		#   self = 4($sp)
 		#   map = 0($sp)
 		
-		# Passing function arguments
-		addi $sp, $sp, -12 # Reserving space for arguments
-		sw $ra, 8($sp) # Storing return address
+		# Set attribute population_map of self
+		lw $t0, 4($sp) # $t0 = self
+		lw $t1, 0($sp) # $t1 = map
+		beq $t1, $zero, object_set_attribute_8738373639256
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8738373639256
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8738373639256
+		j object_set_attribute_8738373639256
+		int_set_attribute_8738373639256:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0) # self.population_map = map
+		j end_set_attribute_8738373639256
+		bool_set_attribute_8738373639256:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0) # self.population_map = map
+		j end_set_attribute_8738373639256
+		object_set_attribute_8738373639256:
+		sw $t1, 8($t0) # self.population_map = map
+		end_set_attribute_8738373639256:
 		
-		# Argument population_map
-		# Argument map
-		lw $t0, 12($sp)
-		sw $t0, 0($sp) # Storing map
-		
-		# Calling function function_assign
-		jal function_assign
-		lw $ra, 8($sp)
 		# Loading return value in $v1
 		lw $v1, 4($sp)
 		
@@ -1508,11 +1558,47 @@
 		
 	function_print_at_CellularAutomaton:
 		# Function parameters
-		#   $ra = 32($sp)
-		#   self = 28($sp)
+		#   $ra = 36($sp)
+		#   self = 32($sp)
 		
 		# Reserving space for local variables
-		addi $sp, $sp, -28
+		addi $sp, $sp, -32
+		
+		# Get attribute population_map of self
+		lw $t0, 32($sp) # Get the address of self
+		lw $t1, 8($t0) # Get the attribute 'population_map' from the self
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8738373639319
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8738373639319
+		j object_get_attribute_8738373639319
+		int_get_attribute_8738373639319:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 28($sp) # internal_0 = self.population_map
+		j end_get_attribute_8738373639319
+		bool_get_attribute_8738373639319:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 28($sp) # internal_0 = self.population_map
+		j end_get_attribute_8738373639319
+		object_get_attribute_8738373639319:
+		sw $t1, 28($sp) # internal_0 = self.population_map
+		end_get_attribute_8738373639319:
 		
 		# Allocating String
 		li $v0, 9
@@ -1526,11 +1612,11 @@
 		sw $t0, 4($v0) # Setting length of the string in the second word of the object
 		
 		addi $t0, $zero, 10
-		sb $t0, 8($v0) # internal_0[0] = '\n'
+		sb $t0, 8($v0) # internal_1[0] = '\n'
 		
 		sb $zero, 9($v0) # Null-terminator at the end of the string
 		
-		sw $v0, 24($sp) # internal_0 = "\n"
+		sw $v0, 24($sp) # internal_1 = "\n"
 		
 		# Allocating Int 5
 		li $v0, 9
@@ -1542,23 +1628,36 @@
 		sw $a0, 4($v0) # Setting size in the second word of the object
 		addi $t0, $zero, 5
 		sw $t0, 8($v0) # Setting value in the third word of the object
-		sw $v0, 16($sp) # internal_2 = address of allocated object Int
+		sw $v0, 16($sp) # internal_3 = address of allocated object Int
 		
 		# Get method concat of String
+		lw $t0, 28($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 16($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 12($sp)
+		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
 		sw $ra, 8($sp) # Storing return address
 		
-		# Argument population_map
 		# Argument internal_0
-		lw $t0, 36($sp)
-		sw $t0, 0($sp) # Storing internal_0
+		lw $t0, 40($sp)
+		sw $t0, 4($sp) # Storing internal_0
 		
-		# Calling function internal_3
+		# Argument internal_1
+		lw $t0, 36($sp)
+		sw $t0, 0($sp) # Storing internal_1
+		
+		# Calling function internal_4
 		lw $t0, 24($sp)
 		jalr $t0
 		lw $ra, 8($sp)
-		sw $v1, 32($sp) # internal_1 = result of internal_3
+		sw $v1, 32($sp) # internal_2 = result of internal_4
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
 		# Allocating Int 4
@@ -1571,10 +1670,10 @@
 		sw $a0, 4($v0) # Setting size in the second word of the object
 		addi $t0, $zero, 4
 		sw $t0, 8($v0) # Setting value in the third word of the object
-		sw $v0, 4($sp) # internal_5 = address of allocated object Int
+		sw $v0, 4($sp) # internal_6 = address of allocated object Int
 		
 		# Get method out_string of CellularAutomaton
-		lw $t0, 28($sp)
+		lw $t0, 32($sp)
 		lw $t0, 0($t0)
 		addi $t0, $t0, 12
 		lw $t1, 4($sp)
@@ -1589,35 +1688,71 @@
 		sw $ra, 8($sp) # Storing return address
 		
 		# Argument self
-		lw $t0, 40($sp)
+		lw $t0, 44($sp)
 		sw $t0, 4($sp) # Storing self
 		
-		# Argument internal_1
+		# Argument internal_2
 		lw $t0, 32($sp)
-		sw $t0, 0($sp) # Storing internal_1
+		sw $t0, 0($sp) # Storing internal_2
 		
-		# Calling function internal_6
+		# Calling function internal_7
 		lw $t0, 12($sp)
 		jalr $t0
 		lw $ra, 8($sp)
-		sw $v1, 20($sp) # internal_4 = result of internal_6
+		sw $v1, 20($sp) # internal_5 = result of internal_7
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
 		# Loading return value in $v1
-		lw $v1, 28($sp)
+		lw $v1, 32($sp)
 		
 		# Freeing space for local variables
-		addi $sp, $sp, 28
+		addi $sp, $sp, 32
 		
 		jr $ra
 		
 	function_num_cells_at_CellularAutomaton:
 		# Function parameters
-		#   $ra = 16($sp)
-		#   self = 12($sp)
+		#   $ra = 20($sp)
+		#   self = 16($sp)
 		
 		# Reserving space for local variables
-		addi $sp, $sp, -12
+		addi $sp, $sp, -16
+		
+		# Get attribute population_map of self
+		lw $t0, 16($sp) # Get the address of self
+		lw $t1, 8($t0) # Get the attribute 'population_map' from the self
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8738373639421
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8738373639421
+		j object_get_attribute_8738373639421
+		int_get_attribute_8738373639421:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($sp) # internal_0 = self.population_map
+		j end_get_attribute_8738373639421
+		bool_get_attribute_8738373639421:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($sp) # internal_0 = self.population_map
+		j end_get_attribute_8738373639421
+		object_get_attribute_8738373639421:
+		sw $t1, 12($sp) # internal_0 = self.population_map
+		end_get_attribute_8738373639421:
 		
 		# Allocating Int 4
 		li $v0, 9
@@ -1629,37 +1764,86 @@
 		sw $a0, 4($v0) # Setting size in the second word of the object
 		addi $t0, $zero, 4
 		sw $t0, 8($v0) # Setting value in the third word of the object
-		sw $v0, 4($sp) # internal_1 = address of allocated object Int
+		sw $v0, 4($sp) # internal_2 = address of allocated object Int
 		
 		# Get method length of String
+		lw $t0, 12($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
 		# Passing function arguments
 		addi $sp, $sp, -8 # Reserving space for arguments
 		sw $ra, 4($sp) # Storing return address
 		
-		# Argument population_map
-		# Calling function internal_2
+		# Argument internal_0
+		lw $t0, 20($sp)
+		sw $t0, 0($sp) # Storing internal_0
+		
+		# Calling function internal_3
 		lw $t0, 8($sp)
 		jalr $t0
 		lw $ra, 4($sp)
-		sw $v1, 16($sp) # internal_0 = result of internal_2
+		sw $v1, 16($sp) # internal_1 = result of internal_3
 		addi $sp, $sp, 8 # Freeing space for arguments
 		
 		# Loading return value in $v1
 		lw $v1, 8($sp)
 		
 		# Freeing space for local variables
-		addi $sp, $sp, 12
+		addi $sp, $sp, 16
 		
 		jr $ra
 		
 	function_cell_at_CellularAutomaton:
 		# Function parameters
-		#   $ra = 24($sp)
-		#   self = 20($sp)
-		#   position = 16($sp)
+		#   $ra = 28($sp)
+		#   self = 24($sp)
+		#   position = 20($sp)
 		
 		# Reserving space for local variables
-		addi $sp, $sp, -16
+		addi $sp, $sp, -20
+		
+		# Get attribute population_map of self
+		lw $t0, 24($sp) # Get the address of self
+		lw $t1, 8($t0) # Get the attribute 'population_map' from the self
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8738373640271
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8738373640271
+		j object_get_attribute_8738373640271
+		int_get_attribute_8738373640271:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 16($sp) # internal_0 = self.population_map
+		j end_get_attribute_8738373640271
+		bool_get_attribute_8738373640271:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 16($sp) # internal_0 = self.population_map
+		j end_get_attribute_8738373640271
+		object_get_attribute_8738373640271:
+		sw $t1, 16($sp) # internal_0 = self.population_map
+		end_get_attribute_8738373640271:
 		
 		# Allocating Int 1
 		li $v0, 9
@@ -1671,7 +1855,7 @@
 		sw $a0, 4($v0) # Setting size in the second word of the object
 		addi $t0, $zero, 1
 		sw $t0, 8($v0) # Setting value in the third word of the object
-		sw $v0, 12($sp) # internal_0 = address of allocated object Int
+		sw $v0, 12($sp) # internal_1 = address of allocated object Int
 		
 		# Allocating Int 6
 		li $v0, 9
@@ -1683,34 +1867,47 @@
 		sw $a0, 4($v0) # Setting size in the second word of the object
 		addi $t0, $zero, 6
 		sw $t0, 8($v0) # Setting value in the third word of the object
-		sw $v0, 4($sp) # internal_2 = address of allocated object Int
+		sw $v0, 4($sp) # internal_3 = address of allocated object Int
 		
 		# Get method substr of String
+		lw $t0, 16($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
 		# Passing function arguments
 		addi $sp, $sp, -16 # Reserving space for arguments
 		sw $ra, 12($sp) # Storing return address
 		
-		# Argument population_map
-		# Argument position
+		# Argument internal_0
 		lw $t0, 32($sp)
+		sw $t0, 8($sp) # Storing internal_0
+		
+		# Argument position
+		lw $t0, 36($sp)
 		sw $t0, 4($sp) # Storing position
 		
-		# Argument internal_0
+		# Argument internal_1
 		lw $t0, 28($sp)
-		sw $t0, 0($sp) # Storing internal_0
+		sw $t0, 0($sp) # Storing internal_1
 		
-		# Calling function internal_3
+		# Calling function internal_4
 		lw $t0, 16($sp)
 		jalr $t0
 		lw $ra, 12($sp)
-		sw $v1, 24($sp) # internal_1 = result of internal_3
+		sw $v1, 24($sp) # internal_2 = result of internal_4
 		addi $sp, $sp, 16 # Freeing space for arguments
 		
 		# Loading return value in $v1
 		lw $v1, 8($sp)
 		
 		# Freeing space for local variables
-		addi $sp, $sp, 16
+		addi $sp, $sp, 20
 		
 		jr $ra
 		
@@ -1769,16 +1966,16 @@
 		lw $t0, 52($sp)
 		sw $t0, 60($sp)
 		
-		# If internal_1 then goto then_8759185135318
+		# If internal_1 then goto then_8738373652965
 		lw $t0, 60($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, then_8759185135318
+		beq $t0, $t1, then_8738373652965
 		
-		# Jumping to else_8759185135318
-		j else_8759185135318
+		# Jumping to else_8738373652965
+		j else_8738373652965
 		
-		then_8759185135318:
+		then_8738373652965:
 		
 		# Allocating Int 10
 		li $v0, 9
@@ -1894,10 +2091,10 @@
 		lw $t0, 28($sp)
 		sw $t0, 64($sp)
 		
-		# Jumping to endif_8759185135318
-		j endif_8759185135318
+		# Jumping to endif_8738373652965
+		j endif_8738373652965
 		
-		else_8759185135318:
+		else_8738373652965:
 		
 		# Allocating Int 1
 		li $v0, 9
@@ -1975,10 +2172,10 @@
 		lw $t0, 8($sp)
 		sw $t0, 64($sp)
 		
-		# Jumping to endif_8759185135318
-		j endif_8759185135318
+		# Jumping to endif_8738373652965
+		j endif_8738373652965
 		
-		endif_8759185135318:
+		endif_8738373652965:
 		
 		# Loading return value in $v1
 		lw $v1, 64($sp)
@@ -2099,16 +2296,16 @@
 		lw $t0, 36($sp)
 		sw $t0, 60($sp)
 		
-		# If internal_1 then goto then_8759185136424
+		# If internal_1 then goto then_8738373653815
 		lw $t0, 60($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, then_8759185136424
+		beq $t0, $t1, then_8738373653815
 		
-		# Jumping to else_8759185136424
-		j else_8759185136424
+		# Jumping to else_8738373653815
+		j else_8738373653815
 		
-		then_8759185136424:
+		then_8738373653815:
 		
 		# Allocating Int 0
 		li $v0, 9
@@ -2168,10 +2365,10 @@
 		lw $t0, 28($sp)
 		sw $t0, 64($sp)
 		
-		# Jumping to endif_8759185136424
-		j endif_8759185136424
+		# Jumping to endif_8738373653815
+		j endif_8738373653815
 		
-		else_8759185136424:
+		else_8738373653815:
 		
 		# Allocating Int 1
 		li $v0, 9
@@ -2249,10 +2446,10 @@
 		lw $t0, 8($sp)
 		sw $t0, 64($sp)
 		
-		# Jumping to endif_8759185136424
-		j endif_8759185136424
+		# Jumping to endif_8738373653815
+		j endif_8738373653815
 		
-		endif_8759185136424:
+		endif_8738373653815:
 		
 		# Loading return value in $v1
 		lw $v1, 64($sp)
@@ -2377,16 +2574,16 @@
 		lw $t0, 104($sp)
 		sw $t0, 124($sp)
 		
-		# If internal_3 then goto then_8759185136478
+		# If internal_3 then goto then_8738373653869
 		lw $t0, 124($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, then_8759185136478
+		beq $t0, $t1, then_8738373653869
 		
-		# Jumping to else_8759185136478
-		j else_8759185136478
+		# Jumping to else_8738373653869
+		j else_8738373653869
 		
-		then_8759185136478:
+		then_8738373653869:
 		
 		# Allocating Int 1
 		li $v0, 9
@@ -2404,10 +2601,10 @@
 		lw $t0, 100($sp)
 		sw $t0, 128($sp)
 		
-		# Jumping to endif_8759185136478
-		j endif_8759185136478
+		# Jumping to endif_8738373653869
+		j endif_8738373653869
 		
-		else_8759185136478:
+		else_8738373653869:
 		
 		# Allocating Int 0
 		li $v0, 9
@@ -2425,10 +2622,10 @@
 		lw $t0, 96($sp)
 		sw $t0, 128($sp)
 		
-		# Jumping to endif_8759185136478
-		j endif_8759185136478
+		# Jumping to endif_8738373653869
+		j endif_8738373653869
 		
-		endif_8759185136478:
+		endif_8738373653869:
 		
 		# Allocating Bool 0
 		li $v0, 9
@@ -2524,16 +2721,16 @@
 		lw $t0, 68($sp)
 		sw $t0, 88($sp)
 		
-		# If internal_12 then goto then_8759185136529
+		# If internal_12 then goto then_8738373653920
 		lw $t0, 88($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, then_8759185136529
+		beq $t0, $t1, then_8738373653920
 		
-		# Jumping to else_8759185136529
-		j else_8759185136529
+		# Jumping to else_8738373653920
+		j else_8738373653920
 		
-		then_8759185136529:
+		then_8738373653920:
 		
 		# Allocating Int 1
 		li $v0, 9
@@ -2551,10 +2748,10 @@
 		lw $t0, 64($sp)
 		sw $t0, 92($sp)
 		
-		# Jumping to endif_8759185136529
-		j endif_8759185136529
+		# Jumping to endif_8738373653920
+		j endif_8738373653920
 		
-		else_8759185136529:
+		else_8738373653920:
 		
 		# Allocating Int 0
 		li $v0, 9
@@ -2572,10 +2769,10 @@
 		lw $t0, 60($sp)
 		sw $t0, 92($sp)
 		
-		# Jumping to endif_8759185136529
-		j endif_8759185136529
+		# Jumping to endif_8738373653920
+		j endif_8738373653920
 		
-		endif_8759185136529:
+		endif_8738373653920:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -2689,16 +2886,16 @@
 		lw $t0, 28($sp)
 		sw $t0, 48($sp)
 		
-		# If internal_22 then goto then_8759185136574
+		# If internal_22 then goto then_8738373653965
 		lw $t0, 48($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, then_8759185136574
+		beq $t0, $t1, then_8738373653965
 		
-		# Jumping to else_8759185136574
-		j else_8759185136574
+		# Jumping to else_8738373653965
+		j else_8738373653965
 		
-		then_8759185136574:
+		then_8738373653965:
 		
 		# Allocating Int 1
 		li $v0, 9
@@ -2716,10 +2913,10 @@
 		lw $t0, 24($sp)
 		sw $t0, 52($sp)
 		
-		# Jumping to endif_8759185136574
-		j endif_8759185136574
+		# Jumping to endif_8738373653965
+		j endif_8738373653965
 		
-		else_8759185136574:
+		else_8738373653965:
 		
 		# Allocating Int 0
 		li $v0, 9
@@ -2737,10 +2934,10 @@
 		lw $t0, 20($sp)
 		sw $t0, 52($sp)
 		
-		# Jumping to endif_8759185136574
-		j endif_8759185136574
+		# Jumping to endif_8738373653965
+		j endif_8738373653965
 		
-		endif_8759185136574:
+		endif_8738373653965:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -2794,16 +2991,16 @@
 		lw $t0, 8($sp)
 		sw $t0, 132($sp)
 		
-		# If internal_1 then goto then_8759185136526
+		# If internal_1 then goto then_8738373653917
 		lw $t0, 132($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, then_8759185136526
+		beq $t0, $t1, then_8738373653917
 		
-		# Jumping to else_8759185136526
-		j else_8759185136526
+		# Jumping to else_8738373653917
+		j else_8738373653917
 		
-		then_8759185136526:
+		then_8738373653917:
 		
 		# Allocating String
 		li $v0, 9
@@ -2827,10 +3024,10 @@
 		lw $t0, 4($sp)
 		sw $t0, 136($sp)
 		
-		# Jumping to endif_8759185136526
-		j endif_8759185136526
+		# Jumping to endif_8738373653917
+		j endif_8738373653917
 		
-		else_8759185136526:
+		else_8738373653917:
 		
 		# Allocating String
 		li $v0, 9
@@ -2854,10 +3051,10 @@
 		lw $t0, 0($sp)
 		sw $t0, 136($sp)
 		
-		# Jumping to endif_8759185136526
-		j endif_8759185136526
+		# Jumping to endif_8738373653917
+		j endif_8738373653917
 		
-		endif_8759185136526:
+		endif_8738373653917:
 		
 		# Loading return value in $v1
 		lw $v1, 136($sp)
@@ -2961,7 +3158,7 @@
 		# Allocating NUll to internal_6
 		sw $zero, 36($sp) # internal_6 = 0
 		
-		while_start_8759185137704:
+		while_start_8738373654583:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -2981,16 +3178,16 @@
 		sw $v1, 44($sp) # internal_7 = result of function_less_than
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# If internal_7 then goto while_body_8759185137704
+		# If internal_7 then goto while_body_8738373654583
 		lw $t0, 32($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, while_body_8759185137704
+		beq $t0, $t1, while_body_8738373654583
 		
-		# Jumping to while_end_8759185137704
-		j while_end_8759185137704
+		# Jumping to while_end_8738373654583
+		j while_end_8738373654583
 		
-		while_body_8759185137704:
+		while_body_8738373654583:
 		
 		# Allocating Int 14
 		li $v0, 9
@@ -3142,23 +3339,48 @@
 		sw $v1, 72($sp) # position = result of function_assign
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# Jumping to while_start_8759185137704
-		j while_start_8759185137704
+		# Jumping to while_start_8738373654583
+		j while_start_8738373654583
 		
-		while_end_8759185137704:
+		while_end_8738373654583:
 		
-		# Passing function arguments
-		addi $sp, $sp, -12 # Reserving space for arguments
-		sw $ra, 8($sp) # Storing return address
+		# Set attribute population_map of self
+		lw $t0, 64($sp) # $t0 = self
+		lw $t1, 40($sp) # $t1 = temp
+		beq $t1, $zero, object_set_attribute_8738373613159
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8738373613159
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8738373613159
+		j object_set_attribute_8738373613159
+		int_set_attribute_8738373613159:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0) # self.population_map = temp
+		j end_set_attribute_8738373613159
+		bool_set_attribute_8738373613159:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0) # self.population_map = temp
+		j end_set_attribute_8738373613159
+		object_set_attribute_8738373613159:
+		sw $t1, 8($t0) # self.population_map = temp
+		end_set_attribute_8738373613159:
 		
-		# Argument population_map
-		# Argument temp
-		lw $t0, 52($sp)
-		sw $t0, 0($sp) # Storing temp
-		
-		# Calling function function_assign
-		jal function_assign
-		lw $ra, 8($sp)
 		# Loading return value in $v1
 		lw $v1, 64($sp)
 		
@@ -3178,18 +3400,43 @@
 		# Allocating NUll to internal_0
 		sw $zero, 0($sp) # internal_0 = 0
 		
-		# Passing function arguments
-		addi $sp, $sp, -12 # Reserving space for arguments
-		sw $ra, 8($sp) # Storing return address
+		# Set attribute cells of self
+		lw $t0, 4($sp) # $t0 = self
+		lw $t1, 0($sp) # $t1 = internal_0
+		beq $t1, $zero, object_set_attribute_8738373613044
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8738373613044
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8738373613044
+		j object_set_attribute_8738373613044
+		int_set_attribute_8738373613044:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0) # self.cells = internal_0
+		j end_set_attribute_8738373613044
+		bool_set_attribute_8738373613044:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0) # self.cells = internal_0
+		j end_set_attribute_8738373613044
+		object_set_attribute_8738373613044:
+		sw $t1, 8($t0) # self.cells = internal_0
+		end_set_attribute_8738373613044:
 		
-		# Argument cells
-		# Argument internal_0
-		lw $t0, 12($sp)
-		sw $t0, 0($sp) # Storing internal_0
-		
-		# Calling function function_assign
-		jal function_assign
-		lw $ra, 8($sp)
 		# Loading return value in $v1
 		lw $v1, 4($sp)
 		
@@ -3200,11 +3447,11 @@
 		
 	function_main_at_Main:
 		# Function parameters
-		#   $ra = 88($sp)
-		#   self = 84($sp)
+		#   $ra = 100($sp)
+		#   self = 96($sp)
 		
 		# Reserving space for local variables
-		addi $sp, $sp, -84
+		addi $sp, $sp, -96
 		
 		# Allocating CellularAutomaton
 		li $v0, 9
@@ -3213,20 +3460,20 @@
 		la $t0, type_CellularAutomaton # $t0 = address of the type
 		sw $t0, 0($v0) # Setting type in the first word of th object
 		sw $a0, 4($v0) # Setting size in the second word of th object
-		sw $v0, 80($sp) # internal_0 = address of allocated object CellularAutomaton
+		sw $v0, 92($sp) # internal_0 = address of allocated object CellularAutomaton
 		
 		# Passing function arguments
 		addi $sp, $sp, -8 # Reserving space for arguments
 		sw $ra, 4($sp) # Storing return address
 		
 		# Argument internal_0
-		lw $t0, 88($sp)
+		lw $t0, 100($sp)
 		sw $t0, 0($sp) # Storing internal_0
 		
 		# Calling function function___init___at_CellularAutomaton
 		jal function___init___at_CellularAutomaton
 		lw $ra, 4($sp)
-		sw $v1, 88($sp) # internal_0 = result of function___init___at_CellularAutomaton
+		sw $v1, 100($sp) # internal_0 = result of function___init___at_CellularAutomaton
 		addi $sp, $sp, 8 # Freeing space for arguments
 		
 		# Allocating String
@@ -3299,7 +3546,7 @@
 		
 		sb $zero, 27($v0) # Null-terminator at the end of the string
 		
-		sw $v0, 76($sp) # internal_1 = "         X         "
+		sw $v0, 88($sp) # internal_1 = "         X         "
 		
 		# Allocating Int 8
 		li $v0, 9
@@ -3311,50 +3558,111 @@
 		sw $a0, 4($v0) # Setting size in the second word of the object
 		addi $t0, $zero, 8
 		sw $t0, 8($v0) # Setting value in the third word of the object
-		sw $v0, 68($sp) # internal_3 = address of allocated object Int
+		sw $v0, 80($sp) # internal_3 = address of allocated object Int
 		
 		# Get method init of CellularAutomaton
-		lw $t0, 80($sp)
+		lw $t0, 92($sp)
 		lw $t0, 0($t0)
 		addi $t0, $t0, 12
-		lw $t1, 68($sp)
+		lw $t1, 80($sp)
 		lw $t1, 8($t1)
 		sll $t1, $t1, 2
 		add $t0, $t0, $t1
 		lw $t0, 0($t0)
-		sw $t0, 64($sp)
+		sw $t0, 76($sp)
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
 		sw $ra, 8($sp) # Storing return address
 		
 		# Argument internal_0
-		lw $t0, 92($sp)
+		lw $t0, 104($sp)
 		sw $t0, 4($sp) # Storing internal_0
 		
 		# Argument internal_1
-		lw $t0, 88($sp)
+		lw $t0, 100($sp)
 		sw $t0, 0($sp) # Storing internal_1
 		
 		# Calling function internal_4
-		lw $t0, 76($sp)
+		lw $t0, 88($sp)
 		jalr $t0
 		lw $ra, 8($sp)
-		sw $v1, 84($sp) # internal_2 = result of internal_4
+		sw $v1, 96($sp) # internal_2 = result of internal_4
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# Passing function arguments
-		addi $sp, $sp, -12 # Reserving space for arguments
-		sw $ra, 8($sp) # Storing return address
+		# Set attribute cells of self
+		lw $t0, 96($sp) # $t0 = self
+		lw $t1, 84($sp) # $t1 = internal_2
+		beq $t1, $zero, object_set_attribute_8738373613894
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8738373613894
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8738373613894
+		j object_set_attribute_8738373613894
+		int_set_attribute_8738373613894:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0) # self.cells = internal_2
+		j end_set_attribute_8738373613894
+		bool_set_attribute_8738373613894:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0) # self.cells = internal_2
+		j end_set_attribute_8738373613894
+		object_set_attribute_8738373613894:
+		sw $t1, 8($t0) # self.cells = internal_2
+		end_set_attribute_8738373613894:
 		
-		# Argument cells
-		# Argument internal_2
-		lw $t0, 84($sp)
-		sw $t0, 0($sp) # Storing internal_2
+		# Get attribute cells of self
+		lw $t0, 96($sp) # Get the address of self
+		lw $t1, 8($t0) # Get the attribute 'cells' from the self
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8738373614005
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8738373614005
+		j object_get_attribute_8738373614005
+		int_get_attribute_8738373614005:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 72($sp) # internal_5 = self.cells
+		j end_get_attribute_8738373614005
+		bool_get_attribute_8738373614005:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 72($sp) # internal_5 = self.cells
+		j end_get_attribute_8738373614005
+		object_get_attribute_8738373614005:
+		sw $t1, 72($sp) # internal_5 = self.cells
+		end_get_attribute_8738373614005:
 		
-		# Calling function function_assign
-		jal function_assign
-		lw $ra, 8($sp)
 		# Allocating Int 9
 		li $v0, 9
 		addi $a0, $zero, 12
@@ -3365,19 +3673,32 @@
 		sw $a0, 4($v0) # Setting size in the second word of the object
 		addi $t0, $zero, 9
 		sw $t0, 8($v0) # Setting value in the third word of the object
-		sw $v0, 56($sp) # internal_6 = address of allocated object Int
+		sw $v0, 64($sp) # internal_7 = address of allocated object Int
 		
 		# Get method print of CellularAutomaton
+		lw $t0, 72($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 64($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 60($sp)
+		
 		# Passing function arguments
 		addi $sp, $sp, -8 # Reserving space for arguments
 		sw $ra, 4($sp) # Storing return address
 		
-		# Argument cells
-		# Calling function internal_7
-		lw $t0, 60($sp)
+		# Argument internal_5
+		lw $t0, 80($sp)
+		sw $t0, 0($sp) # Storing internal_5
+		
+		# Calling function internal_8
+		lw $t0, 68($sp)
 		jalr $t0
 		lw $ra, 4($sp)
-		sw $v1, 68($sp) # internal_5 = result of internal_7
+		sw $v1, 76($sp) # internal_6 = result of internal_8
 		addi $sp, $sp, 8 # Freeing space for arguments
 		
 		# Allocating Int 20
@@ -3390,30 +3711,30 @@
 		sw $a0, 4($v0) # Setting size in the second word of the object
 		addi $t0, $zero, 20
 		sw $t0, 8($v0) # Setting value in the third word of the object
-		sw $v0, 44($sp) # internal_9 = address of allocated object Int
+		sw $v0, 52($sp) # internal_10 = address of allocated object Int
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
 		sw $ra, 8($sp) # Storing return address
 		
 		# Argument countdown
-		lw $t0, 60($sp)
+		lw $t0, 68($sp)
 		sw $t0, 4($sp) # Storing countdown
 		
-		# Argument internal_9
-		lw $t0, 56($sp)
-		sw $t0, 0($sp) # Storing internal_9
+		# Argument internal_10
+		lw $t0, 64($sp)
+		sw $t0, 0($sp) # Storing internal_10
 		
 		# Calling function function_assign
 		jal function_assign
 		lw $ra, 8($sp)
-		sw $v1, 60($sp) # countdown = result of function_assign
+		sw $v1, 68($sp) # countdown = result of function_assign
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# Allocating NUll to internal_10
-		sw $zero, 40($sp) # internal_10 = 0
+		# Allocating NUll to internal_11
+		sw $zero, 48($sp) # internal_11 = 0
 		
-		while_start_8759185136580:
+		while_start_8738373654556:
 		
 		# Allocating Int 0
 		li $v0, 9
@@ -3425,36 +3746,72 @@
 		sw $a0, 4($v0) # Setting size in the second word of the object
 		addi $t0, $zero, 0
 		sw $t0, 8($v0) # Setting value in the third word of the object
-		sw $v0, 36($sp) # internal_11 = address of allocated object Int
+		sw $v0, 44($sp) # internal_12 = address of allocated object Int
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
 		sw $ra, 8($sp) # Storing return address
 		
-		# Argument internal_11
-		lw $t0, 48($sp)
-		sw $t0, 4($sp) # Storing internal_11
+		# Argument internal_12
+		lw $t0, 56($sp)
+		sw $t0, 4($sp) # Storing internal_12
 		
 		# Argument countdown
-		lw $t0, 60($sp)
+		lw $t0, 68($sp)
 		sw $t0, 0($sp) # Storing countdown
 		
 		# Calling function function_less_than
 		jal function_less_than
 		lw $ra, 8($sp)
-		sw $v1, 44($sp) # internal_12 = result of function_less_than
+		sw $v1, 52($sp) # internal_13 = result of function_less_than
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# If internal_12 then goto while_body_8759185136580
-		lw $t0, 32($sp) # Loading the address of the condition
+		# If internal_13 then goto while_body_8738373654556
+		lw $t0, 40($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, while_body_8759185136580
+		beq $t0, $t1, while_body_8738373654556
 		
-		# Jumping to while_end_8759185136580
-		j while_end_8759185136580
+		# Jumping to while_end_8738373654556
+		j while_end_8738373654556
 		
-		while_body_8759185136580:
+		while_body_8738373654556:
+		
+		# Get attribute cells of self
+		lw $t0, 96($sp) # Get the address of self
+		lw $t1, 8($t0) # Get the attribute 'cells' from the self
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8738373660299
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8738373660299
+		j object_get_attribute_8738373660299
+		int_get_attribute_8738373660299:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 36($sp) # internal_14 = self.cells
+		j end_get_attribute_8738373660299
+		bool_get_attribute_8738373660299:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 36($sp) # internal_14 = self.cells
+		j end_get_attribute_8738373660299
+		object_get_attribute_8738373660299:
+		sw $t1, 36($sp) # internal_14 = self.cells
+		end_get_attribute_8738373660299:
 		
 		# Allocating Int 15
 		li $v0, 9
@@ -3466,20 +3823,69 @@
 		sw $a0, 4($v0) # Setting size in the second word of the object
 		addi $t0, $zero, 15
 		sw $t0, 8($v0) # Setting value in the third word of the object
-		sw $v0, 24($sp) # internal_14 = address of allocated object Int
+		sw $v0, 28($sp) # internal_16 = address of allocated object Int
 		
 		# Get method evolve of CellularAutomaton
+		lw $t0, 36($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 28($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 24($sp)
+		
 		# Passing function arguments
 		addi $sp, $sp, -8 # Reserving space for arguments
 		sw $ra, 4($sp) # Storing return address
 		
-		# Argument cells
-		# Calling function internal_15
-		lw $t0, 28($sp)
+		# Argument internal_14
+		lw $t0, 44($sp)
+		sw $t0, 0($sp) # Storing internal_14
+		
+		# Calling function internal_17
+		lw $t0, 32($sp)
 		jalr $t0
 		lw $ra, 4($sp)
-		sw $v1, 36($sp) # internal_13 = result of internal_15
+		sw $v1, 40($sp) # internal_15 = result of internal_17
 		addi $sp, $sp, 8 # Freeing space for arguments
+		
+		# Get attribute cells of self
+		lw $t0, 96($sp) # Get the address of self
+		lw $t1, 8($t0) # Get the attribute 'cells' from the self
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8738373660221
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8738373660221
+		j object_get_attribute_8738373660221
+		int_get_attribute_8738373660221:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 20($sp) # internal_18 = self.cells
+		j end_get_attribute_8738373660221
+		bool_get_attribute_8738373660221:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 20($sp) # internal_18 = self.cells
+		j end_get_attribute_8738373660221
+		object_get_attribute_8738373660221:
+		sw $t1, 20($sp) # internal_18 = self.cells
+		end_get_attribute_8738373660221:
 		
 		# Allocating Int 9
 		li $v0, 9
@@ -3491,19 +3897,32 @@
 		sw $a0, 4($v0) # Setting size in the second word of the object
 		addi $t0, $zero, 9
 		sw $t0, 8($v0) # Setting value in the third word of the object
-		sw $v0, 12($sp) # internal_17 = address of allocated object Int
+		sw $v0, 12($sp) # internal_20 = address of allocated object Int
 		
 		# Get method print of CellularAutomaton
+		lw $t0, 20($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 12($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 8($sp)
+		
 		# Passing function arguments
 		addi $sp, $sp, -8 # Reserving space for arguments
 		sw $ra, 4($sp) # Storing return address
 		
-		# Argument cells
-		# Calling function internal_18
+		# Argument internal_18
+		lw $t0, 28($sp)
+		sw $t0, 0($sp) # Storing internal_18
+		
+		# Calling function internal_21
 		lw $t0, 16($sp)
 		jalr $t0
 		lw $ra, 4($sp)
-		sw $v1, 24($sp) # internal_16 = result of internal_18
+		sw $v1, 24($sp) # internal_19 = result of internal_21
 		addi $sp, $sp, 8 # Freeing space for arguments
 		
 		# Allocating Int 1
@@ -3516,24 +3935,24 @@
 		sw $a0, 4($v0) # Setting size in the second word of the object
 		addi $t0, $zero, 1
 		sw $t0, 8($v0) # Setting value in the third word of the object
-		sw $v0, 4($sp) # internal_19 = address of allocated object Int
+		sw $v0, 4($sp) # internal_22 = address of allocated object Int
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
 		sw $ra, 8($sp) # Storing return address
 		
 		# Argument countdown
-		lw $t0, 60($sp)
+		lw $t0, 68($sp)
 		sw $t0, 4($sp) # Storing countdown
 		
-		# Argument internal_19
+		# Argument internal_22
 		lw $t0, 16($sp)
-		sw $t0, 0($sp) # Storing internal_19
+		sw $t0, 0($sp) # Storing internal_22
 		
 		# Calling function function_sub
 		jal function_sub
 		lw $ra, 8($sp)
-		sw $v1, 12($sp) # internal_20 = result of function_sub
+		sw $v1, 12($sp) # internal_23 = result of function_sub
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
 		# Passing function arguments
@@ -3541,29 +3960,29 @@
 		sw $ra, 8($sp) # Storing return address
 		
 		# Argument countdown
-		lw $t0, 60($sp)
+		lw $t0, 68($sp)
 		sw $t0, 4($sp) # Storing countdown
 		
-		# Argument internal_20
+		# Argument internal_23
 		lw $t0, 12($sp)
-		sw $t0, 0($sp) # Storing internal_20
+		sw $t0, 0($sp) # Storing internal_23
 		
 		# Calling function function_assign
 		jal function_assign
 		lw $ra, 8($sp)
-		sw $v1, 60($sp) # countdown = result of function_assign
+		sw $v1, 68($sp) # countdown = result of function_assign
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# Jumping to while_start_8759185136580
-		j while_start_8759185136580
+		# Jumping to while_start_8738373654556
+		j while_start_8738373654556
 		
-		while_end_8759185136580:
+		while_end_8738373654556:
 		
 		# Loading return value in $v1
-		lw $v1, 84($sp)
+		lw $v1, 96($sp)
 		
 		# Freeing space for local variables
-		addi $sp, $sp, 84
+		addi $sp, $sp, 96
 		
 		jr $ra
 		

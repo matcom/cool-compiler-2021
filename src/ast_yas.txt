@@ -1,100 +1,180 @@
-class Main inherits IO {
-    out: Int <- {
-    self.out_string("2 is trivially prime.\n");
-2;
-};
-
-    testee: Int <- out;
-
-    divisor: Int;
-
-    stop: Int <- 500;
-
-    m: Object <- while true loop
-     {
-        testee <-         testee + 1;
-        divisor <- 2;
-        while if testee < divisor * divisor
-then
-false
-else
-    if testee - divisor * testee / divisor = 0
-    then
-false
-    else
-true
-    fi
-fi loop
-             divisor <-             divisor + 1
-        pool;
-        if testee < divisor * divisor
-        then
-            {
-                out <-                 testee;
-                self.out_int(out);
-                self.out_string(" is prime.\n");
-            }
-        else
-0
-        fi;
-        if stop <= testee
-        then
-            "halt".abort()
-        else
-"continue"
-        fi;
-    }
-pool;
-
-    __init__ (): Main {
+class List inherits IO {
+    __init__ (): List {
         {
-            out <-             {
-                self.out_string("2 is trivially prime.\n");
-2;
-            };
-            testee <-             out;
-            divisor <- 0;
-            stop <- 500;
-            m <-             while true loop
-                 {
-                    testee <-                     testee + 1;
-                    divisor <- 2;
-                    while if testee < divisor * divisor
-then
-false
-else
-    if testee - divisor * testee / divisor = 0
-    then
-false
-    else
-true
-    fi
-fi loop
-                         divisor <-                         divisor + 1
-                    pool;
-                    if testee < divisor * divisor
-                    then
-                        {
-                            out <-                             testee;
-                            self.out_int(out);
-                            self.out_string(" is prime.\n");
-                        }
-                    else
-0
-                    fi;
-                    if stop <= testee
-                    then
-                        "halt".abort()
-                    else
-"continue"
-                    fi;
-                }
-            pool;
             self;
         }
     };
 
-    main (): Int {
-0
+    isNil (): Bool {
+        {
+            self.abort();
+true;
+        }
+    };
+
+    cons (hd: Int): Cons {
+        let new_cell: Cons <- (new Cons) in
+            new_cell.init(hd, self)
+    };
+
+    car (): Int {
+        {
+            self.abort();
+            (new Int);
+        }
+    };
+
+    cdr (): List {
+        {
+            self.abort();
+            (new List);
+        }
+    };
+
+    rev (): List {
+        self.cdr()
+    };
+
+    sort (): List {
+        self.cdr()
+    };
+
+    insert (i: Int): List {
+        self.cdr()
+    };
+
+    rcons (i: Int): List {
+        self.cdr()
+    };
+
+    print_list (): Object {
+        self.abort()
+    };
+}
+
+class Cons inherits List {
+    xcar: Int;
+
+    xcdr: List;
+
+    __init__ (): Cons {
+        {
+            xcar <- 0;
+            xcdr <- NULL;
+            self;
+        }
+    };
+
+    isNil (): Bool {
+false
+    };
+
+    init (hd: Int, tl: List): Cons {
+        {
+            xcar <-             hd;
+            xcdr <-             tl;
+            self;
+        }
+    };
+
+    car (): Int {
+        xcar
+    };
+
+    cdr (): List {
+        xcdr
+    };
+
+    rev (): List {
+        xcdr.rev().rcons(xcar)
+    };
+
+    sort (): List {
+        xcdr.sort().insert(xcar)
+    };
+
+    insert (i: Int): List {
+        if i < xcar
+        then
+            (new Cons).init(i, self)
+        else
+            (new Cons).init(xcar, xcdr.insert(i))
+        fi
+    };
+
+    rcons (i: Int): List {
+        (new Cons).init(xcar, xcdr.rcons(i))
+    };
+
+    print_list (): Object {
+        {
+            self.out_int(xcar);
+            self.out_string("\n");
+            xcdr.print_list();
+        }
+    };
+}
+
+class Nil inherits List {
+    __init__ (): Nil {
+        {
+            self;
+        }
+    };
+
+    isNil (): Bool {
+true
+    };
+
+    rev (): List {
+        self
+    };
+
+    sort (): List {
+        self
+    };
+
+    insert (i: Int): List {
+        self.rcons(i)
+    };
+
+    rcons (i: Int): List {
+        (new Cons).init(i, self)
+    };
+
+    print_list (): Object {
+true
+    };
+}
+
+class Main inherits IO {
+    l: List;
+
+    __init__ (): Main {
+        {
+            l <- NULL;
+            self;
+        }
+    };
+
+    iota (i: Int): List {
+        {
+            l <-             (new Nil);
+            let j: Int <- 0 in
+                while j < i loop
+                     {
+                        l <-                         (new Cons).init(j, l);
+                        j <-                         j + 1;
+                    }
+                pool;
+            l;
+        }
+    };
+
+    main (): Object {
+        {
+            self.out_string("How many numbers to sort? ");
+            self.iota(self.in_int()).rev().sort().print_list();
+        }
     };
 }

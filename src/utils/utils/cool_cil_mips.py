@@ -33,7 +33,7 @@ class ExtendedCoolTranslator:
         for name in default_class_names:
             t = self.context.get_type(name)
             t.define_method("__init__", [], [], t)
-            t.methods.move_to_end("__init__", last=False)
+            t.methods_dict.move_to_end("__init__", last=False)
 
         for declaration in node.class_list:
             self.class_declarations[declaration.name] = declaration
@@ -76,7 +76,7 @@ class ExtendedCoolTranslator:
         )
 
         self.current_type.define_method("__init__", [], [], self.current_type)
-        self.current_type.methods.move_to_end("__init__", last=False)
+        self.current_type.methods_dict.move_to_end("__init__", last=False)
 
         attrs = [
             feature

@@ -1903,7 +1903,7 @@
 		# Allocating NUll to internal_6
 		sw $zero, 28($sp) # internal_6 = 0
 		
-		while_start_8779492990772:
+		while_start_8751921379389:
 		
 		# Allocating Int 0
 		li $v0, 9
@@ -1977,16 +1977,16 @@
 		sw $v1, 24($sp) # internal_10 = result of function_xor
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# If internal_10 then goto while_body_8779492990772
+		# If internal_10 then goto while_body_8751921379389
 		lw $t0, 12($sp) # Loading the address of the condition
 		lw $t0, 8($t0) # Loading the value of the condition
 		addi $t1, $zero, 1 # Setting the value to 1 for comparison
-		beq $t0, $t1, while_body_8779492990772
+		beq $t0, $t1, while_body_8751921379389
 		
-		# Jumping to while_end_8779492990772
-		j while_end_8779492990772
+		# Jumping to while_end_8751921379389
+		j while_end_8751921379389
 		
-		while_body_8779492990772:
+		while_body_8751921379389:
 		
 		# Passing function arguments
 		addi $sp, $sp, -12 # Reserving space for arguments
@@ -2108,10 +2108,10 @@
 		sw $v1, 64($sp) # a = result of function_assign
 		addi $sp, $sp, 12 # Freeing space for arguments
 		
-		# Jumping to while_start_8779492990772
-		j while_start_8779492990772
+		# Jumping to while_start_8751921379389
+		j while_start_8751921379389
 		
-		while_end_8779492990772:
+		while_end_8751921379389:
 		
 		# Loading return value in $v1
 		lw $v1, 36($sp)

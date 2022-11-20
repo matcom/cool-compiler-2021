@@ -21,10 +21,6 @@ class Node:
     line: int
     lexpos: int
     scope: Scope
-
-    def set_line_lexpos(self, line, lexpos):
-        self.line = line
-        self.lexpos = lexpos
         
     def set_position(self, line, lexpos):
         self.line = line
@@ -111,6 +107,7 @@ class MethodCallNode(ExprNode):
         self.exprlist = exprlist
         self.atom = atom
         self.type = typex
+        
         self.id_position = (-1, -1)
         self.type_position = (-1, -1)
         self.exprlist_positions = []
@@ -125,10 +122,6 @@ class IsVoidNode(ExprNode):
     def __init__(self, expr):
         self.expr = expr
 
-class NewNode(ExprNode):
-    def __init__(self, type_):
-        self.type = type_
-        self.type_position = (-1, -1)
 
 class AtomicNode(ExprNode):
     def __init__(self, lex):
@@ -136,6 +129,11 @@ class AtomicNode(ExprNode):
         self.lex: str = lex
         self.scope = None
 
+class NewNode(AtomicNode):
+    def __init__(self, type_):
+        self.type = type_
+        self.type_position = (-1, -1)
+        
 class ExprParNode(AtomicNode):
     def __init__(self, expr):
         self.expr = expr

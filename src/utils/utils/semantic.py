@@ -14,7 +14,7 @@ class Attribute:
         self.type = typex
 
     def __str__(self):
-        return f'([attrib] {self.name} : {self.type.name})'
+        return f"[attrib] {self.name} : {self.type.name};"
 
     def __repr__(self):
         return str(self)
@@ -22,60 +22,90 @@ class Attribute:
 
 class Method:
     def __init__(self, name, param_names, params_types, return_type):
-        self.name = name
+        self.name: str = name
         self.param_names = param_names
         self.param_types = params_types
-        self.return_type = return_type
+        self.return_type= return_type
 
     def __str__(self):
-        params = ', '.join(f'{n}:{t.name}' for n, t in zip(self.param_names, self.param_types))
-        return f'([method] {self.name}({params}): {self.return_type.name})'
+        params = ", ".join(
+            f"{n}: {t.name}" for n, t in zip(self.param_names, self.param_types)
+        )
+        return f"[method] {self.name}({params}): {self.return_type.name};"
 
-    def __repr__(self):
-        return str(self)
-
-    # def __eq__(self, other):
-    #     return other.name == self.name and \
-    #            other.return_type == self.return_type and \
-    #            other.param_types == self.param_types
+    def __eq__(self, other):
+        return (
+            other.name == self.name
+            and other.return_type == self.return_type
+            and tuple(other.param_types) == tuple(self.param_types)
+        )
 
 
 class Type:
     def __init__(self, name: str):
-        self.name = name
-        self.attributes: OrderedDict = OrderedDict()
-        self.methods: OrderedDict = OrderedDict()
+        self.name: str = name
+        self.attributes_dict = OrderedDict()
+        self.methods_dict = OrderedDict()
         self.parent = None
 
-    def set_parent(self, parent):
+    @property
+    def attributes(self):
+        return [x for _, x in self.attributes_dict.items()]
+
+    @property
+    def methods(self):
+        return [x for _, x in self.methods_dict.items()]
+
+    def set_parent(self, parent: "Type"):
         if self.parent is not None:
-            raise SemanticError(f'Parent type is already set for {self.name}.')
+            raise SemanticError(f"Parent type is already set for {self.name}.")
         self.parent = parent
 
-    def get_attribute(self, name: str):
+    def get_attribute(self, name: str, owner: bool = False):
         try:
-            return self.attributes[name]
+            return (
+                self.attributes_dict[name]
+                if not owner
+                else (self.attributes_dict[name], self)
+            )
         except KeyError:
             if self.parent is None:
-                raise SemanticError(f'Attribute "{name}" is not defined in {self.name}.')
+                raise SemanticError(
+                    f'Attribute "{name}" is not defined in {self.name}.'
+                )
             try:
-                return self.parent.get_attribute(name)
+                return self.parent.get_attribute(name, owner)
             except SemanticError:
-                raise SemanticError(f'Attribute "{name}" is not defined in {self.name}.')
+                raise SemanticError(
+                    f'Attribute "{name}" is not defined in {self.name}.'
+                )
 
-    def define_attribute(self, name: str, typex):
+    def define_attribute(self, name, typex):
         try:
             self.get_attribute(name)
         except SemanticError:
             attribute = Attribute(name, typex)
-            self.attributes[name] = attribute
+            self.attributes_dict[name] = attribute
             return attribute
         else:
-            raise SemanticError(f'Attribute "{name}" is already defined in {self.name}.')
+            raise SemanticError(
+                f'Attribute "{name}" is already defined in {self.name}.'
+            )
 
-    def get_method(self, name: str, owner=False):
+    def contains_attribute(self, name: str):
+        return (
+            name in self.attributes_dict
+            or self.parent is not None
+            and self.parent.contains_attribute(name)
+        )
+
+    def get_method(self, name: str, owner: bool = False):
         try:
-            return self.methods[name] if not owner else (self.methods[name], self)
+            return (
+                self.methods_dict[name]
+                if not owner
+                else (self.methods_dict[name], self)
+            )
         except KeyError:
             if self.parent is None:
                 raise SemanticError(f'Method "{name}" is not defined in {self.name}.')
@@ -84,41 +114,41 @@ class Type:
             except SemanticError:
                 raise SemanticError(f'Method "{name}" is not defined in {self.name}.')
 
-    def define_method(self, name: str, param_names: list, param_types: list, return_type):
-        if name in self.methods:
+    def define_method( self, name: str, param_names, param_types, return_type):
+        if name in self.methods_dict:
             raise SemanticError(f'Method "{name}" already defined in {self.name}')
 
         method = Method(name, param_names, param_types, return_type)
-        self.methods[name] = method
+        self.methods_dict[name] = method
         return method
 
-    def all_attributes(self, clean=True):
-        plain = OrderedDict() if self.parent is None else self.parent.all_attributes(False)
-        for attr in self.attributes.values():
-            plain[attr.name] = (attr, self)
-        return plain.values() if clean else plain
+    def contains_method(self, name):
+        return name in self.methods_dict or (
+            self.parent is not None and self.parent.contains_method(name)
+        )
 
-    def include_attribute(self,id_attr):
-        return id_attr in self.all_attributes(False).keys()
+    def all_attributes(self):
+        attributes = [] if self.parent is None else self.parent.all_attributes()
+        attributes += [(x, self) for x in self.attributes]
+        return attributes
 
-    def include_method(self,id_method):
-        return id_method in self.all_methods(False).keys()
-
-    def all_methods(self, clean=True):
-        plain = OrderedDict() if self.parent is None else self.parent.all_methods(False)
-        for method in self.methods.values():
-            plain[method.name] = (method, self)
-        return plain.values() if clean else plain
+    def all_methods(self):
+        methods = [] if self.parent is None else self.parent.all_methods()
+        methods += [(x, self) for x in self.methods]
+        return methods
 
     def conforms_to(self, other):
-        return other.bypass() or self == other or self.parent is not None and self.parent.conforms_to(other)
-
-    def bypass(self):
-        return False
+        return (
+            other.bypass()
+            or self == other
+            or self.parent is not None
+            and self.parent.conforms_to(other)
+        )
 
     def join(self, other):
         if isinstance(self, ErrorType):
             return other
+
         if isinstance(other, ErrorType):
             return self
 
@@ -131,56 +161,41 @@ class Type:
             current_type = current_type.parent
         return current_type
 
-    # @staticmethod
+    @staticmethod
     def multi_join(types):
         static_type = types[0]
         for t in types[1:]:
             static_type = static_type.join(t)
         return static_type
 
+    def bypass(self):
+        return False
+
+    def get_ancestors(self) :
+        if self.parent is None:
+            return [self]
+        return [self] + self.parent.get_ancestors()
 
     def __str__(self):
-        output = f'type {self.name}'
-        # parent = '' if self.parent is None else f' : {self.parent.name}'
-        # output += parent
-        # output += ' {'
-        # output += '\n\t' if self.attributes or self.methods else ''
-        # output += '\n\t'.join(str(x) for x in self.attributes.values())
-        # output += '\n\t' if self.attributes else ''
-        # output += '\n\t'.join(str(x) for x in self.methods.values())
-        # output += '\n' if self.methods else ''
-        # output += '}\n'
+        output = f"type {self.name}"
+        parent = "" if self.parent is None else f" : {self.parent.name}"
+        output += parent
+        output += " {"
+        output += "\n\t" if self.attributes or self.methods else ""
+        output += "\n\t".join(str(x) for x in self.attributes)
+        output += "\n\t" if self.attributes_dict else ""
+        output += "\n\t".join(str(x) for x in self.methods)
+        output += "\n" if self.methods_dict else ""
+        output += "}\n"
         return output
 
     def __repr__(self):
         return str(self)
 
-    def common_ancestor(self, other):
-        current_anc = self.get_ancestors()
-        other_anc = other
-
-        while other_anc is not None:
-            if other_anc in current_anc:
-                return other_anc
-            other_anc = other_anc.parent
-        
-        return current_anc[-1]
-        
-    def get_ancestors(self):
-        if self.parent is None:
-            return [self]
-        return [self] + self.parent.get_ancestors()
-
-    def contains_attribute(self, name: str):
-        return (name in self.attributes or self.parent is not None and self.parent.contains_attribute(name))
-
-
-    def contains_method(self, name):
-        return name in self.methods or (self.parent is not None and self.parent.contains_method(name))
 
 class ErrorType(Type):
     def __init__(self):
-        Type.__init__(self, '<error>')
+        super().__init__("Error")
 
     def conforms_to(self, other):
         return True
@@ -237,7 +252,7 @@ class Context:
 
     def create_type(self, name: str):
         if name in self.types:
-            raise SemanticError(f'Type ({name}) already in context.')
+            raise SemanticError(f"Type with the same name ({name}) already in context.")
         typex = self.types[name] = Type(name)
         return typex
 
@@ -248,112 +263,89 @@ class Context:
             raise SemanticError(f'Type "{name}" is not defined.')
 
     def __str__(self):
-        return '{\n\t' + '\n\t'.join(y for x in self.types for y in str(x).split('\n')) + '\n}'
+        return (
+            "{\n\t"
+            + "\n\t".join(y for x in self.types.values() for y in str(x).split("\n"))
+            + "\n}"
+        )
 
     def __repr__(self):
         return str(self)
-    
+
     def __iter__(self):
         return iter(self.types.values())
 
 
 class VariableInfo:
-    def __init__(self, name, vtype):
-        self.name = name
-        self.type = vtype
+    def __init__(self, name, var_type):
+        self.name: str = name
+        self.type: Type = var_type
 
     def __str__(self):
-        return self.name + ': ' + self.type.name
-    
-    def __repr__(self):
-        return str(self)
+        return self.name + ": " + self.type.name
 
 
 class Scope:
-    def __init__(self, parent=None):
-        self.local_variable = []
+    def __init__(self, parent = None):
+        self.locals = {}
         self.parent = parent
         self.children = []
-        self.index = 0 if parent is None else len(parent)
 
-    def __len__(self):
-        return len(self.local_variable)
-
-    def scope_to_string(self, tab: int = 0):
-        s = "    " * tab + "{\n"
-        for local in self.local_variable:
-            s += "    " * (tab + 1) + f"name: {local.name}, type: {local.type.name}\n"
-
-        s += "    " * (tab + 1) + f"children ({len(self.children)}): [\n"
-
-        for child in self.children:
-            s += child.scope_to_string(tab + 2) + "\n"
-
-        s += "    " * (tab + 1) + f"]\n"
-
-        s += "    " * tab + "}"
-        return s
-
-
-    def __str__(self):
-        return self.scope_to_string()
-        # return f'\nlocals: {self.local_variable}\nchildren ({len(self.children)}): , {self.children}'
-
-    # def scope_to_string(self, tab: int = 0):
-    #     s = "    " * tab + "{"
-    #     for local in self.local_variable:
-    #         s += "\n" + "    " * (tab + 1) + f"{local.name}: {local.type.name}"
-
-    #     s += "\n" + "    " * (tab + 1) + f"children ({len(self.children)}): [\n"
-
-    #     for child in self.children:
-    #         s += child.scope_to_string(tab + 2) + ",\n"
-
-    #     s += "\n" + "    " * (tab + 1) + f"]"
-
-    #     s += "\n" + "    " * tab + "}"
-    #     return s
-
-    def create_child(self):
+    def create_child(self) :
         child = Scope(self)
         self.children.append(child)
         return child
 
-    def define_variable(self, vname, vtype):
-        info = VariableInfo(vname, vtype)
-        self.local_variable.append(info)
+    def define_variable(self, var_name: str, var_type: Type):
+        info = VariableInfo(var_name, var_type)
+        self.locals[var_name] = info
         return info
 
-    def find_variable(self, vname, index=None):
-        local_variables = self.local_variable if index is None else itt.islice(self.local_variable, index)
+    def find_variable(self, var_name: str):
         try:
-            return next(x for x in local_variables if x.name == vname)
-        except StopIteration:
-            return self.parent.find_variable(vname, self.index) if self.parent is not None else None
+            return self.locals[var_name]
+        except KeyError:
+            return (
+                self.parent.find_variable(var_name) if self.parent is not None else None
+            )
 
-    def is_variable_defined(self, vname):
-        return self.find_variable(vname) is not None
-
-    def is_local_variable(self, vname):
-        return any(True for x in self.local_variable if x.name == vname)
-
-    # def __str__(self):
-    #     s = "escoup"
-    #     scope = self
-    #     while scope != None:
-    #         for v in scope.local_variable:
-    #             s += v.name + '\n'
-    #         scope = scope.parent if scope.parent is not None else None
-    #     return s
-    
-    def find_all_variables_with_name(self, var_name):
+    def find_all_variables_with_name(self, var_name: str):
         vars = []
         scope = self
         while scope is not None:
-            if var_name in scope.local_variable:
+            if var_name in scope.locals:
                 vars.append(scope.locals[var_name])
 
             scope = scope.parent
 
         return vars
-    
+
+    def is_defined(self, var_name):
+        return self.find_variable(var_name) is not None
+
+    def is_local_variable(self, var_name: str):
+        return var_name in self.locals
+
+    def clear(self):
+        self.children = []
+
+    def scope_to_string(self, tab: int = 0):
+        s = "    " * tab + "{"
+        for local in self.locals.values():
+            s += "\n" + "    " * (tab + 1) + f"{local.name}: {local.type.name}"
+
+        s += "\n" + "    " * (tab + 1) + f"children ({len(self.children)}): [\n"
+
+        for child in self.children:
+            s += child.scope_to_string(tab + 2) + ",\n"
+
+        s += "\n" + "    " * (tab + 1) + f"]"
+
+        s += "\n" + "    " * tab + "}"
+        return s
+
+    def __len__(self):
+        return len(self.locals)
+
+    def __str__(self) :
+        return self.scope_to_string()

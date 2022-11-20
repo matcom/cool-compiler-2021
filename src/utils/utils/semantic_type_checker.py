@@ -504,7 +504,7 @@ class InferenceChecker:
         attributes = {}
 
         for typex in context:
-            for attr in typex.attributes.values():
+            for attr in typex.attributes:
                 attributes[typex.name, attr.name] = AttributeNode(attr.type, attr)
 
         return attributes
@@ -516,7 +516,7 @@ class InferenceChecker:
         methods = {}
 
         for typex in context:
-            for method in typex.methods.values():
+            for method in typex.methods:
                 methods[typex.name, method.name] = (
                     [
                         ParameterNode(t, method, i)

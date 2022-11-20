@@ -1,6 +1,8 @@
 from fileinput import lineno
-import ply.yacc as yacc
+
 import cool_lexer as lex
+import ply.yacc as yacc
+
 import utils.ast_nodes as ast
 
 tokens = lex.tokens
