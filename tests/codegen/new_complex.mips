@@ -4,6 +4,10 @@
 	# DATA SECTION #
 	################
 
+	####################
+	# Types declaration #
+	####################
+
 	type_Object: .word 24
 	type_Object_inherits_from: .word 0
 	type_Object_name_address: .word type_Object_name_size
@@ -111,8 +115,12 @@
 .text
 	
 	################
-	# TEXT SECTION #
+	# Functions declaration #
 	################
+
+	#########################
+	# Functions declaration #
+	#########################
 
 	function_add:
 		# SPACE FOR LOCAL VARIABLES
@@ -1543,16 +1551,16 @@
 		lw $t0, 120($sp)
 		sw $t0, 148($sp)
 		
-		# IF internal_8 THEN GOTO then_8791500794820
+		# IF internal_8 THEN GOTO then_8767745767361
 		lw $t0, 148($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8791500794820
+		beq $t0, $t1, then_8767745767361
 		
-		# JUMP TO else_8791500794820
-		j else_8791500794820
+		# JUMP TO else_8767745767361
+		j else_8767745767361
 		
-		then_8791500794820:
+		then_8767745767361:
 		
 		# ALLOCATING STRING
 		li $v0, 9
@@ -1624,10 +1632,10 @@
 		lw $t0, 112($sp)
 		sw $t0, 152($sp)
 		
-		# JUMP TO endif_8791500794820
-		j endif_8791500794820
+		# JUMP TO endif_8767745767361
+		j endif_8767745767361
 		
-		else_8791500794820:
+		else_8767745767361:
 		
 		# ALLOCATING STRING
 		li $v0, 9
@@ -1699,10 +1707,10 @@
 		lw $t0, 96($sp)
 		sw $t0, 152($sp)
 		
-		# JUMP TO endif_8791500794820
-		j endif_8791500794820
+		# JUMP TO endif_8767745767361
+		j endif_8767745767361
 		
-		endif_8791500794820:
+		endif_8767745767361:
 		
 		# ALLOCATING BOOL -> 0
 		li $v0, 9
@@ -1876,16 +1884,16 @@
 		lw $t0, 40($sp)
 		sw $t0, 80($sp)
 		
-		# IF internal_25 THEN GOTO then_8791500795754
+		# IF internal_25 THEN GOTO then_8767745768295
 		lw $t0, 80($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8791500795754
+		beq $t0, $t1, then_8767745768295
 		
-		# JUMP TO else_8791500795754
-		j else_8791500795754
+		# JUMP TO else_8767745768295
+		j else_8767745768295
 		
-		then_8791500795754:
+		then_8767745768295:
 		
 		# ALLOCATING STRING
 		li $v0, 9
@@ -1957,10 +1965,10 @@
 		lw $t0, 24($sp)
 		sw $t0, 84($sp)
 		
-		# JUMP TO endif_8791500795754
-		j endif_8791500795754
+		# JUMP TO endif_8767745768295
+		j endif_8767745768295
 		
-		else_8791500795754:
+		else_8767745768295:
 		
 		# ALLOCATING STRING
 		li $v0, 9
@@ -2032,10 +2040,10 @@
 		lw $t0, 8($sp)
 		sw $t0, 84($sp)
 		
-		# JUMP TO endif_8791500795754
-		j endif_8791500795754
+		# JUMP TO endif_8767745768295
+		j endif_8767745768295
 		
-		endif_8791500795754:
+		endif_8767745768295:
 		
 		lw $v1, 84($sp)
 		
@@ -2063,17 +2071,17 @@
 		# SET ATTRIBUTE x OF self
 		lw $t0, 8($sp)
 		lw $t1, 4($sp)
-		beq $t1, $zero, object_set_attribute_8791500781198
+		beq $t1, $zero, object_set_attribute_8767745753739
 		lw $t2, 0($t1)
 		la $t3, type_Int
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_set_attribute_8791500781198
+		beq $t6, $t5, int_set_attribute_8767745753739
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_set_attribute_8791500781198
-		j object_set_attribute_8791500781198
-		int_set_attribute_8791500781198:
+		beq $t6, $t5, bool_set_attribute_8767745753739
+		j object_set_attribute_8767745753739
+		int_set_attribute_8767745753739:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2082,8 +2090,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 8($t0)
-		j end_set_attribute_8791500781198
-		bool_set_attribute_8791500781198:
+		j end_set_attribute_8767745753739
+		bool_set_attribute_8767745753739:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2092,10 +2100,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 8($t0)
-		j end_set_attribute_8791500781198
-		object_set_attribute_8791500781198:
+		j end_set_attribute_8767745753739
+		object_set_attribute_8767745753739:
 		sw $t1, 8($t0)
-		end_set_attribute_8791500781198:
+		end_set_attribute_8767745753739:
 		
 		# ALLOCATING INT -> 0
 		li $v0, 9
@@ -2112,17 +2120,17 @@
 		# SET ATTRIBUTE y OF self
 		lw $t0, 8($sp)
 		lw $t1, 0($sp)
-		beq $t1, $zero, object_set_attribute_8791500781222
+		beq $t1, $zero, object_set_attribute_8767745753763
 		lw $t2, 0($t1)
 		la $t3, type_Int
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_set_attribute_8791500781222
+		beq $t6, $t5, int_set_attribute_8767745753763
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_set_attribute_8791500781222
-		j object_set_attribute_8791500781222
-		int_set_attribute_8791500781222:
+		beq $t6, $t5, bool_set_attribute_8767745753763
+		j object_set_attribute_8767745753763
+		int_set_attribute_8767745753763:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2131,8 +2139,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 12($t0)
-		j end_set_attribute_8791500781222
-		bool_set_attribute_8791500781222:
+		j end_set_attribute_8767745753763
+		bool_set_attribute_8767745753763:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2141,10 +2149,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 12($t0)
-		j end_set_attribute_8791500781222
-		object_set_attribute_8791500781222:
+		j end_set_attribute_8767745753763
+		object_set_attribute_8767745753763:
 		sw $t1, 12($t0)
-		end_set_attribute_8791500781222:
+		end_set_attribute_8767745753763:
 		
 		lw $v1, 8($sp)
 		
@@ -2165,11 +2173,11 @@
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_get_attribute_8791500781291
+		beq $t6, $t5, int_get_attribute_8767745753832
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_get_attribute_8791500781291
-		j object_get_attribute_8791500781291
-		int_get_attribute_8791500781291:
+		beq $t6, $t5, bool_get_attribute_8767745753832
+		j object_get_attribute_8767745753832
+		int_get_attribute_8767745753832:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2178,8 +2186,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 12($sp)
-		j end_get_attribute_8791500781291
-		bool_get_attribute_8791500781291:
+		j end_get_attribute_8767745753832
+		bool_get_attribute_8767745753832:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2188,10 +2196,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 12($sp)
-		j end_get_attribute_8791500781291
-		object_get_attribute_8791500781291:
+		j end_get_attribute_8767745753832
+		object_get_attribute_8767745753832:
 		sw $t1, 12($sp)
-		end_get_attribute_8791500781291:
+		end_get_attribute_8767745753832:
 		
 		# FUNCTION ARG
 		addi $sp, $sp, -12
@@ -2219,11 +2227,11 @@
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_get_attribute_8791500781593
+		beq $t6, $t5, int_get_attribute_8767745754134
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_get_attribute_8791500781593
-		j object_get_attribute_8791500781593
-		int_get_attribute_8791500781593:
+		beq $t6, $t5, bool_get_attribute_8767745754134
+		j object_get_attribute_8767745754134
+		int_get_attribute_8767745754134:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2232,8 +2240,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 4($sp)
-		j end_get_attribute_8791500781593
-		bool_get_attribute_8791500781593:
+		j end_get_attribute_8767745754134
+		bool_get_attribute_8767745754134:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2242,10 +2250,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 4($sp)
-		j end_get_attribute_8791500781593
-		object_get_attribute_8791500781593:
+		j end_get_attribute_8767745754134
+		object_get_attribute_8767745754134:
 		sw $t1, 4($sp)
-		end_get_attribute_8791500781593:
+		end_get_attribute_8767745754134:
 		
 		# FUNCTION ARG
 		addi $sp, $sp, -12
@@ -2296,11 +2304,11 @@
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_get_attribute_8791500781674
+		beq $t6, $t5, int_get_attribute_8767745754215
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_get_attribute_8791500781674
-		j object_get_attribute_8791500781674
-		int_get_attribute_8791500781674:
+		beq $t6, $t5, bool_get_attribute_8767745754215
+		j object_get_attribute_8767745754215
+		int_get_attribute_8767745754215:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2309,8 +2317,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 88($sp)
-		j end_get_attribute_8791500781674
-		bool_get_attribute_8791500781674:
+		j end_get_attribute_8767745754215
+		bool_get_attribute_8767745754215:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2319,10 +2327,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 88($sp)
-		j end_get_attribute_8791500781674
-		object_get_attribute_8791500781674:
+		j end_get_attribute_8767745754215
+		object_get_attribute_8767745754215:
 		sw $t1, 88($sp)
-		end_get_attribute_8791500781674:
+		end_get_attribute_8767745754215:
 		
 		# ALLOCATING INT -> 0
 		li $v0, 9
@@ -2358,16 +2366,16 @@
 		lw $t0, 80($sp)
 		sw $t0, 92($sp)
 		
-		# IF internal_1 THEN GOTO then_8791500795877
+		# IF internal_1 THEN GOTO then_8767745768439
 		lw $t0, 92($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8791500795877
+		beq $t0, $t1, then_8767745768439
 		
-		# JUMP TO else_8791500795877
-		j else_8791500795877
+		# JUMP TO else_8767745768439
+		j else_8767745768439
 		
-		then_8791500795877:
+		then_8767745768439:
 		
 		# GET ATTRIBUTE x OF self
 		lw $t0, 100($sp)
@@ -2377,11 +2385,11 @@
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_get_attribute_8791500781761
+		beq $t6, $t5, int_get_attribute_8767745754302
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_get_attribute_8791500781761
-		j object_get_attribute_8791500781761
-		int_get_attribute_8791500781761:
+		beq $t6, $t5, bool_get_attribute_8767745754302
+		j object_get_attribute_8767745754302
+		int_get_attribute_8767745754302:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2390,8 +2398,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 76($sp)
-		j end_get_attribute_8791500781761
-		bool_get_attribute_8791500781761:
+		j end_get_attribute_8767745754302
+		bool_get_attribute_8767745754302:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2400,10 +2408,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 76($sp)
-		j end_get_attribute_8791500781761
-		object_get_attribute_8791500781761:
+		j end_get_attribute_8767745754302
+		object_get_attribute_8767745754302:
 		sw $t1, 76($sp)
-		end_get_attribute_8791500781761:
+		end_get_attribute_8767745754302:
 		
 		# ALLOCATING INT -> 5
 		li $v0, 9
@@ -2451,10 +2459,10 @@
 		lw $t0, 72($sp)
 		sw $t0, 96($sp)
 		
-		# JUMP TO endif_8791500795877
-		j endif_8791500795877
+		# JUMP TO endif_8767745768439
+		j endif_8767745768439
 		
-		else_8791500795877:
+		else_8767745768439:
 		
 		# GET ATTRIBUTE x OF self
 		lw $t0, 100($sp)
@@ -2464,11 +2472,11 @@
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_get_attribute_8791500782150
+		beq $t6, $t5, int_get_attribute_8767745754947
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_get_attribute_8791500782150
-		j object_get_attribute_8791500782150
-		int_get_attribute_8791500782150:
+		beq $t6, $t5, bool_get_attribute_8767745754947
+		j object_get_attribute_8767745754947
+		int_get_attribute_8767745754947:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2477,8 +2485,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 60($sp)
-		j end_get_attribute_8791500782150
-		bool_get_attribute_8791500782150:
+		j end_get_attribute_8767745754947
+		bool_get_attribute_8767745754947:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2487,10 +2495,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 60($sp)
-		j end_get_attribute_8791500782150
-		object_get_attribute_8791500782150:
+		j end_get_attribute_8767745754947
+		object_get_attribute_8767745754947:
 		sw $t1, 60($sp)
-		end_get_attribute_8791500782150:
+		end_get_attribute_8767745754947:
 		
 		# ALLOCATING INT -> 5
 		li $v0, 9
@@ -2602,11 +2610,11 @@
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_get_attribute_8791500782240
+		beq $t6, $t5, int_get_attribute_8767745755037
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_get_attribute_8791500782240
-		j object_get_attribute_8791500782240
-		int_get_attribute_8791500782240:
+		beq $t6, $t5, bool_get_attribute_8767745755037
+		j object_get_attribute_8767745755037
+		int_get_attribute_8767745755037:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2615,8 +2623,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 28($sp)
-		j end_get_attribute_8791500782240
-		bool_get_attribute_8791500782240:
+		j end_get_attribute_8767745755037
+		bool_get_attribute_8767745755037:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2625,10 +2633,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 28($sp)
-		j end_get_attribute_8791500782240
-		object_get_attribute_8791500782240:
+		j end_get_attribute_8767745755037
+		object_get_attribute_8767745755037:
 		sw $t1, 28($sp)
-		end_get_attribute_8791500782240:
+		end_get_attribute_8767745755037:
 		
 		# ALLOCATING INT -> 5
 		li $v0, 9
@@ -2736,10 +2744,10 @@
 		lw $t0, 8($sp)
 		sw $t0, 96($sp)
 		
-		# JUMP TO endif_8791500795877
-		j endif_8791500795877
+		# JUMP TO endif_8767745768439
+		j endif_8767745768439
 		
-		endif_8791500795877:
+		endif_8767745768439:
 		
 		lw $v1, 96($sp)
 		
@@ -2760,11 +2768,11 @@
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_get_attribute_8791500783159
+		beq $t6, $t5, int_get_attribute_8767745755444
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_get_attribute_8791500783159
-		j object_get_attribute_8791500783159
-		int_get_attribute_8791500783159:
+		beq $t6, $t5, bool_get_attribute_8767745755444
+		j object_get_attribute_8767745755444
+		int_get_attribute_8767745755444:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2773,8 +2781,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 44($sp)
-		j end_get_attribute_8791500783159
-		bool_get_attribute_8791500783159:
+		j end_get_attribute_8767745755444
+		bool_get_attribute_8767745755444:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2783,10 +2791,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 44($sp)
-		j end_get_attribute_8791500783159
-		object_get_attribute_8791500783159:
+		j end_get_attribute_8767745755444
+		object_get_attribute_8767745755444:
 		sw $t1, 44($sp)
-		end_get_attribute_8791500783159:
+		end_get_attribute_8767745755444:
 		
 		# GET ATTRIBUTE x OF self
 		lw $t0, 48($sp)
@@ -2796,11 +2804,11 @@
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_get_attribute_8791500783186
+		beq $t6, $t5, int_get_attribute_8767745755471
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_get_attribute_8791500783186
-		j object_get_attribute_8791500783186
-		int_get_attribute_8791500783186:
+		beq $t6, $t5, bool_get_attribute_8767745755471
+		j object_get_attribute_8767745755471
+		int_get_attribute_8767745755471:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2809,8 +2817,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 40($sp)
-		j end_get_attribute_8791500783186
-		bool_get_attribute_8791500783186:
+		j end_get_attribute_8767745755471
+		bool_get_attribute_8767745755471:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2819,10 +2827,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 40($sp)
-		j end_get_attribute_8791500783186
-		object_get_attribute_8791500783186:
+		j end_get_attribute_8767745755471
+		object_get_attribute_8767745755471:
 		sw $t1, 40($sp)
-		end_get_attribute_8791500783186:
+		end_get_attribute_8767745755471:
 		
 		# ALLOCATING INT -> 1
 		li $v0, 9
@@ -2922,11 +2930,11 @@
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_get_attribute_8791500783285
+		beq $t6, $t5, int_get_attribute_8767745755570
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_get_attribute_8791500783285
-		j object_get_attribute_8791500783285
-		int_get_attribute_8791500783285:
+		beq $t6, $t5, bool_get_attribute_8767745755570
+		j object_get_attribute_8767745755570
+		int_get_attribute_8767745755570:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2935,8 +2943,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 20($sp)
-		j end_get_attribute_8791500783285
-		bool_get_attribute_8791500783285:
+		j end_get_attribute_8767745755570
+		bool_get_attribute_8767745755570:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2945,10 +2953,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 20($sp)
-		j end_get_attribute_8791500783285
-		object_get_attribute_8791500783285:
+		j end_get_attribute_8767745755570
+		object_get_attribute_8767745755570:
 		sw $t1, 20($sp)
-		end_get_attribute_8791500783285:
+		end_get_attribute_8767745755570:
 		
 		# GET ATTRIBUTE y OF self
 		lw $t0, 48($sp)
@@ -2958,11 +2966,11 @@
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_get_attribute_8791500783312
+		beq $t6, $t5, int_get_attribute_8767745755597
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_get_attribute_8791500783312
-		j object_get_attribute_8791500783312
-		int_get_attribute_8791500783312:
+		beq $t6, $t5, bool_get_attribute_8767745755597
+		j object_get_attribute_8767745755597
+		int_get_attribute_8767745755597:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2971,8 +2979,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 16($sp)
-		j end_get_attribute_8791500783312
-		bool_get_attribute_8791500783312:
+		j end_get_attribute_8767745755597
+		bool_get_attribute_8767745755597:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -2981,10 +2989,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 16($sp)
-		j end_get_attribute_8791500783312
-		object_get_attribute_8791500783312:
+		j end_get_attribute_8767745755597
+		object_get_attribute_8767745755597:
 		sw $t1, 16($sp)
-		end_get_attribute_8791500783312:
+		end_get_attribute_8767745755597:
 		
 		# ALLOCATING INT -> 1
 		li $v0, 9
@@ -3095,11 +3103,11 @@
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_get_attribute_8791500783945
+		beq $t6, $t5, int_get_attribute_8767745756486
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_get_attribute_8791500783945
-		j object_get_attribute_8791500783945
-		int_get_attribute_8791500783945:
+		beq $t6, $t5, bool_get_attribute_8767745756486
+		j object_get_attribute_8767745756486
+		int_get_attribute_8767745756486:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3108,8 +3116,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 20($sp)
-		j end_get_attribute_8791500783945
-		bool_get_attribute_8791500783945:
+		j end_get_attribute_8767745756486
+		bool_get_attribute_8767745756486:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3118,10 +3126,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 20($sp)
-		j end_get_attribute_8791500783945
-		object_get_attribute_8791500783945:
+		j end_get_attribute_8767745756486
+		object_get_attribute_8767745756486:
 		sw $t1, 20($sp)
-		end_get_attribute_8791500783945:
+		end_get_attribute_8767745756486:
 		
 		# GET ATTRIBUTE y OF self
 		lw $t0, 24($sp)
@@ -3131,11 +3139,11 @@
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_get_attribute_8791500783972
+		beq $t6, $t5, int_get_attribute_8767745756513
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_get_attribute_8791500783972
-		j object_get_attribute_8791500783972
-		int_get_attribute_8791500783972:
+		beq $t6, $t5, bool_get_attribute_8767745756513
+		j object_get_attribute_8767745756513
+		int_get_attribute_8767745756513:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3144,8 +3152,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 16($sp)
-		j end_get_attribute_8791500783972
-		bool_get_attribute_8791500783972:
+		j end_get_attribute_8767745756513
+		bool_get_attribute_8767745756513:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3154,10 +3162,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 16($sp)
-		j end_get_attribute_8791500783972
-		object_get_attribute_8791500783972:
+		j end_get_attribute_8767745756513
+		object_get_attribute_8767745756513:
 		sw $t1, 16($sp)
-		end_get_attribute_8791500783972:
+		end_get_attribute_8767745756513:
 		
 		# ALLOCATING INT -> 1
 		li $v0, 9
@@ -3268,11 +3276,11 @@
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_get_attribute_8791500784089
+		beq $t6, $t5, int_get_attribute_8767745756630
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_get_attribute_8791500784089
-		j object_get_attribute_8791500784089
-		int_get_attribute_8791500784089:
+		beq $t6, $t5, bool_get_attribute_8767745756630
+		j object_get_attribute_8767745756630
+		int_get_attribute_8767745756630:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3281,8 +3289,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 20($sp)
-		j end_get_attribute_8791500784089
-		bool_get_attribute_8791500784089:
+		j end_get_attribute_8767745756630
+		bool_get_attribute_8767745756630:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3291,10 +3299,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 20($sp)
-		j end_get_attribute_8791500784089
-		object_get_attribute_8791500784089:
+		j end_get_attribute_8767745756630
+		object_get_attribute_8767745756630:
 		sw $t1, 20($sp)
-		end_get_attribute_8791500784089:
+		end_get_attribute_8767745756630:
 		
 		# GET ATTRIBUTE x OF self
 		lw $t0, 24($sp)
@@ -3304,11 +3312,11 @@
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_get_attribute_8791500784116
+		beq $t6, $t5, int_get_attribute_8767745756657
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_get_attribute_8791500784116
-		j object_get_attribute_8791500784116
-		int_get_attribute_8791500784116:
+		beq $t6, $t5, bool_get_attribute_8767745756657
+		j object_get_attribute_8767745756657
+		int_get_attribute_8767745756657:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3317,8 +3325,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 16($sp)
-		j end_get_attribute_8791500784116
-		bool_get_attribute_8791500784116:
+		j end_get_attribute_8767745756657
+		bool_get_attribute_8767745756657:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3327,10 +3335,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 16($sp)
-		j end_get_attribute_8791500784116
-		object_get_attribute_8791500784116:
+		j end_get_attribute_8767745756657
+		object_get_attribute_8767745756657:
 		sw $t1, 16($sp)
-		end_get_attribute_8791500784116:
+		end_get_attribute_8767745756657:
 		
 		# ALLOCATING INT -> 1
 		li $v0, 9
@@ -3453,11 +3461,11 @@
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_get_attribute_8791500784264
+		beq $t6, $t5, int_get_attribute_8767745756805
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_get_attribute_8791500784264
-		j object_get_attribute_8791500784264
-		int_get_attribute_8791500784264:
+		beq $t6, $t5, bool_get_attribute_8767745756805
+		j object_get_attribute_8767745756805
+		int_get_attribute_8767745756805:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3466,8 +3474,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 56($sp)
-		j end_get_attribute_8791500784264
-		bool_get_attribute_8791500784264:
+		j end_get_attribute_8767745756805
+		bool_get_attribute_8767745756805:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3476,10 +3484,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 56($sp)
-		j end_get_attribute_8791500784264
-		object_get_attribute_8791500784264:
+		j end_get_attribute_8767745756805
+		object_get_attribute_8767745756805:
 		sw $t1, 56($sp)
-		end_get_attribute_8791500784264:
+		end_get_attribute_8767745756805:
 		
 		# ALLOCATING INT -> 14
 		li $v0, 9
@@ -3541,16 +3549,16 @@
 		lw $t0, 40($sp)
 		sw $t0, 60($sp)
 		
-		# IF internal_1 THEN GOTO then_8791500797094
+		# IF internal_1 THEN GOTO then_8767745769635
 		lw $t0, 60($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8791500797094
+		beq $t0, $t1, then_8767745769635
 		
-		# JUMP TO else_8791500797094
-		j else_8791500797094
+		# JUMP TO else_8767745769635
+		j else_8767745769635
 		
-		then_8791500797094:
+		then_8767745769635:
 		
 		# ALLOCATING BOOL -> 0
 		li $v0, 9
@@ -3572,11 +3580,11 @@
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_get_attribute_8791500784933
+		beq $t6, $t5, int_get_attribute_8767745757474
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_get_attribute_8791500784933
-		j object_get_attribute_8791500784933
-		int_get_attribute_8791500784933:
+		beq $t6, $t5, bool_get_attribute_8767745757474
+		j object_get_attribute_8767745757474
+		int_get_attribute_8767745757474:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3585,8 +3593,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 28($sp)
-		j end_get_attribute_8791500784933
-		bool_get_attribute_8791500784933:
+		j end_get_attribute_8767745757474
+		bool_get_attribute_8767745757474:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3595,10 +3603,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 28($sp)
-		j end_get_attribute_8791500784933
-		object_get_attribute_8791500784933:
+		j end_get_attribute_8767745757474
+		object_get_attribute_8767745757474:
 		sw $t1, 28($sp)
-		end_get_attribute_8791500784933:
+		end_get_attribute_8767745757474:
 		
 		# ALLOCATING INT -> 15
 		li $v0, 9
@@ -3660,16 +3668,16 @@
 		lw $t0, 12($sp)
 		sw $t0, 32($sp)
 		
-		# IF internal_8 THEN GOTO then_8791500797703
+		# IF internal_8 THEN GOTO then_8767745770500
 		lw $t0, 32($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8791500797703
+		beq $t0, $t1, then_8767745770500
 		
-		# JUMP TO else_8791500797703
-		j else_8791500797703
+		# JUMP TO else_8767745770500
+		j else_8767745770500
 		
-		then_8791500797703:
+		then_8767745770500:
 		
 		# ALLOCATING BOOL -> 1
 		li $v0, 9
@@ -3687,10 +3695,10 @@
 		lw $t0, 8($sp)
 		sw $t0, 36($sp)
 		
-		# JUMP TO endif_8791500797703
-		j endif_8791500797703
+		# JUMP TO endif_8767745770500
+		j endif_8767745770500
 		
-		else_8791500797703:
+		else_8767745770500:
 		
 		# ALLOCATING BOOL -> 0
 		li $v0, 9
@@ -3708,19 +3716,19 @@
 		lw $t0, 4($sp)
 		sw $t0, 36($sp)
 		
-		# JUMP TO endif_8791500797703
-		j endif_8791500797703
+		# JUMP TO endif_8767745770500
+		j endif_8767745770500
 		
-		endif_8791500797703:
+		endif_8767745770500:
 		
 		# internal_0 <- internal_7
 		lw $t0, 36($sp)
 		sw $t0, 64($sp)
 		
-		# JUMP TO endif_8791500797094
-		j endif_8791500797094
+		# JUMP TO endif_8767745769635
+		j endif_8767745769635
 		
-		else_8791500797094:
+		else_8767745769635:
 		
 		# ALLOCATING BOOL -> 0
 		li $v0, 9
@@ -3738,10 +3746,10 @@
 		lw $t0, 0($sp)
 		sw $t0, 64($sp)
 		
-		# JUMP TO endif_8791500797094
-		j endif_8791500797094
+		# JUMP TO endif_8767745769635
+		j endif_8767745769635
 		
-		endif_8791500797094:
+		endif_8767745769635:
 		
 		lw $v1, 64($sp)
 		
@@ -3762,11 +3770,11 @@
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_get_attribute_8791500785412
+		beq $t6, $t5, int_get_attribute_8767745757693
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_get_attribute_8791500785412
-		j object_get_attribute_8791500785412
-		int_get_attribute_8791500785412:
+		beq $t6, $t5, bool_get_attribute_8767745757693
+		j object_get_attribute_8767745757693
+		int_get_attribute_8767745757693:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3775,8 +3783,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 0($sp)
-		j end_get_attribute_8791500785412
-		bool_get_attribute_8791500785412:
+		j end_get_attribute_8767745757693
+		bool_get_attribute_8767745757693:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3785,10 +3793,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 0($sp)
-		j end_get_attribute_8791500785412
-		object_get_attribute_8791500785412:
+		j end_get_attribute_8767745757693
+		object_get_attribute_8767745757693:
 		sw $t1, 0($sp)
-		end_get_attribute_8791500785412:
+		end_get_attribute_8767745757693:
 		
 		lw $v1, 0($sp)
 		
@@ -3809,11 +3817,11 @@
 		la $t4, type_Bool
 		addi $t5, $zero, 1
 		seq $t6, $t2, $t3
-		beq $t6, $t5, int_get_attribute_8791500785442
+		beq $t6, $t5, int_get_attribute_8767745757983
 		seq $t6, $t2, $t4
-		beq $t6, $t5, bool_get_attribute_8791500785442
-		j object_get_attribute_8791500785442
-		int_get_attribute_8791500785442:
+		beq $t6, $t5, bool_get_attribute_8767745757983
+		j object_get_attribute_8767745757983
+		int_get_attribute_8767745757983:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3822,8 +3830,8 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 0($sp)
-		j end_get_attribute_8791500785442
-		bool_get_attribute_8791500785442:
+		j end_get_attribute_8767745757983
+		bool_get_attribute_8767745757983:
 		li $v0, 9
 		addi $a0, $zero, 12
 		syscall
@@ -3832,10 +3840,10 @@
 		lw $t5, 8($t1)
 		sw $t5, 8($v0)
 		sw $v0, 0($sp)
-		j end_get_attribute_8791500785442
-		object_get_attribute_8791500785442:
+		j end_get_attribute_8767745757983
+		object_get_attribute_8767745757983:
 		sw $t1, 0($sp)
-		end_get_attribute_8791500785442:
+		end_get_attribute_8767745757983:
 		
 		lw $v1, 0($sp)
 		

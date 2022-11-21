@@ -4,6 +4,10 @@
 	# DATA SECTION #
 	################
 
+	####################
+	# Types declaration #
+	####################
+
 	type_Object: .word 24
 	type_Object_inherits_from: .word 0
 	type_Object_name_address: .word type_Object_name_size
@@ -105,8 +109,12 @@
 .text
 	
 	################
-	# TEXT SECTION #
+	# Functions declaration #
 	################
+
+	#########################
+	# Functions declaration #
+	#########################
 
 	function_add:
 		# SPACE FOR LOCAL VARIABLES
@@ -1368,16 +1376,16 @@
 		lw $t0, 200($sp)
 		sw $t0, 208($sp)
 		
-		# IF internal_1 THEN GOTO then_8771787125694
+		# IF internal_1 THEN GOTO then_8773056377022
 		lw $t0, 208($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8771787125694
+		beq $t0, $t1, then_8773056377022
 		
-		# JUMP TO else_8771787125694
-		j else_8771787125694
+		# JUMP TO else_8773056377022
+		j else_8773056377022
 		
-		then_8771787125694:
+		then_8773056377022:
 		
 		# ALLOCATING INT -> 0
 		li $v0, 9
@@ -1395,10 +1403,10 @@
 		lw $t0, 196($sp)
 		sw $t0, 212($sp)
 		
-		# JUMP TO endif_8771787125694
-		j endif_8771787125694
+		# JUMP TO endif_8773056377022
+		j endif_8773056377022
 		
-		else_8771787125694:
+		else_8773056377022:
 		
 		# ALLOCATING BOOL -> 0
 		li $v0, 9
@@ -1452,16 +1460,16 @@
 		lw $t0, 180($sp)
 		sw $t0, 188($sp)
 		
-		# IF internal_6 THEN GOTO then_8771787125748
+		# IF internal_6 THEN GOTO then_8773056377076
 		lw $t0, 188($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8771787125748
+		beq $t0, $t1, then_8773056377076
 		
-		# JUMP TO else_8771787125748
-		j else_8771787125748
+		# JUMP TO else_8773056377076
+		j else_8773056377076
 		
-		then_8771787125748:
+		then_8773056377076:
 		
 		# ALLOCATING INT -> 1
 		li $v0, 9
@@ -1479,10 +1487,10 @@
 		lw $t0, 176($sp)
 		sw $t0, 192($sp)
 		
-		# JUMP TO endif_8771787125748
-		j endif_8771787125748
+		# JUMP TO endif_8773056377076
+		j endif_8773056377076
 		
-		else_8771787125748:
+		else_8773056377076:
 		
 		# ALLOCATING BOOL -> 0
 		li $v0, 9
@@ -1536,16 +1544,16 @@
 		lw $t0, 160($sp)
 		sw $t0, 168($sp)
 		
-		# IF internal_11 THEN GOTO then_8771787126574
+		# IF internal_11 THEN GOTO then_8773056377902
 		lw $t0, 168($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8771787126574
+		beq $t0, $t1, then_8773056377902
 		
-		# JUMP TO else_8771787126574
-		j else_8771787126574
+		# JUMP TO else_8773056377902
+		j else_8773056377902
 		
-		then_8771787126574:
+		then_8773056377902:
 		
 		# ALLOCATING INT -> 2
 		li $v0, 9
@@ -1563,10 +1571,10 @@
 		lw $t0, 156($sp)
 		sw $t0, 172($sp)
 		
-		# JUMP TO endif_8771787126574
-		j endif_8771787126574
+		# JUMP TO endif_8773056377902
+		j endif_8773056377902
 		
-		else_8771787126574:
+		else_8773056377902:
 		
 		# ALLOCATING BOOL -> 0
 		li $v0, 9
@@ -1620,16 +1628,16 @@
 		lw $t0, 140($sp)
 		sw $t0, 148($sp)
 		
-		# IF internal_16 THEN GOTO then_8771787126628
+		# IF internal_16 THEN GOTO then_8773056377956
 		lw $t0, 148($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8771787126628
+		beq $t0, $t1, then_8773056377956
 		
-		# JUMP TO else_8771787126628
-		j else_8771787126628
+		# JUMP TO else_8773056377956
+		j else_8773056377956
 		
-		then_8771787126628:
+		then_8773056377956:
 		
 		# ALLOCATING INT -> 3
 		li $v0, 9
@@ -1647,10 +1655,10 @@
 		lw $t0, 136($sp)
 		sw $t0, 152($sp)
 		
-		# JUMP TO endif_8771787126628
-		j endif_8771787126628
+		# JUMP TO endif_8773056377956
+		j endif_8773056377956
 		
-		else_8771787126628:
+		else_8773056377956:
 		
 		# ALLOCATING BOOL -> 0
 		li $v0, 9
@@ -1704,16 +1712,16 @@
 		lw $t0, 120($sp)
 		sw $t0, 128($sp)
 		
-		# IF internal_21 THEN GOTO then_8771787126682
+		# IF internal_21 THEN GOTO then_8773056378010
 		lw $t0, 128($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8771787126682
+		beq $t0, $t1, then_8773056378010
 		
-		# JUMP TO else_8771787126682
-		j else_8771787126682
+		# JUMP TO else_8773056378010
+		j else_8773056378010
 		
-		then_8771787126682:
+		then_8773056378010:
 		
 		# ALLOCATING INT -> 4
 		li $v0, 9
@@ -1731,10 +1739,10 @@
 		lw $t0, 116($sp)
 		sw $t0, 132($sp)
 		
-		# JUMP TO endif_8771787126682
-		j endif_8771787126682
+		# JUMP TO endif_8773056378010
+		j endif_8773056378010
 		
-		else_8771787126682:
+		else_8773056378010:
 		
 		# ALLOCATING BOOL -> 0
 		li $v0, 9
@@ -1788,16 +1796,16 @@
 		lw $t0, 100($sp)
 		sw $t0, 108($sp)
 		
-		# IF internal_26 THEN GOTO then_8771787126736
+		# IF internal_26 THEN GOTO then_8773056378064
 		lw $t0, 108($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8771787126736
+		beq $t0, $t1, then_8773056378064
 		
-		# JUMP TO else_8771787126736
-		j else_8771787126736
+		# JUMP TO else_8773056378064
+		j else_8773056378064
 		
-		then_8771787126736:
+		then_8773056378064:
 		
 		# ALLOCATING INT -> 5
 		li $v0, 9
@@ -1815,10 +1823,10 @@
 		lw $t0, 96($sp)
 		sw $t0, 112($sp)
 		
-		# JUMP TO endif_8771787126736
-		j endif_8771787126736
+		# JUMP TO endif_8773056378064
+		j endif_8773056378064
 		
-		else_8771787126736:
+		else_8773056378064:
 		
 		# ALLOCATING BOOL -> 0
 		li $v0, 9
@@ -1872,16 +1880,16 @@
 		lw $t0, 80($sp)
 		sw $t0, 88($sp)
 		
-		# IF internal_31 THEN GOTO then_8771787127050
+		# IF internal_31 THEN GOTO then_8773056378378
 		lw $t0, 88($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8771787127050
+		beq $t0, $t1, then_8773056378378
 		
-		# JUMP TO else_8771787127050
-		j else_8771787127050
+		# JUMP TO else_8773056378378
+		j else_8773056378378
 		
-		then_8771787127050:
+		then_8773056378378:
 		
 		# ALLOCATING INT -> 6
 		li $v0, 9
@@ -1899,10 +1907,10 @@
 		lw $t0, 76($sp)
 		sw $t0, 92($sp)
 		
-		# JUMP TO endif_8771787127050
-		j endif_8771787127050
+		# JUMP TO endif_8773056378378
+		j endif_8773056378378
 		
-		else_8771787127050:
+		else_8773056378378:
 		
 		# ALLOCATING BOOL -> 0
 		li $v0, 9
@@ -1956,16 +1964,16 @@
 		lw $t0, 60($sp)
 		sw $t0, 68($sp)
 		
-		# IF internal_36 THEN GOTO then_8771787127104
+		# IF internal_36 THEN GOTO then_8773056378432
 		lw $t0, 68($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8771787127104
+		beq $t0, $t1, then_8773056378432
 		
-		# JUMP TO else_8771787127104
-		j else_8771787127104
+		# JUMP TO else_8773056378432
+		j else_8773056378432
 		
-		then_8771787127104:
+		then_8773056378432:
 		
 		# ALLOCATING INT -> 7
 		li $v0, 9
@@ -1983,10 +1991,10 @@
 		lw $t0, 56($sp)
 		sw $t0, 72($sp)
 		
-		# JUMP TO endif_8771787127104
-		j endif_8771787127104
+		# JUMP TO endif_8773056378432
+		j endif_8773056378432
 		
-		else_8771787127104:
+		else_8773056378432:
 		
 		# ALLOCATING BOOL -> 0
 		li $v0, 9
@@ -2040,16 +2048,16 @@
 		lw $t0, 40($sp)
 		sw $t0, 48($sp)
 		
-		# IF internal_41 THEN GOTO then_8771787127158
+		# IF internal_41 THEN GOTO then_8773056378486
 		lw $t0, 48($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8771787127158
+		beq $t0, $t1, then_8773056378486
 		
-		# JUMP TO else_8771787127158
-		j else_8771787127158
+		# JUMP TO else_8773056378486
+		j else_8773056378486
 		
-		then_8771787127158:
+		then_8773056378486:
 		
 		# ALLOCATING INT -> 8
 		li $v0, 9
@@ -2067,10 +2075,10 @@
 		lw $t0, 36($sp)
 		sw $t0, 52($sp)
 		
-		# JUMP TO endif_8771787127158
-		j endif_8771787127158
+		# JUMP TO endif_8773056378486
+		j endif_8773056378486
 		
-		else_8771787127158:
+		else_8773056378486:
 		
 		# ALLOCATING BOOL -> 0
 		li $v0, 9
@@ -2124,16 +2132,16 @@
 		lw $t0, 20($sp)
 		sw $t0, 28($sp)
 		
-		# IF internal_46 THEN GOTO then_8771787127212
+		# IF internal_46 THEN GOTO then_8773056378540
 		lw $t0, 28($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8771787127212
+		beq $t0, $t1, then_8773056378540
 		
-		# JUMP TO else_8771787127212
-		j else_8771787127212
+		# JUMP TO else_8773056378540
+		j else_8773056378540
 		
-		then_8771787127212:
+		then_8773056378540:
 		
 		# ALLOCATING INT -> 9
 		li $v0, 9
@@ -2151,10 +2159,10 @@
 		lw $t0, 16($sp)
 		sw $t0, 32($sp)
 		
-		# JUMP TO endif_8771787127212
-		j endif_8771787127212
+		# JUMP TO endif_8773056378540
+		j endif_8773056378540
 		
-		else_8771787127212:
+		else_8773056378540:
 		
 		# ALLOCATING INT -> 1
 		li $v0, 9
@@ -2210,91 +2218,91 @@
 		lw $t0, 0($sp)
 		sw $t0, 32($sp)
 		
-		# JUMP TO endif_8771787127212
-		j endif_8771787127212
+		# JUMP TO endif_8773056378540
+		j endif_8773056378540
 		
-		endif_8771787127212:
+		endif_8773056378540:
 		
 		# internal_40 <- internal_45
 		lw $t0, 32($sp)
 		sw $t0, 52($sp)
 		
-		# JUMP TO endif_8771787127158
-		j endif_8771787127158
+		# JUMP TO endif_8773056378486
+		j endif_8773056378486
 		
-		endif_8771787127158:
+		endif_8773056378486:
 		
 		# internal_35 <- internal_40
 		lw $t0, 52($sp)
 		sw $t0, 72($sp)
 		
-		# JUMP TO endif_8771787127104
-		j endif_8771787127104
+		# JUMP TO endif_8773056378432
+		j endif_8773056378432
 		
-		endif_8771787127104:
+		endif_8773056378432:
 		
 		# internal_30 <- internal_35
 		lw $t0, 72($sp)
 		sw $t0, 92($sp)
 		
-		# JUMP TO endif_8771787127050
-		j endif_8771787127050
+		# JUMP TO endif_8773056378378
+		j endif_8773056378378
 		
-		endif_8771787127050:
+		endif_8773056378378:
 		
 		# internal_25 <- internal_30
 		lw $t0, 92($sp)
 		sw $t0, 112($sp)
 		
-		# JUMP TO endif_8771787126736
-		j endif_8771787126736
+		# JUMP TO endif_8773056378064
+		j endif_8773056378064
 		
-		endif_8771787126736:
+		endif_8773056378064:
 		
 		# internal_20 <- internal_25
 		lw $t0, 112($sp)
 		sw $t0, 132($sp)
 		
-		# JUMP TO endif_8771787126682
-		j endif_8771787126682
+		# JUMP TO endif_8773056378010
+		j endif_8773056378010
 		
-		endif_8771787126682:
+		endif_8773056378010:
 		
 		# internal_15 <- internal_20
 		lw $t0, 132($sp)
 		sw $t0, 152($sp)
 		
-		# JUMP TO endif_8771787126628
-		j endif_8771787126628
+		# JUMP TO endif_8773056377956
+		j endif_8773056377956
 		
-		endif_8771787126628:
+		endif_8773056377956:
 		
 		# internal_10 <- internal_15
 		lw $t0, 152($sp)
 		sw $t0, 172($sp)
 		
-		# JUMP TO endif_8771787126574
-		j endif_8771787126574
+		# JUMP TO endif_8773056377902
+		j endif_8773056377902
 		
-		endif_8771787126574:
+		endif_8773056377902:
 		
 		# internal_5 <- internal_10
 		lw $t0, 172($sp)
 		sw $t0, 192($sp)
 		
-		# JUMP TO endif_8771787125748
-		j endif_8771787125748
+		# JUMP TO endif_8773056377076
+		j endif_8773056377076
 		
-		endif_8771787125748:
+		endif_8773056377076:
 		
 		# internal_0 <- internal_5
 		lw $t0, 192($sp)
 		sw $t0, 212($sp)
 		
-		# JUMP TO endif_8771787125694
-		j endif_8771787125694
+		# JUMP TO endif_8773056377022
+		j endif_8773056377022
 		
-		endif_8771787125694:
+		endif_8773056377022:
 		
 		lw $v1, 212($sp)
 		
@@ -2353,16 +2361,16 @@
 		lw $t0, 200($sp)
 		sw $t0, 208($sp)
 		
-		# IF internal_1 THEN GOTO then_8771787126547
+		# IF internal_1 THEN GOTO then_8773056377875
 		lw $t0, 208($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8771787126547
+		beq $t0, $t1, then_8773056377875
 		
-		# JUMP TO else_8771787126547
-		j else_8771787126547
+		# JUMP TO else_8773056377875
+		j else_8773056377875
 		
-		then_8771787126547:
+		then_8773056377875:
 		
 		# ALLOCATING STRING
 		li $v0, 9
@@ -2386,10 +2394,10 @@
 		lw $t0, 196($sp)
 		sw $t0, 212($sp)
 		
-		# JUMP TO endif_8771787126547
-		j endif_8771787126547
+		# JUMP TO endif_8773056377875
+		j endif_8773056377875
 		
-		else_8771787126547:
+		else_8773056377875:
 		
 		# ALLOCATING BOOL -> 0
 		li $v0, 9
@@ -2437,16 +2445,16 @@
 		lw $t0, 180($sp)
 		sw $t0, 188($sp)
 		
-		# IF internal_6 THEN GOTO then_8771787126637
+		# IF internal_6 THEN GOTO then_8773056377965
 		lw $t0, 188($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8771787126637
+		beq $t0, $t1, then_8773056377965
 		
-		# JUMP TO else_8771787126637
-		j else_8771787126637
+		# JUMP TO else_8773056377965
+		j else_8773056377965
 		
-		then_8771787126637:
+		then_8773056377965:
 		
 		# ALLOCATING STRING
 		li $v0, 9
@@ -2470,10 +2478,10 @@
 		lw $t0, 176($sp)
 		sw $t0, 192($sp)
 		
-		# JUMP TO endif_8771787126637
-		j endif_8771787126637
+		# JUMP TO endif_8773056377965
+		j endif_8773056377965
 		
-		else_8771787126637:
+		else_8773056377965:
 		
 		# ALLOCATING BOOL -> 0
 		li $v0, 9
@@ -2521,16 +2529,16 @@
 		lw $t0, 160($sp)
 		sw $t0, 168($sp)
 		
-		# IF internal_11 THEN GOTO then_8771787127182
+		# IF internal_11 THEN GOTO then_8773056378510
 		lw $t0, 168($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8771787127182
+		beq $t0, $t1, then_8773056378510
 		
-		# JUMP TO else_8771787127182
-		j else_8771787127182
+		# JUMP TO else_8773056378510
+		j else_8773056378510
 		
-		then_8771787127182:
+		then_8773056378510:
 		
 		# ALLOCATING STRING
 		li $v0, 9
@@ -2554,10 +2562,10 @@
 		lw $t0, 156($sp)
 		sw $t0, 172($sp)
 		
-		# JUMP TO endif_8771787127182
-		j endif_8771787127182
+		# JUMP TO endif_8773056378510
+		j endif_8773056378510
 		
-		else_8771787127182:
+		else_8773056378510:
 		
 		# ALLOCATING BOOL -> 0
 		li $v0, 9
@@ -2605,16 +2613,16 @@
 		lw $t0, 140($sp)
 		sw $t0, 148($sp)
 		
-		# IF internal_16 THEN GOTO then_8771787127239
+		# IF internal_16 THEN GOTO then_8773056378567
 		lw $t0, 148($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8771787127239
+		beq $t0, $t1, then_8773056378567
 		
-		# JUMP TO else_8771787127239
-		j else_8771787127239
+		# JUMP TO else_8773056378567
+		j else_8773056378567
 		
-		then_8771787127239:
+		then_8773056378567:
 		
 		# ALLOCATING STRING
 		li $v0, 9
@@ -2638,10 +2646,10 @@
 		lw $t0, 136($sp)
 		sw $t0, 152($sp)
 		
-		# JUMP TO endif_8771787127239
-		j endif_8771787127239
+		# JUMP TO endif_8773056378567
+		j endif_8773056378567
 		
-		else_8771787127239:
+		else_8773056378567:
 		
 		# ALLOCATING BOOL -> 0
 		li $v0, 9
@@ -2689,16 +2697,16 @@
 		lw $t0, 120($sp)
 		sw $t0, 128($sp)
 		
-		# IF internal_21 THEN GOTO then_8771787127272
+		# IF internal_21 THEN GOTO then_8773056378600
 		lw $t0, 128($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8771787127272
+		beq $t0, $t1, then_8773056378600
 		
-		# JUMP TO else_8771787127272
-		j else_8771787127272
+		# JUMP TO else_8773056378600
+		j else_8773056378600
 		
-		then_8771787127272:
+		then_8773056378600:
 		
 		# ALLOCATING STRING
 		li $v0, 9
@@ -2722,10 +2730,10 @@
 		lw $t0, 116($sp)
 		sw $t0, 132($sp)
 		
-		# JUMP TO endif_8771787127272
-		j endif_8771787127272
+		# JUMP TO endif_8773056378600
+		j endif_8773056378600
 		
-		else_8771787127272:
+		else_8773056378600:
 		
 		# ALLOCATING BOOL -> 0
 		li $v0, 9
@@ -2773,16 +2781,16 @@
 		lw $t0, 100($sp)
 		sw $t0, 108($sp)
 		
-		# IF internal_26 THEN GOTO then_8771787127586
+		# IF internal_26 THEN GOTO then_8773056378914
 		lw $t0, 108($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8771787127586
+		beq $t0, $t1, then_8773056378914
 		
-		# JUMP TO else_8771787127586
-		j else_8771787127586
+		# JUMP TO else_8773056378914
+		j else_8773056378914
 		
-		then_8771787127586:
+		then_8773056378914:
 		
 		# ALLOCATING STRING
 		li $v0, 9
@@ -2806,10 +2814,10 @@
 		lw $t0, 96($sp)
 		sw $t0, 112($sp)
 		
-		# JUMP TO endif_8771787127586
-		j endif_8771787127586
+		# JUMP TO endif_8773056378914
+		j endif_8773056378914
 		
-		else_8771787127586:
+		else_8773056378914:
 		
 		# ALLOCATING BOOL -> 0
 		li $v0, 9
@@ -2857,16 +2865,16 @@
 		lw $t0, 80($sp)
 		sw $t0, 88($sp)
 		
-		# IF internal_31 THEN GOTO then_8771787127640
+		# IF internal_31 THEN GOTO then_8773056378968
 		lw $t0, 88($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8771787127640
+		beq $t0, $t1, then_8773056378968
 		
-		# JUMP TO else_8771787127640
-		j else_8771787127640
+		# JUMP TO else_8773056378968
+		j else_8773056378968
 		
-		then_8771787127640:
+		then_8773056378968:
 		
 		# ALLOCATING STRING
 		li $v0, 9
@@ -2890,10 +2898,10 @@
 		lw $t0, 76($sp)
 		sw $t0, 92($sp)
 		
-		# JUMP TO endif_8771787127640
-		j endif_8771787127640
+		# JUMP TO endif_8773056378968
+		j endif_8773056378968
 		
-		else_8771787127640:
+		else_8773056378968:
 		
 		# ALLOCATING BOOL -> 0
 		li $v0, 9
@@ -2941,16 +2949,16 @@
 		lw $t0, 60($sp)
 		sw $t0, 68($sp)
 		
-		# IF internal_36 THEN GOTO then_8771787127694
+		# IF internal_36 THEN GOTO then_8773056379022
 		lw $t0, 68($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8771787127694
+		beq $t0, $t1, then_8773056379022
 		
-		# JUMP TO else_8771787127694
-		j else_8771787127694
+		# JUMP TO else_8773056379022
+		j else_8773056379022
 		
-		then_8771787127694:
+		then_8773056379022:
 		
 		# ALLOCATING STRING
 		li $v0, 9
@@ -2974,10 +2982,10 @@
 		lw $t0, 56($sp)
 		sw $t0, 72($sp)
 		
-		# JUMP TO endif_8771787127694
-		j endif_8771787127694
+		# JUMP TO endif_8773056379022
+		j endif_8773056379022
 		
-		else_8771787127694:
+		else_8773056379022:
 		
 		# ALLOCATING BOOL -> 0
 		li $v0, 9
@@ -3025,16 +3033,16 @@
 		lw $t0, 40($sp)
 		sw $t0, 48($sp)
 		
-		# IF internal_41 THEN GOTO then_8771787127748
+		# IF internal_41 THEN GOTO then_8773056379076
 		lw $t0, 48($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8771787127748
+		beq $t0, $t1, then_8773056379076
 		
-		# JUMP TO else_8771787127748
-		j else_8771787127748
+		# JUMP TO else_8773056379076
+		j else_8773056379076
 		
-		then_8771787127748:
+		then_8773056379076:
 		
 		# ALLOCATING STRING
 		li $v0, 9
@@ -3058,10 +3066,10 @@
 		lw $t0, 36($sp)
 		sw $t0, 52($sp)
 		
-		# JUMP TO endif_8771787127748
-		j endif_8771787127748
+		# JUMP TO endif_8773056379076
+		j endif_8773056379076
 		
-		else_8771787127748:
+		else_8773056379076:
 		
 		# ALLOCATING BOOL -> 0
 		li $v0, 9
@@ -3109,16 +3117,16 @@
 		lw $t0, 20($sp)
 		sw $t0, 28($sp)
 		
-		# IF internal_46 THEN GOTO then_8771787127802
+		# IF internal_46 THEN GOTO then_8773056379130
 		lw $t0, 28($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8771787127802
+		beq $t0, $t1, then_8773056379130
 		
-		# JUMP TO else_8771787127802
-		j else_8771787127802
+		# JUMP TO else_8773056379130
+		j else_8773056379130
 		
-		then_8771787127802:
+		then_8773056379130:
 		
 		# ALLOCATING STRING
 		li $v0, 9
@@ -3142,10 +3150,10 @@
 		lw $t0, 16($sp)
 		sw $t0, 32($sp)
 		
-		# JUMP TO endif_8771787127802
-		j endif_8771787127802
+		# JUMP TO endif_8773056379130
+		j endif_8773056379130
 		
-		else_8771787127802:
+		else_8773056379130:
 		
 		# ALLOCATING INT -> 1
 		li $v0, 9
@@ -3204,91 +3212,91 @@
 		lw $t0, 0($sp)
 		sw $t0, 32($sp)
 		
-		# JUMP TO endif_8771787127802
-		j endif_8771787127802
+		# JUMP TO endif_8773056379130
+		j endif_8773056379130
 		
-		endif_8771787127802:
+		endif_8773056379130:
 		
 		# internal_40 <- internal_45
 		lw $t0, 32($sp)
 		sw $t0, 52($sp)
 		
-		# JUMP TO endif_8771787127748
-		j endif_8771787127748
+		# JUMP TO endif_8773056379076
+		j endif_8773056379076
 		
-		endif_8771787127748:
+		endif_8773056379076:
 		
 		# internal_35 <- internal_40
 		lw $t0, 52($sp)
 		sw $t0, 72($sp)
 		
-		# JUMP TO endif_8771787127694
-		j endif_8771787127694
+		# JUMP TO endif_8773056379022
+		j endif_8773056379022
 		
-		endif_8771787127694:
+		endif_8773056379022:
 		
 		# internal_30 <- internal_35
 		lw $t0, 72($sp)
 		sw $t0, 92($sp)
 		
-		# JUMP TO endif_8771787127640
-		j endif_8771787127640
+		# JUMP TO endif_8773056378968
+		j endif_8773056378968
 		
-		endif_8771787127640:
+		endif_8773056378968:
 		
 		# internal_25 <- internal_30
 		lw $t0, 92($sp)
 		sw $t0, 112($sp)
 		
-		# JUMP TO endif_8771787127586
-		j endif_8771787127586
+		# JUMP TO endif_8773056378914
+		j endif_8773056378914
 		
-		endif_8771787127586:
+		endif_8773056378914:
 		
 		# internal_20 <- internal_25
 		lw $t0, 112($sp)
 		sw $t0, 132($sp)
 		
-		# JUMP TO endif_8771787127272
-		j endif_8771787127272
+		# JUMP TO endif_8773056378600
+		j endif_8773056378600
 		
-		endif_8771787127272:
+		endif_8773056378600:
 		
 		# internal_15 <- internal_20
 		lw $t0, 132($sp)
 		sw $t0, 152($sp)
 		
-		# JUMP TO endif_8771787127239
-		j endif_8771787127239
+		# JUMP TO endif_8773056378567
+		j endif_8773056378567
 		
-		endif_8771787127239:
+		endif_8773056378567:
 		
 		# internal_10 <- internal_15
 		lw $t0, 152($sp)
 		sw $t0, 172($sp)
 		
-		# JUMP TO endif_8771787127182
-		j endif_8771787127182
+		# JUMP TO endif_8773056378510
+		j endif_8773056378510
 		
-		endif_8771787127182:
+		endif_8773056378510:
 		
 		# internal_5 <- internal_10
 		lw $t0, 172($sp)
 		sw $t0, 192($sp)
 		
-		# JUMP TO endif_8771787126637
-		j endif_8771787126637
+		# JUMP TO endif_8773056377965
+		j endif_8773056377965
 		
-		endif_8771787126637:
+		endif_8773056377965:
 		
 		# internal_0 <- internal_5
 		lw $t0, 192($sp)
 		sw $t0, 212($sp)
 		
-		# JUMP TO endif_8771787126547
-		j endif_8771787126547
+		# JUMP TO endif_8773056377875
+		j endif_8773056377875
 		
-		endif_8771787126547:
+		endif_8773056377875:
 		
 		lw $v1, 212($sp)
 		
@@ -3385,16 +3393,16 @@
 		lw $t0, 196($sp)
 		sw $t0, 216($sp)
 		
-		# IF internal_1 THEN GOTO then_8771787127254
+		# IF internal_1 THEN GOTO then_8773056378582
 		lw $t0, 216($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8771787127254
+		beq $t0, $t1, then_8773056378582
 		
-		# JUMP TO else_8771787127254
-		j else_8771787127254
+		# JUMP TO else_8773056378582
+		j else_8773056378582
 		
-		then_8771787127254:
+		then_8773056378582:
 		
 		# ALLOCATING INT -> 0
 		li $v0, 9
@@ -3412,10 +3420,10 @@
 		lw $t0, 192($sp)
 		sw $t0, 220($sp)
 		
-		# JUMP TO endif_8771787127254
-		j endif_8771787127254
+		# JUMP TO endif_8773056378582
+		j endif_8773056378582
 		
-		else_8771787127254:
+		else_8773056378582:
 		
 		# ALLOCATING BOOL -> 0
 		li $v0, 9
@@ -3539,16 +3547,16 @@
 		lw $t0, 156($sp)
 		sw $t0, 184($sp)
 		
-		# IF internal_9 THEN GOTO then_8771787127287
+		# IF internal_9 THEN GOTO then_8773056378615
 		lw $t0, 184($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8771787127287
+		beq $t0, $t1, then_8773056378615
 		
-		# JUMP TO else_8771787127287
-		j else_8771787127287
+		# JUMP TO else_8773056378615
+		j else_8773056378615
 		
-		then_8771787127287:
+		then_8773056378615:
 		
 		# ALLOCATING INT -> 1
 		li $v0, 9
@@ -3794,10 +3802,10 @@
 		lw $t0, 96($sp)
 		sw $t0, 188($sp)
 		
-		# JUMP TO endif_8771787127287
-		j endif_8771787127287
+		# JUMP TO endif_8773056378615
+		j endif_8773056378615
 		
-		else_8771787127287:
+		else_8773056378615:
 		
 		# ALLOCATING BOOL -> 0
 		li $v0, 9
@@ -3921,16 +3929,16 @@
 		lw $t0, 60($sp)
 		sw $t0, 88($sp)
 		
-		# IF internal_33 THEN GOTO then_8771787127619
+		# IF internal_33 THEN GOTO then_8773056378947
 		lw $t0, 88($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8771787127619
+		beq $t0, $t1, then_8773056378947
 		
-		# JUMP TO else_8771787127619
-		j else_8771787127619
+		# JUMP TO else_8773056378947
+		j else_8773056378947
 		
-		then_8771787127619:
+		then_8773056378947:
 		
 		# ALLOCATING INT -> 1
 		li $v0, 9
@@ -4104,10 +4112,10 @@
 		lw $t0, 20($sp)
 		sw $t0, 92($sp)
 		
-		# JUMP TO endif_8771787127619
-		j endif_8771787127619
+		# JUMP TO endif_8773056378947
+		j endif_8773056378947
 		
-		else_8771787127619:
+		else_8773056378947:
 		
 		# ALLOCATING INT -> 7
 		li $v0, 9
@@ -4155,28 +4163,28 @@
 		lw $t0, 8($sp)
 		sw $t0, 92($sp)
 		
-		# JUMP TO endif_8771787127619
-		j endif_8771787127619
+		# JUMP TO endif_8773056378947
+		j endif_8773056378947
 		
-		endif_8771787127619:
+		endif_8773056378947:
 		
 		# internal_8 <- internal_32
 		lw $t0, 92($sp)
 		sw $t0, 188($sp)
 		
-		# JUMP TO endif_8771787127287
-		j endif_8771787127287
+		# JUMP TO endif_8773056378615
+		j endif_8773056378615
 		
-		endif_8771787127287:
+		endif_8773056378615:
 		
 		# internal_0 <- internal_8
 		lw $t0, 188($sp)
 		sw $t0, 220($sp)
 		
-		# JUMP TO endif_8771787127254
-		j endif_8771787127254
+		# JUMP TO endif_8773056378582
+		j endif_8773056378582
 		
-		endif_8771787127254:
+		endif_8773056378582:
 		
 		lw $v1, 220($sp)
 		
@@ -4308,7 +4316,7 @@
 		# ALLOCATING NUll INTO -> internal_8
 		sw $zero, 52($sp)
 		
-		while_start_8771787128679:
+		while_start_8773056380007:
 		
 		# FUNCTION ARG
 		addi $sp, $sp, -12
@@ -4328,16 +4336,16 @@
 		sw $v1, 60($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_9 THEN GOTO while_body_8771787128679
+		# IF internal_9 THEN GOTO while_body_8773056380007
 		lw $t0, 48($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, while_body_8771787128679
+		beq $t0, $t1, while_body_8773056380007
 		
-		# JUMP TO while_end_8771787128679
-		j while_end_8771787128679
+		# JUMP TO while_end_8773056380007
+		j while_end_8773056380007
 		
-		while_body_8771787128679:
+		while_body_8773056380007:
 		
 		# ALLOCATING INT -> 10
 		li $v0, 9
@@ -4553,10 +4561,10 @@
 		sw $v1, 72($sp)
 		addi $sp, $sp, 12
 		
-		# JUMP TO while_start_8771787128679
-		j while_start_8771787128679
+		# JUMP TO while_start_8773056380007
+		j while_start_8773056380007
 		
-		while_end_8771787128679:
+		while_end_8773056380007:
 		
 		lw $v1, 84($sp)
 		
@@ -4615,16 +4623,16 @@
 		lw $t0, 80($sp)
 		sw $t0, 88($sp)
 		
-		# IF internal_1 THEN GOTO then_8771787128730
+		# IF internal_1 THEN GOTO then_8773056380058
 		lw $t0, 88($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8771787128730
+		beq $t0, $t1, then_8773056380058
 		
-		# JUMP TO else_8771787128730
-		j else_8771787128730
+		# JUMP TO else_8773056380058
+		j else_8773056380058
 		
-		then_8771787128730:
+		then_8773056380058:
 		
 		# ALLOCATING STRING
 		li $v0, 9
@@ -4648,10 +4656,10 @@
 		lw $t0, 76($sp)
 		sw $t0, 92($sp)
 		
-		# JUMP TO endif_8771787128730
-		j endif_8771787128730
+		# JUMP TO endif_8773056380058
+		j endif_8773056380058
 		
-		else_8771787128730:
+		else_8773056380058:
 		
 		# ALLOCATING BOOL -> 0
 		li $v0, 9
@@ -4699,16 +4707,16 @@
 		lw $t0, 60($sp)
 		sw $t0, 68($sp)
 		
-		# IF internal_6 THEN GOTO then_8771787128914
+		# IF internal_6 THEN GOTO then_8773056380242
 		lw $t0, 68($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8771787128914
+		beq $t0, $t1, then_8773056380242
 		
-		# JUMP TO else_8771787128914
-		j else_8771787128914
+		# JUMP TO else_8773056380242
+		j else_8773056380242
 		
-		then_8771787128914:
+		then_8773056380242:
 		
 		# ALLOCATING INT -> 9
 		li $v0, 9
@@ -4756,10 +4764,10 @@
 		lw $t0, 56($sp)
 		sw $t0, 72($sp)
 		
-		# JUMP TO endif_8771787128914
-		j endif_8771787128914
+		# JUMP TO endif_8773056380242
+		j endif_8773056380242
 		
-		else_8771787128914:
+		else_8773056380242:
 		
 		# ALLOCATING STRING
 		li $v0, 9
@@ -4969,19 +4977,19 @@
 		lw $t0, 8($sp)
 		sw $t0, 72($sp)
 		
-		# JUMP TO endif_8771787128914
-		j endif_8771787128914
+		# JUMP TO endif_8773056380242
+		j endif_8773056380242
 		
-		endif_8771787128914:
+		endif_8773056380242:
 		
 		# internal_0 <- internal_5
 		lw $t0, 72($sp)
 		sw $t0, 92($sp)
 		
-		# JUMP TO endif_8771787128730
-		j endif_8771787128730
+		# JUMP TO endif_8773056380058
+		j endif_8773056380058
 		
-		endif_8771787128730:
+		endif_8773056380058:
 		
 		lw $v1, 92($sp)
 		
@@ -5040,16 +5048,16 @@
 		lw $t0, 64($sp)
 		sw $t0, 72($sp)
 		
-		# IF internal_1 THEN GOTO then_8771787128893
+		# IF internal_1 THEN GOTO then_8773056380221
 		lw $t0, 72($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, then_8771787128893
+		beq $t0, $t1, then_8773056380221
 		
-		# JUMP TO else_8771787128893
-		j else_8771787128893
+		# JUMP TO else_8773056380221
+		j else_8773056380221
 		
-		then_8771787128893:
+		then_8773056380221:
 		
 		# ALLOCATING STRING
 		li $v0, 9
@@ -5070,10 +5078,10 @@
 		lw $t0, 60($sp)
 		sw $t0, 76($sp)
 		
-		# JUMP TO endif_8771787128893
-		j endif_8771787128893
+		# JUMP TO endif_8773056380221
+		j endif_8773056380221
 		
-		else_8771787128893:
+		else_8773056380221:
 		
 		# ALLOCATING INT -> 10
 		li $v0, 9
@@ -5301,10 +5309,10 @@
 		lw $t0, 8($sp)
 		sw $t0, 76($sp)
 		
-		# JUMP TO endif_8771787128893
-		j endif_8771787128893
+		# JUMP TO endif_8773056380221
+		j endif_8773056380221
 		
-		endif_8771787128893:
+		endif_8773056380221:
 		
 		lw $v1, 76($sp)
 		

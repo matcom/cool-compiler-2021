@@ -4,6 +4,10 @@
 	# DATA SECTION #
 	################
 
+	####################
+	# Types declaration #
+	####################
+
 	type_Object: .word 24
 	type_Object_inherits_from: .word 0
 	type_Object_name_address: .word type_Object_name_size
@@ -89,8 +93,12 @@
 .text
 	
 	################
-	# TEXT SECTION #
+	# Functions declaration #
 	################
+
+	#########################
+	# Functions declaration #
+	#########################
 
 	function_add:
 		# SPACE FOR LOCAL VARIABLES
@@ -1757,7 +1765,7 @@
 		# ALLOCATING NUll INTO -> internal_6
 		sw $zero, 28($sp)
 		
-		while_start_8772415892450:
+		while_start_8749731881704:
 		
 		# ALLOCATING INT -> 0
 		li $v0, 9
@@ -1831,16 +1839,16 @@
 		sw $v1, 24($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_10 THEN GOTO while_body_8772415892450
+		# IF internal_10 THEN GOTO while_body_8749731881704
 		lw $t0, 12($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, while_body_8772415892450
+		beq $t0, $t1, while_body_8749731881704
 		
-		# JUMP TO while_end_8772415892450
-		j while_end_8772415892450
+		# JUMP TO while_end_8749731881704
+		j while_end_8749731881704
 		
-		while_body_8772415892450:
+		while_body_8749731881704:
 		
 		# FUNCTION ARG
 		addi $sp, $sp, -12
@@ -1962,10 +1970,10 @@
 		sw $v1, 64($sp)
 		addi $sp, $sp, 12
 		
-		# JUMP TO while_start_8772415892450
-		j while_start_8772415892450
+		# JUMP TO while_start_8749731881704
+		j while_start_8749731881704
 		
-		while_end_8772415892450:
+		while_end_8749731881704:
 		
 		lw $v1, 36($sp)
 		

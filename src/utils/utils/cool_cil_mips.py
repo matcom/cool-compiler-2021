@@ -2555,8 +2555,18 @@ class MipsFormatter1:
 
         dottext = "\n\t".join(instructions)
         
-        dotdata_comment = '\n\t################\n\t# DATA SECTION #\n\t################\n\n\t# Types declaration\n'
-        dottext_comment = '\n\t################\n\t# TEXT SECTION #\n\t################\n\n\t# Functions declaration\n'
+        h1  = '################'
+        h1t = '# DATA SECTION #'
+        h2t = '# TEXT SECTION #'
+        
+        h1_  = '####################'
+        h1t_ = '# Types declaration #'
+        
+        h2  = '#########################'
+        h2t = '# Functions declaration #'
+        
+        dotdata_comment = f'\n\t{h1}\n\t{h1t}\n\t{h1}\n\n\t{h1_}\n\t{h1t_}\n\t{h1_}\n'
+        dottext_comment = f'\n\t{h1}\n\t{h2t}\n\t{h1}\n\n\t{h2}\n\t{h2t}\n\t{h2}\n'
 
         return f".data\n\t{dotdata_comment}\n\t{dotdata}\n\n.text\n\t{dottext_comment}\n\t{dottext}"
 
