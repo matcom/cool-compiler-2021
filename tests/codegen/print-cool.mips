@@ -92,7 +92,7 @@
 .text
 	
 	################
-	# Functions declaration #
+	# TEXT SECTION #
 	################
 
 	#########################

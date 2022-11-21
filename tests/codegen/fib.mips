@@ -93,7 +93,7 @@
 .text
 	
 	################
-	# Functions declaration #
+	# TEXT SECTION #
 	################
 
 	#########################
@@ -1765,7 +1765,7 @@
 		# ALLOCATING NUll INTO -> internal_6
 		sw $zero, 28($sp)
 		
-		while_start_8749731881704:
+		while_start_8770340693227:
 		
 		# ALLOCATING INT -> 0
 		li $v0, 9
@@ -1839,16 +1839,16 @@
 		sw $v1, 24($sp)
 		addi $sp, $sp, 12
 		
-		# IF internal_10 THEN GOTO while_body_8749731881704
+		# IF internal_10 THEN GOTO while_body_8770340693227
 		lw $t0, 12($sp)
 		lw $t0, 8($t0)
 		addi $t1, $zero, 1
-		beq $t0, $t1, while_body_8749731881704
+		beq $t0, $t1, while_body_8770340693227
 		
-		# JUMP TO while_end_8749731881704
-		j while_end_8749731881704
+		# JUMP TO while_end_8770340693227
+		j while_end_8770340693227
 		
-		while_body_8749731881704:
+		while_body_8770340693227:
 		
 		# FUNCTION ARG
 		addi $sp, $sp, -12
@@ -1970,10 +1970,10 @@
 		sw $v1, 64($sp)
 		addi $sp, $sp, 12
 		
-		# JUMP TO while_start_8749731881704
-		j while_start_8749731881704
+		# JUMP TO while_start_8770340693227
+		j while_start_8770340693227
 		
-		while_end_8749731881704:
+		while_end_8770340693227:
 		
 		lw $v1, 36($sp)
 		

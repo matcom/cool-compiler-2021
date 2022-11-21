@@ -2557,7 +2557,7 @@ class MipsFormatter1:
         
         h1  = '################'
         h1t = '# DATA SECTION #'
-        h2t = '# TEXT SECTION #'
+        h2t_ = '# TEXT SECTION #'
         
         h1_  = '####################'
         h1t_ = '# Types declaration #'
@@ -2566,7 +2566,7 @@ class MipsFormatter1:
         h2t = '# Functions declaration #'
         
         dotdata_comment = f'\n\t{h1}\n\t{h1t}\n\t{h1}\n\n\t{h1_}\n\t{h1t_}\n\t{h1_}\n'
-        dottext_comment = f'\n\t{h1}\n\t{h2t}\n\t{h1}\n\n\t{h2}\n\t{h2t}\n\t{h2}\n'
+        dottext_comment = f'\n\t{h1}\n\t{h2t_}\n\t{h1}\n\n\t{h2}\n\t{h2t}\n\t{h2}\n'
 
         return f".data\n\t{dotdata_comment}\n\t{dotdata}\n\n.text\n\t{dottext_comment}\n\t{dottext}"
 
