@@ -1,0 +1,77 @@
+.data
+Bool_parents: .word 1, 2, 0, 
+Bool: .word Bool_parents, Object_abort, Object_copy, Object_type_name, 
+Int_parents: .word 1, 3, 0, 
+Int: .word Int_parents, Object_abort, Object_copy, Object_type_name, 
+String_parents: .word 1, 4, 0, 
+String: .word String_parents, Object_abort, Object_copy, Object_type_name, String_concat, String_length, String_substr, 
+SELF_TYPE_parents: .word 1, 5, 0, 
+SELF_TYPE: .word SELF_TYPE_parents, Object_abort, Object_copy, Object_type_name, 
+Object_parents: .word 1, 0, 
+Object: .word Object_parents, Object_abort, Object_copy, Object_type_name, 
+IO_parents: .word 1, 6, 0, 
+IO: .word IO_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, 
+Main_parents: .word 1, 6, 7, 0, 
+Main: .word Main_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, Main_main, 
+string_0: .asciiz "Hello, World.\n"
+
+.text
+.globl main
+main:
+#Parametro Return $ra en stackpoiner + 20
+#Parametro self en stackpoiner + 16
+addi $sp, $sp, -4          #Push local var instance stackpointer 12
+addi $sp, $sp, -4          #Push local var type_name@0 stackpointer 8
+addi $sp, $sp, -4          #Push local var @result stackpointer 4
+addi $sp, $sp, -4          #Push local var $ra stackpointer 0
+sw $ra, 0($sp)          #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_Main
+#Allocate a una class Main puntero en sp + 12
+#atributo @type en puntero + 0
+#atributo type en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall
+sw $v0, 12($sp)          #Reservando memoria para una instancia de tipo Main
+la $t0, Main
+sw $t0, 8($sp)          #Cargando el nombre del tipo desde el data
+lw $t0, 12($sp)          #Buscando la instancia en la pila instance
+lw $t1, 8($sp)          #Buscando el valor que se va a guardar en la propiedad
+sw $t1, 0($t0)          #Seteando el valor en la direccion de la memoria del objeto          #Assignando el nombre del tipo en el campo type
+lw $t0, 12($sp)          #Saca de la pila instance
+addi $sp, $sp, -4
+sw $t0, 0($sp)          #Mete para la pila instance
+jal Main_main          #Call a la function Main_main
+sw $s0, 4($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila
+li $v0, 10
+syscall
+
+Main_main:
+#Parametro Return $ra en stackpoiner + 16
+#Parametro self en stackpoiner + 12
+addi $sp, $sp, -4          #Push local var param_0_to_out_string@0 stackpointer 8
+addi $sp, $sp, -4          #Push local var @result stackpointer 4
+addi $sp, $sp, -4          #Push local var $ra stackpointer 0
+sw $ra, 0($sp)          #Agrega $ra a la pila para salvar el punto de retorno de la funcion Main_main
+la $t0, string_0
+sw $t0, 8($sp)          #Fin del paramentro 0 al StaticDispatch out_string
+lw $t0, 12($sp)          #Saca de la pila self
+addi $sp, $sp, -4
+sw $t0, 0($sp)          #Mete para la pila self          #Agrega a la pila el paramentro 0 al StaticDispatch out_string
+lw $t0, 12($sp)          #Saca de la pila param_0_to_out_string@0
+addi $sp, $sp, -4
+sw $t0, 0($sp)          #Mete para la pila param_0_to_out_string@0          #Agrega a la pila el paramentro 1 al StaticDispatch out_string
+jal IO_out_string          #Call a la function IO_out_string
+sw $s0, 4($sp)          #Save el resultado de la funcion que esta en $s0 pa la pila
+lw $s0, 4($sp)          #Envia el resultado de la funcion en $s0
+lw $ra, 16($sp)          #Lee el $ra mas profundo de la pila para retornar a la funcion anterior
+addi $sp, $sp, 20          #Limpia la pila
+jr $ra          #Final de la function main
+
+
+IO_out_string:
+li $v0, 4
+lw $a0, 0($sp)
+syscall
+lw $a0, 4($sp)
+addi $sp, $sp, 8
+jr $ra

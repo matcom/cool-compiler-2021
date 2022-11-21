@@ -1,0 +1,340 @@
+.data
+String_Name: .asciiz "String"
+String: .word  String_Name, 2, 
+Int_Name: .asciiz "Int"
+Int: .word  Int_Name, 2, 
+T: .asciiz ""
+
+
+.text
+.globl main
+main:
+
+jal __str__input__
+
+move $s0, $v0
+move $a0, $v0
+jal __str__print__
+
+jal __str__input__
+move $s1, $v0
+move $s6, $v0
+
+jal __str__length__
+
+lw		$a0, 4($v0)
+li		$v0, 1		# system call #4 - print string
+syscall	
+
+move $s6, $s0
+move $a0, $s1
+jal __str__concat__
+
+move $s6, $v0
+move $a0, $v0
+jal __str__print__
+
+jal __str__length__
+
+lw		$a0, 4($v0)
+li		$v0, 1		# system call #4 - print string
+syscall	
+
+la $a0, T
+jal __str__new__
+
+move $a0, $v0
+move $a1, $s1
+jal __str__cmp__
+
+lw		$a0, 4($v0)
+li		$v0, 1		# system call #4 - print string
+syscall				# execute
+
+li		$v0, 10		# system call #4 - print string
+syscall				# execute
+
+
+#region
+#############################################################################################
+__str__new__:
+# En $s6 self
+# En $a0 el direccion de memoria que apunta a un string	
+# Return $v0 la instancia del nuevo string
+
+move $t2, $a0  #Salva la direccion de memoria  
+
+#Allocate a una class String
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall  #en $v0 la instancia del nuevo String
+
+la $t0, String     #Carga la direccion de memoria de la definicion de tipo Int
+sw $t0, ($v0)   #Guarda en la pocision cero de la instancia la direccion de la definicion del tipo
+sw $t2, 4($v0)  #Guarda en la pocicion 4 de la instancia el valor del la propiedad **value** 
+
+# No modifica la pila 
+jr $ra # Esta funcion no tiene saltos internos y en $v0 esta la instancia del nuevo Int
+
+##########################################################################################################
+__str__print__:
+# En $s6 **self**
+# En $a0 la direccion del **String** a pintar 	
+# Return $v0 **self**
+
+lw $t0, 4($a0)  #Lee la propiedad **value**
+
+li $v0, 4
+move $a0, $t0  #Pinta el valor la propiedad **value** del String
+syscall
+
+move $v0, $s6  #Guarda en $v0 **self** para retornar 
+# No modifica la pila 
+jr $ra # Esta funcion no tiene saltos internos y en $v0 esta self
+
+##########################################################################################################
+__str__input__:
+# En $s6 **self**
+# Return $v0 la instancia del nuevo **String**
+
+addi $sp, $sp, -4
+sw $ra ($sp)   #Salva $ra en 12($sp)
+addi $sp, $sp, -4
+sw $s6, ($sp)    #Salva self en 8($sp)
+
+li $a0, 1000    # reserva memoria para el string
+li $v0, 9       
+syscall         # En $v0 direccion de memoria del nuevo string
+
+move $a0, $v0   # Asigan la direccion del nuevo string para llamar a la funcion de leer
+li $v0, 8       # Leer un string de la consola 
+li $a1 , 1000   
+syscall         # En $a0 el string leido en la consola 
+jal __str__new__ #En $v0 la instancia del nuevo entero 
+move $a0, $v0
+
+addi $sp, $sp, -4
+sw $v0, ($sp)    #Salva el nuevo string en 4($sp)
+
+move $s6, $v0   #cambia sefl por el nuevo string 
+jal __str__length__
+
+lw $t0, 4($v0)      #Lee la propiedad **value** del **Int** que devuelve length 
+
+beq $t0,$zero, jline
+addi $t0, $t0, -1   #Resta uno al length para eliminar el '\n'
+
+jline:
+sw $t0, 4($v0)      #Actualiza la propieded **value** del **Int** length
+
+addi $sp, $sp, -4
+sw $v0, ($sp)       #Salva el length en ($sp)
+
+li $a0, 0
+jal __int__new__    #Crea un nuevo entero con **value** 0
+
+lw $s6, 4($sp)      #Self = al string leido en la consola 
+move $a0, $v0       #index = 0 
+lw $a1, ($sp)       #count = length - 1 
+
+jal __str__substr__ #En $v0 el substring sin '\n'
+
+lw $s6, 8($sp)   #Reasigna Self para salir de **input** volver a la funcion anterior 
+lw $ra, 12($sp)  #Reasigna $ra para salir de **input** volver a la funcion anterior
+addi $sp, $sp, 16 #Limpia la pila 
+jr $ra          #Devuelve en $v0 el subsstring leido por la consola 
+
+##########################################################################################################
+__str__length__:
+# En $s6 **self**
+# Return $v0 la instancia del nuevo **Int**
+
+li $t0 , 0       # len result
+lw $t2 , 4($s6)  # Leer la propiedad value a self
+
+loop_len:
+lb  $t3, ($t2)  # Guarda la primara letra
+beq $t3, $zero, end_len  
+add $t0, $t0, 1 # Suma al contador 
+add $t2, $t2, 1  # Mueve el punteron del string en 1 
+j loop_len
+
+end_len:
+move $a0, $t0
+move $s5, $ra
+jal __int__new__
+move $ra, $s5
+jr $ra
+
+###########################################################################################################
+__str__substr__:
+# En $s6 **self**
+# En $a0 **Int** el indece en el que inicia el sub
+# En $a1 **Int** cantidad de caracteres que tiene el sub
+
+lw $t0, 4($s6)  # Lee la propiedad value de **sefl**
+lw $t1, 4($a0)  # Lee la propiedad value del **Int** indice 
+lw $t2, 4($a1)  # Lee la propiedad value del **Int** length 
+
+li $t3, 0        # Contador para iterar el string en busqueda de indice  
+li $t4, 1        # Contador para iterar el string hasta llegar al length
+
+addi $t5, $t2, 1
+move $a0, $t5      # reserva memoria para el string
+li $v0,9
+syscall           # En $v0 la direccion de memoria del nuevo string
+move $t5, $v0    
+
+beq $t2, $zero, end_sub_string
+
+find_index:
+    beq	 $t3, $t1, find_length	# si el contador es el indice comiensa a crear el sub
+    add	 $t0, $t0, 1		    # mueve el puntero del string de self
+    add	 $t3, $t3, 1	        # mueve el contador 
+    j find_index
+
+find_length:
+    lb	 $t6, ($t0)			# Lee la primera letra del string self  
+    sb	 $t6, ($t5)         # guarda la primera letra del string self en el nuevo string
+    beq	 $t2, $t4, end_sub_string	# si el contador del tamaño es igual a j end
+    add	 $t5, $t5, 1		# Mueve el puntero del nuevo string 
+    add	 $t0, $t0, 1		# Mueve el puntero del string self
+    add	 $t4, $t4, 1	    # Contador de tamaño += 1 
+    j find_length
+    
+end_sub_string:
+    add	 $t5, $t5, 1		# Mueve el puntero del nuevo string 
+    sb	 $zero, ($t5)         # guarda la primera letra del string self en el nuevo string
+
+    addi $sp, $sp, -4
+    sw $ra, ($sp)   # Guarda en la pila $ra
+
+    move $a0, $v0       # Pasa como parametros la direccion de memoria del string
+    jal __str__new__    # En $v0 la instancia del nuevos string
+
+    lw $ra, ($sp)       # Reasigna $ra para volver al la funcion anterior 
+    addi $sp, $sp, 4    #  Limpia la pila 
+    jr $ra              # Return instancia del substring en $v0
+
+############################################################################################################
+__str__concat__:
+# En $s6 **self**
+# En #a0 instancia de otro string
+
+addi $sp, $sp, -4
+sw $s6, ($sp)       #Salva **self**
+addi $sp, $sp, -4
+sw $a0, ($sp)       #Salva el string que se paso como parametro 
+addi $sp, $sp, -4
+sw $ra, ($sp)       #Salva $ra para saber a donde retornar 
+
+jal __str__length__
+addi $sp, $sp, -4
+lw $t0, 4($v0)      #Lee el valor de la propiedad **value**
+sw $t0, ($sp)       #Salva el valor del primer length 
+
+lw $t0, 8($sp)
+move $s6, $t0       #Cambia self por el otro string
+jal __str__length__
+lw $t0, ($sp)       #Lee el lenght del string self
+lw $t1, 4($v0)      #Lee el valor de la pripiedad value del resultado de la funcion length 
+add $t0, $t0, $t1   # Suma los length de ambos string
+
+add $t0, $t0, 1 
+move $a0, $t0
+li $v0, 9
+syscall             # Reserva espacion para un string de tamaño length1 + length2
+#En $v0 el nuevo string 
+
+move $t3, $v0
+lw $t2, 8($sp)      #Lee el string que se paso por parametro  
+lw $t1, 4($t2)      #Lee la propiedad **value** del string
+lw $t2, 12($sp)     #Lee self
+lw $t0, 4($t2)      #Lee la propiedad **value** de self 
+
+loop_str1:
+    lb   $t2, ($t0)       # primera letra del puntero al string self
+    beq  $t2, $zero, loop_str2 
+    add  $t0, $t0, 1      # mueve el puntero del string self
+    sb   $t2, ($t3)       # guarda la letra en el nuevo string 
+    add  $t3, $t3, 1      # mueve el puntero del nuevo string
+    j loop_str1
+
+loop_str2:
+    lb   $t2, ($t1)       # primera letra del puntero al string str1
+    beq  $t2, $zero, end_concat
+    add  $t1, $t1, 1    # mueve el puntero del string str1
+    sb   $t2, ($t3)     # guarda la letra en el nuevo string 
+    add  $t3,  $t3, 1   # mueve el puntero del nuevo string
+    j loop_str1
+
+end_concat:
+    move $a0, $v0
+    jal __str__new__
+    lw $ra, 4($sp)
+    lw $s6, 12($sp)
+    addi $sp, $sp, 16 #Limpia la pila
+    jr $ra            # Return en $v0 la nueva instancia de self
+
+############################################################################################################
+__str__cmp__:
+# En $s6 **self**
+# En $a0 instancia de str1
+# En $a1 instancia de str2
+
+addi $sp, $sp -4
+sw $ra, ($sp)
+
+lw $t0, 4($a0)     #Lee la propiedad **value** de str1
+lw $t1, 4($a1)     #Lee la propiedad **value** de str2
+li $a0, 1       # True por default
+
+str_cmp_loop:
+    lb $t2, ($t0)   #Lee una letra de str1
+    lb $t3, ($t1)   #Lee una letra de str2
+    addi $t0, $t0, 1
+    addi $t1, $t1, 1
+    beq $t2, $zero, cmp_end_to_zero     #Se llego al fin del str1
+    beq $t3, $zero, cmp_end_to_zero     #Se llego al fin del str2
+    beq $t2, $t3,   str_cmp_loop        #Continua comparando si son iguales 
+    j str_cmp_false
+
+cmp_end_to_zero:
+    beq $t2, $t3,  end_str_cmp         #Chequea que ambos hallan llegado al final 
+    j str_cmp_false
+
+str_cmp_false:
+    li $a0, 0       #Cambia el defaul True por False 
+end_str_cmp:
+    jal __int__new__    #Crea un Int que luego se debe cambiar por bool
+    lw $ra, ($sp)       #Lee $ra para retornar 
+    addi $sp, $sp, 4    #Limpia la pila 
+    jr $ra              #En $v0 un Int que hay que cambiar por Bool
+
+#endregion
+##########################################################################################################
+__int__new__:
+# En $s6 self
+# En $a0 el valor del entero	
+# Return $v0 la instancia del nuevo int
+
+move $t2, $a0  #Salva el valor del entero  
+
+#Allocate a una class Int
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall  #en $v0 la instancia del nuevo Int
+
+la $t0, Int     #Carga la direccion de memoria de la definicion de tipo Int
+sw $t0, ($v0)   #Guarda en la pocision cero de la instancia la direccion de la definicion del tipo
+sw $t2, 4($v0)  #Guarda en la pocicion 4 de la instancia el valor del la propiedad **value** 
+
+# No modifica la pila 
+jr $ra # Esta funcion no tiene saltos internos y en $v0 esta la instancia del nuevo Int
+
+
+#########################################################################################################

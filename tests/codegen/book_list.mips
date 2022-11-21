@@ -1,0 +1,1691 @@
+.data
+_______error______: .asciiz "Abort called from class "
+_______null_______: .asciiz "null"
+_______endline_______: .asciiz "\n"
+_______void_str_______: .asciiz ""
+Bool_parents: .word 1, 2, 0, 
+Bool_Name: .asciiz "Bool"
+Bool: .word Bool_Name, 2, Bool_parents, Object_abort, Object_copy, Object_type_name, 
+Int_parents: .word 1, 3, 0, 
+Int_Name: .asciiz "Int"
+Int: .word Int_Name, 2, Int_parents, Object_abort, Object_copy, Object_type_name, 
+String_parents: .word 1, 4, 0, 
+String_Name: .asciiz "String"
+String: .word String_Name, 2, String_parents, Object_abort, Object_copy, Object_type_name, String_concat, String_length, String_substr, 
+SELF_TYPE_parents: .word 1, 5, 0, 
+SELF_TYPE_Name: .asciiz "SELF_TYPE"
+SELF_TYPE: .word SELF_TYPE_Name, 1, SELF_TYPE_parents, Object_abort, Object_copy, Object_type_name, 
+Object_parents: .word 1, 0, 
+Object_Name: .asciiz "Object"
+Object: .word Object_Name, 1, Object_parents, Object_abort, Object_copy, Object_type_name, 
+IO_parents: .word 1, 6, 0, 
+IO_Name: .asciiz "IO"
+IO: .word IO_Name, 1, IO_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, 
+Book_parents: .word 1, 6, 7, 0, 
+Book_Name: .asciiz "Book"
+Book: .word Book_Name, 3, Book_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, Book_initBook, Book_print, 
+Article_parents: .word 1, 6, 7, 8, 0, 
+Article_Name: .asciiz "Article"
+Article: .word Article_Name, 4, Article_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, Book_initBook, Article_print, Article_initArticle, 
+BookList_parents: .word 1, 6, 9, 0, 
+BookList_Name: .asciiz "BookList"
+BookList: .word BookList_Name, 1, BookList_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, BookList_isNil, BookList_cons, BookList_car, BookList_cdr, BookList_print_list, 
+Cons_parents: .word 1, 6, 9, 10, 0, 
+Cons_Name: .asciiz "Cons"
+Cons: .word Cons_Name, 3, Cons_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, Cons_isNil, BookList_cons, Cons_car, Cons_cdr, Cons_print_list, Cons_init, 
+Nil_parents: .word 1, 6, 9, 11, 0, 
+Nil_Name: .asciiz "Nil"
+Nil: .word Nil_Name, 1, Nil_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, Nil_isNil, BookList_cons, BookList_car, BookList_cdr, Nil_print_list, 
+Main_parents: .word 1, 12, 0, 
+Main_Name: .asciiz "Main"
+Main: .word Main_Name, 2, Main_parents, Object_abort, Object_copy, Object_type_name, Main_main, 
+string_0: .asciiz "title:      "
+string_1: .asciiz "\n"
+string_2: .asciiz "author:     "
+string_3: .asciiz "\n"
+string_4: .asciiz "periodical:  "
+string_5: .asciiz "\n"
+string_6: .asciiz "- dynamic type was Article -\n"
+string_7: .asciiz "- dynamic type was Book -\n"
+string_8: .asciiz "Compilers, Principles, Techniques, and Tools"
+string_9: .asciiz "Aho, Sethi, and Ullman"
+string_10: .asciiz "The Top 100 CD_ROMs"
+string_11: .asciiz "Ulanoff"
+string_12: .asciiz "PC Magazine"
+
+.text
+.globl main
+main:     #
+addi $sp, $sp, -4     #Push local var self stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion main
+#Allocate a una class Main
+#atributo type_name en puntero + 0
+#atributo books en puntero + 4
+li $a0, 8      #
+li $v0, 9      #
+syscall
+sw $v0, 4($sp)      #Guardando en la variable local self puntero de la instancia de la clase Main
+#Assignacion de la insformacion de tipo a Main
+la $t0, Main      #
+move $s4, $t0      #
+lw $t0, 4($sp)      #Instancia de la clase 
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded type_name
+sw $t1, 0($t0)      #Setea la propiedad type_name con el valor de _
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+jal new_ctr_Main                               #
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+jal Main_main                               #
+li $v0, 10      #
+syscall
+
+new_ctr_Main:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_Main
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+jal new_ctr_Object                               #
+la $t0, _______null_______      #
+move $s4, $t0      #
+lw $t0, 4($sp)      #Instancia de la clase Main
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded books
+sw $t1, 4($t0)      #Setea la propiedad books con el valor de _
+lw $v0, 4($sp)      #Return self
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+Main_main:     #
+#Parametro self en stackpoiner + 72
+addi $sp, $sp, -4     #Push local var a_book stackpointer 68
+addi $sp, $sp, -4     #Push local var new_Book@0 stackpointer 64
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_initBook@0 stackpointer 60
+addi $sp, $sp, -4     #Push local var param_0_to_initBook@0 stackpointer 56
+addi $sp, $sp, -4     #Push local var param_1_to_initBook@0 stackpointer 52
+addi $sp, $sp, -4     #Push local var an_article stackpointer 48
+addi $sp, $sp, -4     #Push local var new_Article@0 stackpointer 44
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_initArticle@0 stackpointer 40
+addi $sp, $sp, -4     #Push local var param_0_to_initArticle@0 stackpointer 36
+addi $sp, $sp, -4     #Push local var param_1_to_initArticle@0 stackpointer 32
+addi $sp, $sp, -4     #Push local var param_2_to_initArticle@0 stackpointer 28
+addi $sp, $sp, -4     #Push local var new_Nil@0 stackpointer 24
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_cons@0 stackpointer 20
+addi $sp, $sp, -4     #Push local var param_0_to_cons@0 stackpointer 16
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_cons@1 stackpointer 12
+addi $sp, $sp, -4     #Push local var param_0_to_cons@1 stackpointer 8
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_print_list@0 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Main_main
+#Eval Expression to Let a_book
+#Evalua la Expresion para el DinamicDispatch initBook
+#Creando instancia de tipo Book
+#Allocate a una class Book
+#atributo type_name en puntero + 0
+#atributo title en puntero + 4
+#atributo author en puntero + 8
+li $a0, 12      #
+li $v0, 9      #
+syscall
+sw $v0, 64($sp)      #Guardando en la variable local new_Book@0 puntero de la instancia de la clase Book
+#Assignacion de la insformacion de tipo a la instancia
+la $t0, Book      #
+move $s4, $t0      #
+lw $t0, 64($sp)      #Instancia de la clase 
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded type_name
+sw $t1, 0($t0)      #Setea la propiedad type_name con el valor de _
+lw $t0, 64($sp)      #Lee el valor de la var new_Book@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con new_Book@0
+jal new_ctr_Book                               #
+sw $v0, 60($sp)      #Asigna el resultado de la funcion
+#Fin de la exprecion previa al DinamicDispatch initBook
+#Evalua el parametro 0 para el CastingDispatch initBook
+la $t0, string_8      #
+move $s4, $t0      #
+lw $s6, 72($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 56($sp)      #
+#Fin del paramentro 0 al CastingDispatch initBook
+#Evalua el parametro 1 para el CastingDispatch initBook
+la $t0, string_9      #
+move $s4, $t0      #
+lw $s6, 72($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 52($sp)      #
+#Fin del paramentro 1 al CastingDispatch initBook
+lw $t0, 60($sp)      #Lee el valor de la var instance_dynamic_to_initBook@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_initBook@0
+lw $t0, 60($sp)      #Lee el valor de la var param_0_to_initBook@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_initBook@0
+lw $t0, 60($sp)      #Lee el valor de la var param_1_to_initBook@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_1_to_initBook@0
+lw $t0, 72($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Book
+lw $t3, 40($t1)      #Buscando el metodo dinamico para la funcion initBook
+jal $t3                               #
+sw $v0, 68($sp)      #Asigna el resultado de la funcion
+#Fin de la asignacion Let a_book
+#Eval Expression to Let an_article
+#Evalua la Expresion para el DinamicDispatch initArticle
+#Creando instancia de tipo Article
+#Allocate a una class Article
+#atributo type_name en puntero + 0
+#atributo title en puntero + 4
+#atributo author en puntero + 8
+#atributo per_title en puntero + 12
+li $a0, 16      #
+li $v0, 9      #
+syscall
+sw $v0, 44($sp)      #Guardando en la variable local new_Article@0 puntero de la instancia de la clase Article
+#Assignacion de la insformacion de tipo a la instancia
+la $t0, Article      #
+move $s4, $t0      #
+lw $t0, 44($sp)      #Instancia de la clase 
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded type_name
+sw $t1, 0($t0)      #Setea la propiedad type_name con el valor de _
+lw $t0, 44($sp)      #Lee el valor de la var new_Article@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con new_Article@0
+jal new_ctr_Article                               #
+sw $v0, 40($sp)      #Asigna el resultado de la funcion
+#Fin de la exprecion previa al DinamicDispatch initArticle
+#Evalua el parametro 0 para el CastingDispatch initArticle
+la $t0, string_10      #
+move $s4, $t0      #
+lw $s6, 72($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 36($sp)      #
+#Fin del paramentro 0 al CastingDispatch initArticle
+#Evalua el parametro 1 para el CastingDispatch initArticle
+la $t0, string_11      #
+move $s4, $t0      #
+lw $s6, 72($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 32($sp)      #
+#Fin del paramentro 1 al CastingDispatch initArticle
+#Evalua el parametro 2 para el CastingDispatch initArticle
+la $t0, string_12      #
+move $s4, $t0      #
+lw $s6, 72($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 28($sp)      #
+#Fin del paramentro 2 al CastingDispatch initArticle
+lw $t0, 40($sp)      #Lee el valor de la var instance_dynamic_to_initArticle@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_initArticle@0
+lw $t0, 40($sp)      #Lee el valor de la var param_0_to_initArticle@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_initArticle@0
+lw $t0, 40($sp)      #Lee el valor de la var param_1_to_initArticle@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_1_to_initArticle@0
+lw $t0, 40($sp)      #Lee el valor de la var param_2_to_initArticle@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_2_to_initArticle@0
+lw $t0, 56($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Article
+lw $t3, 48($t1)      #Buscando el metodo dinamico para la funcion initArticle
+jal $t3                               #
+sw $v0, 48($sp)      #Asigna el resultado de la funcion
+#Fin de la asignacion Let an_article
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Asignando un nuevo valor a la variable books
+#Evalua la Expresion para el DinamicDispatch cons
+#Evalua la Expresion para el DinamicDispatch cons
+#Creando instancia de tipo Nil
+#Allocate a una class Nil
+#atributo type_name en puntero + 0
+li $a0, 4      #
+li $v0, 9      #
+syscall
+sw $v0, 24($sp)      #Guardando en la variable local new_Nil@0 puntero de la instancia de la clase Nil
+#Assignacion de la insformacion de tipo a la instancia
+la $t0, Nil      #
+move $s4, $t0      #
+lw $t0, 24($sp)      #Instancia de la clase 
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded type_name
+sw $t1, 0($t0)      #Setea la propiedad type_name con el valor de _
+lw $t0, 24($sp)      #Lee el valor de la var new_Nil@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con new_Nil@0
+jal new_ctr_Nil                               #
+sw $v0, 20($sp)      #Asigna el resultado de la funcion
+#Fin de la exprecion previa al DinamicDispatch cons
+#Evalua el parametro 0 para el CastingDispatch cons
+#Get Local Var a_book
+lw $t0, 68($sp)      #
+sw $t0, 16($sp)      #
+#Fin del paramentro 0 al CastingDispatch cons
+lw $t0, 20($sp)      #Lee el valor de la var instance_dynamic_to_cons@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_cons@0
+lw $t0, 20($sp)      #Lee el valor de la var param_0_to_cons@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_cons@0
+lw $t0, 28($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Nil
+lw $t3, 44($t1)      #Buscando el metodo dinamico para la funcion cons
+jal $t3                               #
+sw $v0, 12($sp)      #Asigna el resultado de la funcion
+#Fin de la exprecion previa al DinamicDispatch cons
+#Evalua el parametro 0 para el CastingDispatch cons
+#Get Local Var an_article
+lw $t0, 48($sp)      #
+sw $t0, 8($sp)      #
+#Fin del paramentro 0 al CastingDispatch cons
+lw $t0, 12($sp)      #Lee el valor de la var instance_dynamic_to_cons@1
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_cons@1
+lw $t0, 12($sp)      #Lee el valor de la var param_0_to_cons@1
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_cons@1
+lw $t0, 20($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Cons
+lw $t3, 44($t1)      #Buscando el metodo dinamico para la funcion cons
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+lw $t0, 72($sp)      #Instancia de la clase Main
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded books
+sw $t1, 4($t0)      #Setea la propiedad books con el valor de _
+lw $t0, 72($sp)      #Instancia de la clase Main
+lw $t1, 4($t0)      #Lee la propiedad books
+move $s4, $t1      #Guarda el valor de la propiedad books en la variable local _
+#Inicio del paso 1 de una sequencia Block
+#Evalua la Expresion para el DinamicDispatch print_list
+#Get Self Property books
+lw $t0, 72($sp)      #Instancia de la clase Main
+lw $t1, 4($t0)      #Lee la propiedad books
+sw $t1, 4($sp)      #Guarda el valor de la propiedad books en la variable local instance_dynamic_to_print_list@0
+#Fin de la exprecion previa al DinamicDispatch print_list
+lw $t0, 4($sp)      #Lee el valor de la var instance_dynamic_to_print_list@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_print_list@0
+lw $t0, 8($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de BookList
+lw $t3, 56($t1)      #Buscando el metodo dinamico para la funcion print_list
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 76     #
+jr $ra                               #
+
+new_ctr_Object:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_Object
+lw $v0, 4($sp)      #Return self
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+new_ctr_Book:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_Book
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+jal new_ctr_IO                               #
+la $t0, _______void_str_______      #
+move $s4, $t0      #
+lw $s6, 4($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+move $s4, $v0      #
+lw $t0, 4($sp)      #Instancia de la clase Book
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded title
+sw $t1, 4($t0)      #Setea la propiedad title con el valor de _
+la $t0, _______void_str_______      #
+move $s4, $t0      #
+lw $s6, 4($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+move $s4, $v0      #
+lw $t0, 4($sp)      #Instancia de la clase Book
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded author
+sw $t1, 8($t0)      #Setea la propiedad author con el valor de _
+lw $v0, 4($sp)      #Return self
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+Book_initBook:     #
+#Parametro self en stackpoiner + 12
+#Parametro title_p@0 en stackpoiner + 8
+#Parametro author_p@0 en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Book_initBook
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Asignando un nuevo valor a la variable title
+#Get Local Var title_p
+lw $t0, 8($sp)      #
+move $s4, $t0      #
+lw $t0, 12($sp)      #Instancia de la clase Book
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded title
+sw $t1, 4($t0)      #Setea la propiedad title con el valor de _
+lw $t0, 12($sp)      #Instancia de la clase Book
+lw $t1, 4($t0)      #Lee la propiedad title
+move $s4, $t1      #Guarda el valor de la propiedad title en la variable local _
+#Inicio del paso 1 de una sequencia Block
+#Asignando un nuevo valor a la variable author
+#Get Local Var author_p
+lw $t0, 4($sp)      #
+move $s4, $t0      #
+lw $t0, 12($sp)      #Instancia de la clase Book
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded author
+sw $t1, 8($t0)      #Setea la propiedad author con el valor de _
+lw $t0, 12($sp)      #Instancia de la clase Book
+lw $t1, 8($t0)      #Lee la propiedad author
+move $s4, $t1      #Guarda el valor de la propiedad author en la variable local _
+#Inicio del paso 2 de una sequencia Block
+#Get Local Var self
+lw $t0, 12($sp)      #
+move $s4, $t0      #
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 16     #
+jr $ra                               #
+
+new_ctr_Article:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_Article
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+jal new_ctr_Book                               #
+la $t0, _______void_str_______      #
+move $s4, $t0      #
+lw $s6, 4($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+move $s4, $v0      #
+lw $t0, 4($sp)      #Instancia de la clase Article
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded per_title
+sw $t1, 12($t0)      #Setea la propiedad per_title con el valor de _
+lw $v0, 4($sp)      #Return self
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+Article_initArticle:     #
+#Parametro self en stackpoiner + 24
+#Parametro title_p@0 en stackpoiner + 20
+#Parametro author_p@0 en stackpoiner + 16
+#Parametro per_title_p@0 en stackpoiner + 12
+addi $sp, $sp, -4     #Push local var param_0_to_initBook@0 stackpointer 8
+addi $sp, $sp, -4     #Push local var param_1_to_initBook@0 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Article_initArticle
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#StaticDispatch initBook
+#Evalua el parametro 0 para el CastingDispatch initBook
+#Get Local Var title_p
+lw $t0, 20($sp)      #
+sw $t0, 8($sp)      #
+#Fin del paramentro 0 al CastingDispatch initBook
+#Evalua el parametro 1 para el CastingDispatch initBook
+#Get Local Var author_p
+lw $t0, 16($sp)      #
+sw $t0, 4($sp)      #
+#Fin del paramentro 1 al CastingDispatch initBook
+lw $t0, 24($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 12($sp)      #Lee el valor de la var param_0_to_initBook@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_initBook@0
+lw $t0, 12($sp)      #Lee el valor de la var param_1_to_initBook@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_1_to_initBook@0
+lw $t0, 36($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Article
+lw $t3, 40($t1)      #Buscando el metodo dinamico para la funcion initBook
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#Inicio del paso 1 de una sequencia Block
+#Asignando un nuevo valor a la variable per_title
+#Get Local Var per_title_p
+lw $t0, 12($sp)      #
+move $s4, $t0      #
+lw $t0, 24($sp)      #Instancia de la clase Article
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded per_title
+sw $t1, 12($t0)      #Setea la propiedad per_title con el valor de _
+lw $t0, 24($sp)      #Instancia de la clase Article
+lw $t1, 12($t0)      #Lee la propiedad per_title
+move $s4, $t1      #Guarda el valor de la propiedad per_title en la variable local _
+#Inicio del paso 2 de una sequencia Block
+#Get Local Var self
+lw $t0, 24($sp)      #
+move $s4, $t0      #
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 28     #
+jr $ra                               #
+
+new_ctr_Nil:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_Nil
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+jal new_ctr_BookList                               #
+lw $v0, 4($sp)      #Return self
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+BookList_cons:     #
+#Parametro self en stackpoiner + 28
+#Parametro hd@0 en stackpoiner + 24
+addi $sp, $sp, -4     #Push local var new_cell stackpointer 20
+addi $sp, $sp, -4     #Push local var new_Cons@0 stackpointer 16
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_init@0 stackpointer 12
+addi $sp, $sp, -4     #Push local var param_0_to_init@0 stackpointer 8
+addi $sp, $sp, -4     #Push local var param_1_to_init@0 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion BookList_cons
+#Eval Expression to Let new_cell
+#Creando instancia de tipo Cons
+#Allocate a una class Cons
+#atributo type_name en puntero + 0
+#atributo xcar en puntero + 4
+#atributo xcdr en puntero + 8
+li $a0, 12      #
+li $v0, 9      #
+syscall
+sw $v0, 16($sp)      #Guardando en la variable local new_Cons@0 puntero de la instancia de la clase Cons
+#Assignacion de la insformacion de tipo a la instancia
+la $t0, Cons      #
+move $s4, $t0      #
+lw $t0, 16($sp)      #Instancia de la clase 
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded type_name
+sw $t1, 0($t0)      #Setea la propiedad type_name con el valor de _
+lw $t0, 16($sp)      #Lee el valor de la var new_Cons@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con new_Cons@0
+jal new_ctr_Cons                               #
+sw $v0, 20($sp)      #Asigna el resultado de la funcion
+#Fin de la asignacion Let new_cell
+#Evalua la Expresion para el DinamicDispatch init
+#Get Local Var new_cell
+lw $t0, 20($sp)      #
+sw $t0, 12($sp)      #
+#Fin de la exprecion previa al DinamicDispatch init
+#Evalua el parametro 0 para el CastingDispatch init
+#Get Local Var hd
+lw $t0, 24($sp)      #
+sw $t0, 8($sp)      #
+#Fin del paramentro 0 al CastingDispatch init
+#Evalua el parametro 1 para el CastingDispatch init
+#Get Local Var self
+lw $t0, 28($sp)      #
+sw $t0, 4($sp)      #
+#Fin del paramentro 1 al CastingDispatch init
+lw $t0, 12($sp)      #Lee el valor de la var instance_dynamic_to_init@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_init@0
+lw $t0, 12($sp)      #Lee el valor de la var param_0_to_init@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_init@0
+lw $t0, 12($sp)      #Lee el valor de la var param_1_to_init@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_1_to_init@0
+lw $t0, 24($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Cons
+lw $t3, 60($t1)      #Buscando el metodo dinamico para la funcion init
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 32     #
+jr $ra                               #
+
+BookList_print_list:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion BookList_print_list
+#StaticDispatch abort
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 8($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de BookList
+lw $t3, 12($t1)      #Buscando el metodo dinamico para la funcion abort
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+Cons_print_list:     #
+#Parametro self en stackpoiner + 36
+addi $sp, $sp, -4     #Push local var cond@expr@value@0 stackpointer 32
+addi $sp, $sp, -4     #Push local var cond@type@0 stackpointer 28
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_print@0 stackpointer 24
+addi $sp, $sp, -4     #Push local var dummy stackpointer 20
+addi $sp, $sp, -4     #Push local var param_0_to_out_string@0 stackpointer 16
+addi $sp, $sp, -4     #Push local var dummy stackpointer 12
+addi $sp, $sp, -4     #Push local var param_0_to_out_string@1 stackpointer 8
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_print_list@0 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Cons_print_list
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Eval Expression To Case
+#Evalua la Expresion para el DinamicDispatch print
+#Get Self Property xcar
+lw $t0, 36($sp)      #Instancia de la clase Cons
+lw $t1, 4($t0)      #Lee la propiedad xcar
+sw $t1, 24($sp)      #Guarda el valor de la propiedad xcar en la variable local instance_dynamic_to_print@0
+#Fin de la exprecion previa al DinamicDispatch print
+lw $t0, 24($sp)      #Lee el valor de la var instance_dynamic_to_print@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_print@0
+lw $t0, 28($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Book
+lw $t3, 44($t1)      #Buscando el metodo dinamico para la funcion print
+jal $t3                               #
+sw $v0, 32($sp)      #Asigna el resultado de la funcion
+lw $t0, 32($sp)      #
+lw $t1, ($t0)      #Lee la propiedad **type** de la instancia
+lw $t0, 8($t1)      #Lee la propiedad **parents** de la propiedad **type**
+sw $t0, 28($sp)      #
+#Final Expression To Case
+#Check Type To Case When Option Is Article
+li $s4, 8      #
+lw $s6, 36($sp)      #Guarda self
+lw $a0, 28($sp)      #Guarda el parametro 0 -> cond@type@0
+move $a1, $s4      #Guarda el parametro 1 -> _
+jal __bool__check__type__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 36($sp)      #Guarda self
+jal __int__new__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 36($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, Article_step_case_0     #
+#Check Type To Case When Option Is Book
+li $s4, 7      #
+lw $s6, 36($sp)      #Guarda self
+lw $a0, 28($sp)      #Guarda el parametro 0 -> cond@type@0
+move $a1, $s4      #Guarda el parametro 1 -> _
+jal __bool__check__type__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 36($sp)      #Guarda self
+jal __int__new__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 36($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, Book_step_case_0     #
+Article_step_case_0:
+#Assigan el valor de la expresion a la var dummy del case
+lw $t0, 32($sp)      #
+sw $t0, 20($sp)      #
+#Eval Expression Of Article Option
+#StaticDispatch out_string
+#Evalua el parametro 0 para el CastingDispatch out_string
+la $t0, string_6      #
+move $s4, $t0      #
+lw $s6, 36($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 16($sp)      #
+#Fin del paramentro 0 al CastingDispatch out_string
+lw $t0, 36($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 20($sp)      #Lee el valor de la var param_0_to_out_string@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_out_string@0
+lw $t0, 44($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Cons
+lw $t3, 36($t1)      #Buscando el metodo dinamico para la funcion out_string
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+j case_end_0                               #
+Book_step_case_0:
+#Assigan el valor de la expresion a la var dummy del case
+lw $t0, 32($sp)      #
+sw $t0, 20($sp)      #
+#Eval Expression Of Book Option
+#StaticDispatch out_string
+#Evalua el parametro 0 para el CastingDispatch out_string
+la $t0, string_7      #
+move $s4, $t0      #
+lw $s6, 36($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 8($sp)      #
+#Fin del paramentro 0 al CastingDispatch out_string
+lw $t0, 36($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 12($sp)      #Lee el valor de la var param_0_to_out_string@1
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_out_string@1
+lw $t0, 44($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Cons
+lw $t3, 36($t1)      #Buscando el metodo dinamico para la funcion out_string
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+j case_end_0                               #
+case_end_0:
+#Inicio del paso 1 de una sequencia Block
+#Evalua la Expresion para el DinamicDispatch print_list
+#Get Self Property xcdr
+lw $t0, 36($sp)      #Instancia de la clase Cons
+lw $t1, 8($t0)      #Lee la propiedad xcdr
+sw $t1, 4($sp)      #Guarda el valor de la propiedad xcdr en la variable local instance_dynamic_to_print_list@0
+#Fin de la exprecion previa al DinamicDispatch print_list
+lw $t0, 4($sp)      #Lee el valor de la var instance_dynamic_to_print_list@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_print_list@0
+lw $t0, 8($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de BookList
+lw $t3, 56($t1)      #Buscando el metodo dinamico para la funcion print_list
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 40     #
+jr $ra                               #
+
+Nil_print_list:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Nil_print_list
+li $s4, 1      #
+lw $s6, 4($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+lw $s6, 4($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __bool__new__                               #
+move $s4, $v0      #
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+new_ctr_IO:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_IO
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+jal new_ctr_Object                               #
+lw $v0, 4($sp)      #Return self
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+new_ctr_BookList:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_BookList
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+jal new_ctr_IO                               #
+lw $v0, 4($sp)      #Return self
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+new_ctr_Cons:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_Cons
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+jal new_ctr_BookList                               #
+la $t0, _______null_______      #
+move $s4, $t0      #
+lw $t0, 4($sp)      #Instancia de la clase Cons
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded xcar
+sw $t1, 4($t0)      #Setea la propiedad xcar con el valor de _
+la $t0, _______null_______      #
+move $s4, $t0      #
+lw $t0, 4($sp)      #Instancia de la clase Cons
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded xcdr
+sw $t1, 8($t0)      #Setea la propiedad xcdr con el valor de _
+lw $v0, 4($sp)      #Return self
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+Cons_init:     #
+#Parametro self en stackpoiner + 12
+#Parametro hd@0 en stackpoiner + 8
+#Parametro tl@0 en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Cons_init
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Asignando un nuevo valor a la variable xcar
+#Get Local Var hd
+lw $t0, 8($sp)      #
+move $s4, $t0      #
+lw $t0, 12($sp)      #Instancia de la clase Cons
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded xcar
+sw $t1, 4($t0)      #Setea la propiedad xcar con el valor de _
+lw $t0, 12($sp)      #Instancia de la clase Cons
+lw $t1, 4($t0)      #Lee la propiedad xcar
+move $s4, $t1      #Guarda el valor de la propiedad xcar en la variable local _
+#Inicio del paso 1 de una sequencia Block
+#Asignando un nuevo valor a la variable xcdr
+#Get Local Var tl
+lw $t0, 4($sp)      #
+move $s4, $t0      #
+lw $t0, 12($sp)      #Instancia de la clase Cons
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded xcdr
+sw $t1, 8($t0)      #Setea la propiedad xcdr con el valor de _
+lw $t0, 12($sp)      #Instancia de la clase Cons
+lw $t1, 8($t0)      #Lee la propiedad xcdr
+move $s4, $t1      #Guarda el valor de la propiedad xcdr en la variable local _
+#Inicio del paso 2 de una sequencia Block
+#Get Local Var self
+lw $t0, 12($sp)      #
+move $s4, $t0      #
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 16     #
+jr $ra                               #
+
+Object_abort:     #
+#Parametro self en stackpoiner + 0
+addi $sp, $sp, -4     #Push local var $ra stackpointer -4
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Object_abort
+lw $s6, 4($sp)      #Guarda self
+la $a0, _______error______      #
+jal __str__new__                               #
+move $a0, $v0      #
+jal __str__print__                               #Print "Abort called from class "
+lw $t0, ($s6)      #Read type property of self
+lw $a0, ($t0)      #Read type_name of self type
+jal __str__new__                               #
+move $a0, $v0      #
+jal __str__print__                               #Type class"
+la $a0, _______endline_______      #
+jal __str__new__                               #
+move $a0, $v0      #
+jal __str__print__                               #Print "endline"
+li $v0, 10      #
+syscall
+
+Book_print:     #
+#Parametro self en stackpoiner + 44
+addi $sp, $sp, -4     #Push local var param_0_to_out_string@0 stackpointer 40
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_out_string@0 stackpointer 36
+addi $sp, $sp, -4     #Push local var param_0_to_out_string@1 stackpointer 32
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_out_string@1 stackpointer 28
+addi $sp, $sp, -4     #Push local var param_0_to_out_string@2 stackpointer 24
+addi $sp, $sp, -4     #Push local var param_0_to_out_string@3 stackpointer 20
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_out_string@2 stackpointer 16
+addi $sp, $sp, -4     #Push local var param_0_to_out_string@4 stackpointer 12
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_out_string@3 stackpointer 8
+addi $sp, $sp, -4     #Push local var param_0_to_out_string@5 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Book_print
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Evalua la Expresion para el DinamicDispatch out_string
+#Evalua la Expresion para el DinamicDispatch out_string
+#StaticDispatch out_string
+#Evalua el parametro 0 para el CastingDispatch out_string
+la $t0, string_0      #
+move $s4, $t0      #
+lw $s6, 44($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 40($sp)      #
+#Fin del paramentro 0 al CastingDispatch out_string
+lw $t0, 44($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 44($sp)      #Lee el valor de la var param_0_to_out_string@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_out_string@0
+lw $t0, 52($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Book
+lw $t3, 36($t1)      #Buscando el metodo dinamico para la funcion out_string
+jal $t3                               #
+sw $v0, 36($sp)      #Asigna el resultado de la funcion
+#Fin de la exprecion previa al DinamicDispatch out_string
+#Evalua el parametro 0 para el CastingDispatch out_string
+#Get Self Property title
+lw $t0, 44($sp)      #Instancia de la clase Book
+lw $t1, 4($t0)      #Lee la propiedad title
+sw $t1, 32($sp)      #Guarda el valor de la propiedad title en la variable local param_0_to_out_string@1
+#Fin del paramentro 0 al CastingDispatch out_string
+lw $t0, 36($sp)      #Lee el valor de la var instance_dynamic_to_out_string@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_out_string@0
+lw $t0, 36($sp)      #Lee el valor de la var param_0_to_out_string@1
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_out_string@1
+lw $t0, 44($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Book
+lw $t3, 36($t1)      #Buscando el metodo dinamico para la funcion out_string
+jal $t3                               #
+sw $v0, 28($sp)      #Asigna el resultado de la funcion
+#Fin de la exprecion previa al DinamicDispatch out_string
+#Evalua el parametro 0 para el CastingDispatch out_string
+la $t0, string_1      #
+move $s4, $t0      #
+lw $s6, 44($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 24($sp)      #
+#Fin del paramentro 0 al CastingDispatch out_string
+lw $t0, 28($sp)      #Lee el valor de la var instance_dynamic_to_out_string@1
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_out_string@1
+lw $t0, 28($sp)      #Lee el valor de la var param_0_to_out_string@2
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_out_string@2
+lw $t0, 36($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Book
+lw $t3, 36($t1)      #Buscando el metodo dinamico para la funcion out_string
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#Inicio del paso 1 de una sequencia Block
+#Evalua la Expresion para el DinamicDispatch out_string
+#Evalua la Expresion para el DinamicDispatch out_string
+#StaticDispatch out_string
+#Evalua el parametro 0 para el CastingDispatch out_string
+la $t0, string_2      #
+move $s4, $t0      #
+lw $s6, 44($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 20($sp)      #
+#Fin del paramentro 0 al CastingDispatch out_string
+lw $t0, 44($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 24($sp)      #Lee el valor de la var param_0_to_out_string@3
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_out_string@3
+lw $t0, 52($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Book
+lw $t3, 36($t1)      #Buscando el metodo dinamico para la funcion out_string
+jal $t3                               #
+sw $v0, 16($sp)      #Asigna el resultado de la funcion
+#Fin de la exprecion previa al DinamicDispatch out_string
+#Evalua el parametro 0 para el CastingDispatch out_string
+#Get Self Property author
+lw $t0, 44($sp)      #Instancia de la clase Book
+lw $t1, 8($t0)      #Lee la propiedad author
+sw $t1, 12($sp)      #Guarda el valor de la propiedad author en la variable local param_0_to_out_string@4
+#Fin del paramentro 0 al CastingDispatch out_string
+lw $t0, 16($sp)      #Lee el valor de la var instance_dynamic_to_out_string@2
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_out_string@2
+lw $t0, 16($sp)      #Lee el valor de la var param_0_to_out_string@4
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_out_string@4
+lw $t0, 24($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Book
+lw $t3, 36($t1)      #Buscando el metodo dinamico para la funcion out_string
+jal $t3                               #
+sw $v0, 8($sp)      #Asigna el resultado de la funcion
+#Fin de la exprecion previa al DinamicDispatch out_string
+#Evalua el parametro 0 para el CastingDispatch out_string
+la $t0, string_3      #
+move $s4, $t0      #
+lw $s6, 44($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 4($sp)      #
+#Fin del paramentro 0 al CastingDispatch out_string
+lw $t0, 8($sp)      #Lee el valor de la var instance_dynamic_to_out_string@3
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_out_string@3
+lw $t0, 8($sp)      #Lee el valor de la var param_0_to_out_string@5
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_out_string@5
+lw $t0, 16($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Book
+lw $t3, 36($t1)      #Buscando el metodo dinamico para la funcion out_string
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#Inicio del paso 2 de una sequencia Block
+#Get Local Var self
+lw $t0, 44($sp)      #
+move $s4, $t0      #
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 48     #
+jr $ra                               #
+
+Article_print:     #
+#Parametro self en stackpoiner + 28
+addi $sp, $sp, -4     #Push local var instance_Book_to_print@0 stackpointer 24
+addi $sp, $sp, -4     #Push local var param_0_to_out_string@0 stackpointer 20
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_out_string@0 stackpointer 16
+addi $sp, $sp, -4     #Push local var param_0_to_out_string@1 stackpointer 12
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_out_string@1 stackpointer 8
+addi $sp, $sp, -4     #Push local var param_0_to_out_string@2 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Article_print
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Evalua la Expresion para el CastingDispatch print
+#Get Local Var self
+#Fin de la exprecion previa al CastingDispatch print
+lw $t0, 28($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+jal Book_print                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#Inicio del paso 1 de una sequencia Block
+#Evalua la Expresion para el DinamicDispatch out_string
+#Evalua la Expresion para el DinamicDispatch out_string
+#StaticDispatch out_string
+#Evalua el parametro 0 para el CastingDispatch out_string
+la $t0, string_4      #
+move $s4, $t0      #
+lw $s6, 28($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 20($sp)      #
+#Fin del paramentro 0 al CastingDispatch out_string
+lw $t0, 28($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 24($sp)      #Lee el valor de la var param_0_to_out_string@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_out_string@0
+lw $t0, 36($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Article
+lw $t3, 36($t1)      #Buscando el metodo dinamico para la funcion out_string
+jal $t3                               #
+sw $v0, 16($sp)      #Asigna el resultado de la funcion
+#Fin de la exprecion previa al DinamicDispatch out_string
+#Evalua el parametro 0 para el CastingDispatch out_string
+#Get Self Property per_title
+lw $t0, 28($sp)      #Instancia de la clase Article
+lw $t1, 12($t0)      #Lee la propiedad per_title
+sw $t1, 12($sp)      #Guarda el valor de la propiedad per_title en la variable local param_0_to_out_string@1
+#Fin del paramentro 0 al CastingDispatch out_string
+lw $t0, 16($sp)      #Lee el valor de la var instance_dynamic_to_out_string@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_out_string@0
+lw $t0, 16($sp)      #Lee el valor de la var param_0_to_out_string@1
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_out_string@1
+lw $t0, 24($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Article
+lw $t3, 36($t1)      #Buscando el metodo dinamico para la funcion out_string
+jal $t3                               #
+sw $v0, 8($sp)      #Asigna el resultado de la funcion
+#Fin de la exprecion previa al DinamicDispatch out_string
+#Evalua el parametro 0 para el CastingDispatch out_string
+la $t0, string_5      #
+move $s4, $t0      #
+lw $s6, 28($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 4($sp)      #
+#Fin del paramentro 0 al CastingDispatch out_string
+lw $t0, 8($sp)      #Lee el valor de la var instance_dynamic_to_out_string@1
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_out_string@1
+lw $t0, 8($sp)      #Lee el valor de la var param_0_to_out_string@2
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_out_string@2
+lw $t0, 16($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Article
+lw $t3, 36($t1)      #Buscando el metodo dinamico para la funcion out_string
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#Inicio del paso 2 de una sequencia Block
+#Get Local Var self
+lw $t0, 28($sp)      #
+move $s4, $t0      #
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 32     #
+jr $ra                               #
+
+IO_out_string:     #
+#Parametro self en stackpoiner + 4
+#Parametro string en stackpoiner + 0
+addi $sp, $sp, -4     #Push local var $ra stackpointer -4
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion IO_out_string
+lw $s6, 8($sp)      #Guarda self
+lw $a0, 4($sp)      #Guarda el parametro 0 -> string
+jal __str__print__                               #
+lw $ra, 0($sp)      #
+addi $sp, $sp, 12     #
+jr $ra                               #
+
+new_ctr_Bool:     #Esta funcion no se invoca en la ejecucion del programa
+
+new_ctr_Int:     #Esta funcion no se invoca en la ejecucion del programa
+
+new_ctr_String:     #Esta funcion no se invoca en la ejecucion del programa
+
+new_ctr_SELF_TYPE:     #Esta funcion no se invoca en la ejecucion del programa
+
+BookList_isNil:     #Esta funcion no se invoca en la ejecucion del programa
+
+BookList_car:     #Esta funcion no se invoca en la ejecucion del programa
+
+BookList_cdr:     #Esta funcion no se invoca en la ejecucion del programa
+
+Cons_isNil:     #Esta funcion no se invoca en la ejecucion del programa
+
+Cons_car:     #Esta funcion no se invoca en la ejecucion del programa
+
+Cons_cdr:     #Esta funcion no se invoca en la ejecucion del programa
+
+Nil_isNil:     #Esta funcion no se invoca en la ejecucion del programa
+
+IO_in_int:     #Esta funcion no se invoca en la ejecucion del programa
+
+IO_in_string:     #Esta funcion no se invoca en la ejecucion del programa
+
+IO_out_int:     #Esta funcion no se invoca en la ejecucion del programa
+
+String_length:     #Esta funcion no se invoca en la ejecucion del programa
+
+String_concat:     #Esta funcion no se invoca en la ejecucion del programa
+
+String_substr:     #Esta funcion no se invoca en la ejecucion del programa
+
+Object_copy:     #Esta funcion no se invoca en la ejecucion del programa
+
+Object_type_name:     #Esta funcion no se invoca en la ejecucion del programa
+
+###########################################################################region
+#########################################################################################################
+___fin___:
+li		$v0, 10		# system call #4 - print string
+syscall				# execute
+
+#########################################################################################################
+
+__int__new__:
+# En $s6 self
+# En $a0 el valor del entero	
+# Return $v0 la instancia del nuevo int
+
+move $t2, $a0  #Salva el valor del entero  
+
+#Allocate a una class Int
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall  #en $v0 la instancia del nuevo Int
+
+la $t0, Int     #Carga la direccion de memoria de la definicion de tipo Int
+sw $t0, ($v0)   #Guarda en la pocision cero de la instancia la direccion de la definicion del tipo
+sw $t2, 4($v0)  #Guarda en la pocicion 4 de la instancia el valor del la propiedad **value** 
+
+# No modifica la pila 
+jr $ra # Esta funcion no tiene saltos internos y en $v0 esta la instancia del nuevo Int
+
+##########################################################################################################
+__int__print__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a pintar 	
+# Return $v0 **self**
+
+lw $t0, 4($a0)  #Lee la propiedad **value**
+
+li $v0, 1
+move $a0, $t0  #Pinta el valor la propiedad **value** del int
+syscall
+
+move $v0, $s6  #Guarda en $v0 **self** para retornar 
+# No modifica la pila 
+jr $ra # Esta funcion no tiene saltos internos y en $v0 esta self
+
+##########################################################################################################
+__int__input__:
+# En $s6 **self**
+# Return $v0 la instancia del nuevo **Int**
+
+li $v0, 5   #Lee un entero por la consola 
+syscall     #Guarda el entero en $v0
+
+move $s5, $ra    #Salva $ra en $s5 para saltar a crear un Int con el valor leido
+move $a0, $v0
+jal __int__new__ #En $v0 la instancia del nuevo entero 
+
+move $ra, $s5   #Reasigna $ra para salir de **input** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__sum__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a sumando A 	
+# En $a1 la direccion del **Int** a sumando B 	
+# Return $v0 new **Int** con **value** A+B
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del sumando A
+lw $t1, 4($a1)      #Lee la propiedad **value** del sumando B
+add $a0, $t0, $t1  #$a0 =  A + B
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A+B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **sum** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__sub__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# En $a1 la direccion del **Int** a operador B 	
+# Return $v0 new **Int** con **value** A-B
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+lw $t1, 4($a1)      #Lee la propiedad **value** del operador B
+sub	$a0, $t0, $t1   #$a0 =  A - B
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A-B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **rest** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__mul__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# En $a1 la direccion del **Int** a operador B 	
+# Return $v0 new **Int** con **value** A*B
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+lw $t1, 4($a1)      #Lee la propiedad **value** del operador B
+mul	$a0, $t0, $t1   #$a0 =  A * B
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A*B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **mul** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__div__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# En $a1 la direccion del **Int** a operador B 	
+# Return $v0 new **Int** con **value** A/B
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+lw $t1, 4($a1)      #Lee la propiedad **value** del operador B
+div	$a0, $t0, $t1   #$a0 =  A/B
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A/B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **div** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__le__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# En $a1 la direccion del **Int** a operador B 	
+# Return $v0 new **Int** con **value** A-B
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+lw $t1, 4($a1)      #Lee la propiedad **value** del operador B
+slt	$a0, $t0, $t1   #$a0 =  A < B
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A<B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **less** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__leq__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# En $a1 la direccion del **Int** a operador B 	
+# Return $v0 new **Int** con **value** A-B
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+lw $t1, 4($a1)      #Lee la propiedad **value** del operador B
+sle	$a0, $t0, $t1   #$a0 =  A <= B
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A<=B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **less_or_equal** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__eq__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# En $a1 la direccion del **Int** a operador B 	
+# Return $v0 new **Int** con **value** A-B
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+lw $t1, 4($a1)      #Lee la propiedad **value** del operador B
+seq	$a0, $t0, $t1   #$a0 =  A == B
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A==B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **equal** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__complement__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# Return $v0 new **Int** con **value** ~A
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+li $t1, 4294967295  # guarda 2^31 + 1
+xor $a0, $t1, $t0   
+add $a0, $a0, 1     
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con ~A en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **complement** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__neg__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# Return $v0 new **Int** con **value** !A
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+addi $a0, $t0, -1   #$a0 =  A - 1 => if A == 0 then $a0 = -1 else $a0 = 0
+mul  $a0, $a0, -1   #$a0 = -$a0   => if $a0 == 0 then $a0 = 0 else 1
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A+B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **rest** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__clone__:
+# En $s6 self
+
+
+
+#region
+##########################################################################################
+__bool__new__:
+# En $s6 self
+# En $a0 instancia de Int para convertir 	
+# Return $v0 la instancia del nuevo Bool
+
+lw $t0, 4($a0) # Guardando el valor la propiedad de **value**
+
+li $t1, 1
+beq $t0, $t1, __bool__ok_value__  #Comparando el valor con 1
+li $t1, 0
+beq $t0, $t1, __bool__ok_value__  #Comparando el valor con 0
+
+# Si el valor no es ni cero ni uno cierra el programa 
+li		$v0, 4		# system call #4 - print string
+la		$a0, Bool_Name
+syscall				# execute
+li		$v0, 1		# system call #4 - print string
+move	$a0, $t0
+syscall				# execute
+li		$v0, 10		# system call #4 - print string
+syscall				# execute
+
+__bool__ok_value__:
+la $t0, Bool     #Carga la direccion de memoria de la definicion de tipo Bool
+sw $t0, ($a0)    #Guarda en la pocision cero de la instancia la direccion de la definicion del tipo
+
+move $v0, $a0
+# No modifica la pila 
+jr $ra # Esta funcion no tiene saltos internos y en $v0 esta la instancia del nuevo Bool
+
+##########################################################################################################
+__bool__if_go_to__:
+# En $s6 self
+# En $a0 instancia de Bool a evaluar 
+# En $a1 direccion a la que saltar  
+# Return $v0 la instancia del nuevo Bool
+
+lw $t0, 4($a0)  #Guarda el valor de la propiedad **value** del Bool
+li $t1, 1       #Guarda 1 en $t0 para comparar con la propiedad **value**
+
+beq	$t0, $t1, __go_to__	# if $t0 == $t1 then __go_to__
+jr $ra          #esta funcion solo termina si el bool es false 
+__go_to__:
+j $a1   # La condicion se cumple salta hacia el segundo parametro
+
+##########################################################################################################
+__bool__check__type__:
+# En $s6 **self**
+# En $a0 direccion de memoria de la lista de ancestro de un typo 
+# En $a1 identificador numerico de un tipo
+
+li $v0, 1       # Por default devuelve 1
+__check__type__loop__:
+    lw $t0, ($a0)       #Lee el id de un typo 
+    beq $t0, $zero, __check__type__false__
+    beq $t0, $a1, __check__type__end__
+    addi $a0, $a0, 4
+    j __check__type__loop__
+
+__check__type__false__: 
+    li $v0, 0
+__check__type__end__:
+    jr $ra
+
+#region
+#############################################################################################
+__str__new__:
+# En $s6 self
+# En $a0 el direccion de memoria que apunta a un string	
+# Return $v0 la instancia del nuevo string
+
+move $t2, $a0  #Salva la direccion de memoria  
+
+#Allocate a una class String
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall  #en $v0 la instancia del nuevo String
+
+la $t0, String     #Carga la direccion de memoria de la definicion de tipo Int
+sw $t0, ($v0)   #Guarda en la pocision cero de la instancia la direccion de la definicion del tipo
+sw $t2, 4($v0)  #Guarda en la pocicion 4 de la instancia el valor del la propiedad **value** 
+
+# No modifica la pila 
+jr $ra # Esta funcion no tiene saltos internos y en $v0 esta la instancia del nuevo Int
+
+##########################################################################################################
+__str__print__:
+# En $s6 **self**
+# En $a0 la direccion del **String** a pintar 	
+# Return $v0 **self**
+
+lw $t0, 4($a0)  #Lee la propiedad **value**
+
+li $v0, 4
+move $a0, $t0  #Pinta el valor la propiedad **value** del String
+syscall
+
+move $v0, $s6  #Guarda en $v0 **self** para retornar 
+# No modifica la pila 
+jr $ra # Esta funcion no tiene saltos internos y en $v0 esta self
+
+##########################################################################################################
+__str__input__:
+# En $s6 **self**
+# Return $v0 la instancia del nuevo **String**
+
+addi $sp, $sp, -4
+sw $ra ($sp)   #Salva $ra en 12($sp)
+addi $sp, $sp, -4
+sw $s6, ($sp)    #Salva self en 8($sp)
+
+li $a0, 1000    # reserva memoria para el string
+li $v0, 9       
+syscall         # En $v0 direccion de memoria del nuevo string
+
+move $a0, $v0   # Asigan la direccion del nuevo string para llamar a la funcion de leer
+li $v0, 8       # Leer un string de la consola 
+li $a1 , 1000   
+syscall         # En $a0 el string leido en la consola 
+jal __str__new__ #En $v0 la instancia del nuevo entero 
+move $a0, $v0
+
+addi $sp, $sp, -4
+sw $v0, ($sp)    #Salva el nuevo string en 4($sp)
+
+move $s6, $v0   #cambia sefl por el nuevo string 
+jal __str__length__
+
+lw $t0, 4($v0)      #Lee la propiedad **value** del **Int** que devuelve length 
+
+beq $t0,$zero, jline
+addi $t0, $t0, -1   #Resta uno al length para eliminar el '\n'
+
+jline:
+sw $t0, 4($v0)      #Actualiza la propieded **value** del **Int** length
+
+addi $sp, $sp, -4
+sw $v0, ($sp)       #Salva el length en ($sp)
+
+li $a0, 0
+jal __int__new__    #Crea un nuevo entero con **value** 0
+
+lw $s6, 4($sp)      #Self = al string leido en la consola 
+move $a0, $v0       #index = 0 
+lw $a1, ($sp)       #count = length - 1 
+
+jal __str__substr__ #En $v0 el substring sin '\n'
+
+lw $s6, 8($sp)   #Reasigna Self para salir de **input** volver a la funcion anterior 
+lw $ra, 12($sp)  #Reasigna $ra para salir de **input** volver a la funcion anterior
+addi $sp, $sp, 16 #Limpia la pila 
+jr $ra          #Devuelve en $v0 el subsstring leido por la consola 
+
+##########################################################################################################
+__str__length__:
+# En $s6 **self**
+# Return $v0 la instancia del nuevo **Int**
+
+li $t0 , 0       # len result
+lw $t2 , 4($s6)  # Leer la propiedad value a self
+
+loop_len:
+lb  $t3, ($t2)  # Guarda la primara letra
+beq $t3, $zero, end_len  
+add $t0, $t0, 1 # Suma al contador 
+add $t2, $t2, 1  # Mueve el punteron del string en 1 
+j loop_len
+
+end_len:
+move $a0, $t0
+move $s5, $ra
+jal __int__new__
+move $ra, $s5
+jr $ra
+
+###########################################################################################################
+__str__substr__:
+# En $s6 **self**
+# En $a0 **Int** el indece en el que inicia el sub
+# En $a1 **Int** cantidad de caracteres que tiene el sub
+
+lw $t0, 4($s6)  # Lee la propiedad value de **sefl**
+lw $t1, 4($a0)  # Lee la propiedad value del **Int** indice 
+lw $t2, 4($a1)  # Lee la propiedad value del **Int** length 
+
+li $t3, 0        # Contador para iterar el string en busqueda de indice  
+li $t4, 1        # Contador para iterar el string hasta llegar al length
+
+addi $t5, $t2, 1
+move $a0, $t5      # reserva memoria para el string
+li $v0,9
+syscall           # En $v0 la direccion de memoria del nuevo string
+move $t5, $v0    
+
+beq $t2, $zero, end_sub_string
+
+find_index:
+    beq	 $t3, $t1, find_length	# si el contador es el indice comiensa a crear el sub
+    add	 $t0, $t0, 1		    # mueve el puntero del string de self
+    add	 $t3, $t3, 1	        # mueve el contador 
+    j find_index
+
+find_length:
+    lb	 $t6, ($t0)			# Lee la primera letra del string self  
+    sb	 $t6, ($t5)         # guarda la primera letra del string self en el nuevo string
+    beq	 $t2, $t4, end_sub_string	# si el contador del tamaño es igual a j end
+    add	 $t5, $t5, 1		# Mueve el puntero del nuevo string 
+    add	 $t0, $t0, 1		# Mueve el puntero del string self
+    add	 $t4, $t4, 1	    # Contador de tamaño += 1 
+    j find_length
+    
+end_sub_string:
+    add	 $t5, $t5, 1		# Mueve el puntero del nuevo string 
+    sb	 $zero, ($t5)         # guarda la primera letra del string self en el nuevo string
+
+    addi $sp, $sp, -4
+    sw $ra, ($sp)   # Guarda en la pila $ra
+
+    move $a0, $v0       # Pasa como parametros la direccion de memoria del string
+    jal __str__new__    # En $v0 la instancia del nuevos string
+
+    lw $ra, ($sp)       # Reasigna $ra para volver al la funcion anterior 
+    addi $sp, $sp, 4    #  Limpia la pila 
+    jr $ra              # Return instancia del substring en $v0
+
+############################################################################################################
+__str__concat__:
+# En $s6 **self**
+# En #a0 instancia de otro string
+
+addi $sp, $sp, -4
+sw $s6, ($sp)       #Salva **self**
+addi $sp, $sp, -4
+sw $a0, ($sp)       #Salva el string que se paso como parametro 
+addi $sp, $sp, -4
+sw $ra, ($sp)       #Salva $ra para saber a donde retornar 
+
+jal __str__length__
+addi $sp, $sp, -4
+lw $t0, 4($v0)      #Lee el valor de la propiedad **value**
+sw $t0, ($sp)       #Salva el valor del primer length 
+
+lw $t0, 8($sp)
+move $s6, $t0       #Cambia self por el otro string
+jal __str__length__
+lw $t0, ($sp)       #Lee el lenght del string self
+lw $t1, 4($v0)      #Lee el valor de la pripiedad value del resultado de la funcion length 
+add $t0, $t0, $t1   # Suma los length de ambos string
+
+add $t0, $t0, 1 
+move $a0, $t0
+li $v0, 9
+syscall             # Reserva espacion para un string de tamaño length1 + length2
+#En $v0 el nuevo string 
+
+move $t3, $v0
+lw $t2, 8($sp)      #Lee el string que se paso por parametro  
+lw $t1, 4($t2)      #Lee la propiedad **value** del string
+lw $t2, 12($sp)     #Lee self
+lw $t0, 4($t2)      #Lee la propiedad **value** de self 
+
+loop_str1:
+    lb   $t2, ($t0)       # primera letra del puntero al string self
+    beq  $t2, $zero, loop_str2 
+    add  $t0, $t0, 1      # mueve el puntero del string self
+    sb   $t2, ($t3)       # guarda la letra en el nuevo string 
+    add  $t3, $t3, 1      # mueve el puntero del nuevo string
+    j loop_str1
+
+loop_str2:
+    lb   $t2, ($t1)       # primera letra del puntero al string str1
+    beq  $t2, $zero, end_concat
+    add  $t1, $t1, 1    # mueve el puntero del string str1
+    sb   $t2, ($t3)     # guarda la letra en el nuevo string 
+    add  $t3,  $t3, 1   # mueve el puntero del nuevo string
+    j loop_str1
+
+end_concat:
+    move $a0, $v0
+    jal __str__new__
+    lw $ra, 4($sp)
+    lw $s6, 12($sp)
+    addi $sp, $sp, 16 #Limpia la pila
+    jr $ra            # Return en $v0 la nueva instancia de self
+
+############################################################################################################
+__str__cmp__:
+# En $s6 **self**
+# En $a0 instancia de str1
+# En $a1 instancia de str2
+
+addi $sp, $sp -4
+sw $ra, ($sp)
+
+lw $t0, 4($a0)     #Lee la propiedad **value** de str1
+lw $t1, 4($a1)     #Lee la propiedad **value** de str2
+li $a0, 1       # True por default
+
+str_cmp_loop:
+    lb $t2, ($t0)   #Lee una letra de str1
+    lb $t3, ($t1)   #Lee una letra de str2
+    addi $t0, $t0, 1
+    addi $t1, $t1, 1
+    beq $t2, $zero, cmp_end_to_zero     #Se llego al fin del str1
+    beq $t3, $zero, cmp_end_to_zero     #Se llego al fin del str2
+    beq $t2, $t3,   str_cmp_loop        #Continua comparando si son iguales 
+    j str_cmp_false
+
+cmp_end_to_zero:
+    beq $t2, $t3,  end_str_cmp         #Chequea que ambos hallan llegado al final 
+    j str_cmp_false
+
+str_cmp_false:
+    li $a0, 0       #Cambia el defaul True por False 
+end_str_cmp:
+    jal __int__new__    #Crea un Int que luego se debe cambiar por bool
+    lw $ra, ($sp)       #Lee $ra para retornar 
+    addi $sp, $sp, 4    #Limpia la pila 
+    jr $ra              #En $v0 un Int que hay que cambiar por Bool
+

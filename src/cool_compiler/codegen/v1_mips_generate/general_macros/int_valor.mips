@@ -1,0 +1,235 @@
+.data
+Int_Name: .asciiz "Int"
+Int: .word  Int_Name, 2, 
+
+.text
+.globl main
+main:
+    jal __int__input__
+    sw $v0, ($sp)
+
+    move $a0, $v0
+    jal __int__print__ # print number 
+
+    li $a0, -4
+    addi $sp, $sp, -4
+    sw $a0, ($sp)
+
+    lw $a0, ($sp)   # -4
+    lw $a1, 4($sp)  # number
+    jal __int__sum__ # print number + 4
+
+    move $a0, $v0
+    jal __int__print__
+
+    lw $a0, ($sp)   # -4
+    lw $a1, 4($sp)  # number
+    jal __int__sub__
+
+    move $a0, $v0
+    jal __int__print__ # print -4  - number
+
+    lw $a1, ($sp)   # -4
+    lw $a0, 4($sp)  # number
+    jal __int__sub__
+
+    move $a0, $v0
+    jal __int__print__ # print number - -4
+
+    lw $a0, ($sp)   # -4
+    lw $a1, 4($sp)  # number
+    jal __int__mul__
+
+    move $a0, $v0
+    jal __int__print__ # print number * -4
+
+    lw $a0, ($sp)   # -4
+    lw $a1, 4($sp)  # number
+    jal __int__div__
+
+    move $a0, $v0
+    jal __int__print__  # print -4 / number
+
+    lw $a1, ($sp)   # -4
+    lw $a0, 4($sp)  # number
+    jal __int__div__
+
+    move $a0, $v0
+    jal __int__print__  # print number/ -4
+
+    lw $a0, ($sp)   # -4
+    lw $a1, 4($sp)  # number
+    jal __int__le__
+
+    move $a0, $v0
+    jal __int__print__  # print -4 < number
+
+    lw $a0, ($sp)   # -4
+    lw $a1, 4($sp)  # number
+    jal __int__leq__
+
+    move $a0, $v0
+    jal __int__print__  # print -4 <= number
+
+    lw $a0, ($sp)   # -4
+    lw $a1, 4($sp)  # number
+    jal __int__eq__
+    move $s0, $v0
+
+    move $a0, $v0
+    jal __int__print__  # print -4 == number
+
+    move $a0, $s0
+    jal __int__neg__				
+    
+    move $a0, $v0
+    jal __int__print__  # print ! (-4 == numbe)
+
+    lw $a0, 4($sp)  # number
+    jal __int__complement__
+
+    move $a0, $v0
+    jal __int__print__  # print -4 <= number
+
+    li	$v0, 10
+    syscall			
+
+#region
+#########################################################################################################
+___fin___:
+li		$v0, 10		# system call #4 - print string
+syscall				# execute
+
+######################################################################################################
+__int__print__:
+# En $s6 **self**
+# En $a0 el valor del **Int** a pintar 	
+# Return $v0 **self**
+
+li $v0, 1
+syscall
+
+move $v0, $s6  #Guarda en $v0 **self** para retornar 
+# No modifica la pila 
+jr $ra # Esta funcion no tiene saltos internos y en $v0 esta self
+
+##########################################################################################################
+__int__input__:
+# En $s6 **self**
+# Return $v0 el valor del nuevo **Int**
+
+li $v0, 5   #Lee un entero por la consola 
+syscall     #Guarda el entero en $v0
+
+jr $ra          #Esta funcion no tiene saltos internos y en $v0 esta el valor  del nuevo **Int**
+
+##########################################################################################################
+__int__sum__:
+# En $s6 **self**
+# En $a0 valor del **Int** a sumando A 	
+# En $a1 valor del **Int** a sumando B 	
+# Return $v0  **value** A+B
+
+add $v0, $a0, $a1  #$a0 =  A + B
+jr $ra          #Esta funcion no tiene saltos internos y en $v0 esta el valor del nuevo **Int**
+
+##########################################################################################################
+__int__sub__:
+# En $s6 **self**
+# En $a0 valor del **Int** a sumando A 	
+# En $a1 valor del **Int** a sumando B 	
+# Return $v0  **value** A-B
+sub	$v0, $a0, $a1   #$a0 =  A - B
+ 
+jr $ra          #Esta funcion no tiene saltos internos y en $v0 el valor del nuevo **Int**
+
+##########################################################################################################
+__int__mul__:
+# En $s6 **self**
+# En $a0 valor del **Int** a sumando A 	
+# En $a1 valor del **Int** a sumando B 	
+# Return $v0  **value** A*B
+
+mul	$v0, $a0, $a1   #$a0 =  A * B
+
+jr $ra          #Esta funcion no tiene saltos internos y en $v0 esta el valor del nuevo **Int**
+
+##########################################################################################################
+__int__div__:
+# En $s6 **self**
+# En $a0 valor del **Int** a sumando A 	
+# En $a1 valor del **Int** a sumando B 	
+# Return $v0  **value** A/B
+
+div	$v0, $a0, $a1   #$a0 =  A/B
+
+jr $ra          #Esta  funcion no tiene saltos internos y en $v0 esta el valor del nuevo **Int**
+
+##########################################################################################################
+__int__le__:
+# En $s6 **self**
+# En $a0 valor del **Int** a comparador A 	
+# En $a1 valor del **Int** a comparador B 	
+# Return $v0  **value** A < B
+
+
+slt	$v0, $a0, $a1   #$a0 =  A < B
+
+jr $ra          #Esta funcion no tiene saltos internos y en $v0 esta el **Valor** de la comparacion
+
+##########################################################################################################
+__int__leq__:
+# En $s6 **self**
+# En $a0 valor del **Int** a comparador A 	
+# En $a1 valor del **Int** a comparador B 	
+# Return $v0  **value** A <= B
+
+sle	$v0, $a0, $a1   #$a0 =  A <= B
+
+jr $ra          #Esta funcion no tiene saltos internos y en $v0 esta el **Valor** de la comparacion
+
+##########################################################################################################
+__int__eq__:
+# En $s6 **self**
+# En $a0 valor del **Int** a comparador A 	
+# En $a1 valor del **Int** a comparador B 	
+# Return $v0  **value** A == B
+
+seq	$v0, $a0, $a1   #$a0 =  A == B
+
+jr $ra          #Esta funcion no tiene saltos internos y en $v0 esta el **Valor** de la comparacion
+
+##########################################################################################################
+__int__complement__:
+# En $s6 **self**
+# En $a0 el valor del  **Int** a operador A 	
+# Return $v0 valor de  ~A
+
+
+li $t1, 4294967295  # guarda 2^31 + 1
+xor $v0, $t1, $a0   
+add $v0, $v0, 1     
+
+
+jr $ra          #Esta funcion no tiene saltos internos y en $v0 esta el valor de ~A 
+
+##########################################################################################################
+__int__neg__:
+# En $s6 **self**
+# En $a0 el valor del  **Int** a operador A 	
+# Return $v0 **value** !A
+
+addi $a0, $a0, -1   #$a0 =  A - 1 => if A == 0 then $a0 = -1 else $a0 = 0
+mul  $v0, $a0, -1   #$a0 = -$a0   => if $a0 == 0 then $a0 = 0 else 1
+
+
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__clone__:
+# En $s6 self
+
+
+
+#endregion
+##########################################################################################################

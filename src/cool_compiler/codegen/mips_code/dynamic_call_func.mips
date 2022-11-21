@@ -1,0 +1,60 @@
+.data
+Main_parents: .word 1 2 3 
+Main: .word Main_parents f1
+endLine: .asciiz "\n"
+
+.text
+.globl main
+main:
+
+li $a0, 4
+li $v0, 9
+syscall
+sw $v0, 0($sp)  
+
+lw $t0, 0($sp) # Lee la instancia en la pila 
+la $t1, Main   # Guarda en $t1 la direccion de Main 
+lw $t2, Main_parents # Gaurda en $t2 el primer valor de Main_parents 
+sw $t1, 0($t0) # Guarda en 0($t0) lo que esta en $t1 osea la direccion de Main 
+lw $t3, 0($t0) # Guarda en $t3 lo que esta en 0($t0) osea la direccionn de Main
+
+li		$v0, 1		# system call #4 - print string
+la		$a0, Main   # Imprime direccion de Main
+syscall				# execute
+
+li		$v0, 4		# system call #4 - print string
+la		$a0, endLine
+syscall	
+
+li		$v0, 1		# system call #4 - print string
+la		$a0, ($t2)  # Imprime 1 primer elemento de Main_parents
+syscall				# execute
+
+li		$v0, 4		# system call #4 - print string
+la		$a0, endLine 
+syscall				# execute
+
+li		$v0, 1		# system call #4 - print string
+la		$a0, 0($t3) # Imprime direccion de Main
+syscall				# execute
+
+li		$v0, 4		# system call #4 - print string
+la		$a0, endLine 
+syscall				# execute
+
+lw $t4, 4($t3) 
+jal $t4
+
+li		$v0, 4		# system call #4 - print string
+la		$a0, endLine 
+syscall				# execute
+
+li		$v0, 10
+syscall				# execute
+
+
+f1: 
+li		$v0, 1		# system call #4 - print string
+la		$a0, 10
+syscall				# execute
+jr $ra

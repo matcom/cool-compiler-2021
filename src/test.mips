@@ -1,0 +1,4151 @@
+.data
+_______error______: .asciiz "Abort called from class "
+_______null_______: .asciiz "null"
+_______endline_______: .asciiz "\n"
+_______void_str_______: .asciiz ""
+Bool_parents: .word 1, 2, 0, 
+Bool_Name: .asciiz "Bool"
+Bool: .word Bool_Name, 2, Bool_parents, Object_abort, Object_copy, Object_type_name, 
+Int_parents: .word 1, 3, 0, 
+Int_Name: .asciiz "Int"
+Int: .word Int_Name, 2, Int_parents, Object_abort, Object_copy, Object_type_name, 
+String_parents: .word 1, 4, 0, 
+String_Name: .asciiz "String"
+String: .word String_Name, 2, String_parents, Object_abort, Object_copy, Object_type_name, String_concat, String_length, String_substr, 
+SELF_TYPE_parents: .word 1, 5, 0, 
+SELF_TYPE_Name: .asciiz "SELF_TYPE"
+SELF_TYPE: .word SELF_TYPE_Name, 1, SELF_TYPE_parents, Object_abort, Object_copy, Object_type_name, 
+Object_parents: .word 1, 0, 
+Object_Name: .asciiz "Object"
+Object: .word Object_Name, 1, Object_parents, Object_abort, Object_copy, Object_type_name, 
+IO_parents: .word 1, 6, 0, 
+IO_Name: .asciiz "IO"
+IO: .word IO_Name, 1, IO_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, 
+Graph_parents: .word 1, 7, 0, 
+Graph_Name: .asciiz "Graph"
+Graph: .word Graph_Name, 3, Graph_parents, Object_abort, Object_copy, Object_type_name, Graph_add_vertice, Graph_print_E, Graph_print_V, 
+Vertice_parents: .word 1, 6, 8, 0, 
+Vertice_Name: .asciiz "Vertice"
+Vertice: .word Vertice_Name, 3, Vertice_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, Vertice_outgoing, Vertice_number, Vertice_init, Vertice_add_out, Vertice_print, 
+Edge_parents: .word 1, 6, 9, 0, 
+Edge_Name: .asciiz "Edge"
+Edge: .word Edge_Name, 4, Edge_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, Edge_init, Edge_print, 
+EList_parents: .word 1, 6, 10, 0, 
+EList_Name: .asciiz "EList"
+EList: .word EList_Name, 2, EList_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, EList_isNil, EList_head, EList_tail, EList_cons, EList_append, EList_print, 
+ECons_parents: .word 1, 6, 10, 11, 0, 
+ECons_Name: .asciiz "ECons"
+ECons: .word ECons_Name, 3, ECons_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, ECons_isNil, ECons_head, ECons_tail, EList_cons, EList_append, ECons_print, ECons_init, 
+VList_parents: .word 1, 6, 12, 0, 
+VList_Name: .asciiz "VList"
+VList: .word VList_Name, 2, VList_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, VList_isNil, VList_head, VList_tail, VList_cons, VList_print, 
+VCons_parents: .word 1, 6, 12, 13, 0, 
+VCons_Name: .asciiz "VCons"
+VCons: .word VCons_Name, 3, VCons_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, VCons_isNil, VCons_head, VCons_tail, VList_cons, VCons_print, VCons_init, 
+Parse_parents: .word 1, 6, 14, 0, 
+Parse_Name: .asciiz "Parse"
+Parse: .word Parse_Name, 3, Parse_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, Parse_read_input, Parse_parse_line, Parse_c2i, Parse_a2i, Parse_a2i_aux, 
+Main_parents: .word 1, 6, 14, 15, 0, 
+Main_Name: .asciiz "Main"
+Main: .word Main_Name, 4, Main_parents, Object_abort, Object_copy, Object_type_name, IO_in_int, IO_in_string, IO_out_int, IO_out_string, Parse_read_input, Parse_parse_line, Parse_c2i, Parse_a2i, Parse_a2i_aux, Main_main, 
+BoolOp_parents: .word 1, 16, 0, 
+BoolOp_Name: .asciiz "BoolOp"
+BoolOp: .word BoolOp_Name, 1, BoolOp_parents, Object_abort, Object_copy, Object_type_name, BoolOp_and, BoolOp_or, 
+string_0: .asciiz " ("
+string_1: .asciiz ","
+string_2: .asciiz ")"
+string_3: .asciiz "\n"
+string_4: .asciiz "\n"
+string_5: .asciiz "\n"
+string_6: .asciiz ""
+string_7: .asciiz "0"
+string_8: .asciiz "1"
+string_9: .asciiz "2"
+string_10: .asciiz "3"
+string_11: .asciiz "4"
+string_12: .asciiz "5"
+string_13: .asciiz "6"
+string_14: .asciiz "7"
+string_15: .asciiz "8"
+string_16: .asciiz "9"
+string_17: .asciiz "-"
+string_18: .asciiz " "
+string_19: .asciiz " "
+string_20: .asciiz ","
+string_21: .asciiz ""
+string_22: .asciiz ""
+
+.text
+.globl main
+main:     #
+addi $sp, $sp, -4     #Push local var self stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion main
+#Allocate a una class Main
+#atributo type_name en puntero + 0
+#atributo boolop en puntero + 4
+#atributo rest en puntero + 8
+#atributo g en puntero + 12
+li $a0, 16      #
+li $v0, 9      #
+syscall
+sw $v0, 4($sp)      #Guardando en la variable local self puntero de la instancia de la clase Main
+#Assignacion de la insformacion de tipo a Main
+la $t0, Main      #
+move $s4, $t0      #
+lw $t0, 4($sp)      #Instancia de la clase 
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded type_name
+sw $t1, 0($t0)      #Setea la propiedad type_name con el valor de _
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+jal new_ctr_Main                               #
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+jal Main_main                               #
+li $v0, 10      #
+syscall
+
+new_ctr_Main:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_Main
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+jal new_ctr_Parse                               #
+#Assignando el resultado de la expression al atributo g de la clase Main
+#StaticDispatch read_input
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 8($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Main
+lw $t3, 40($t1)      #Buscando el metodo dinamico para la funcion read_input
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+lw $t0, 4($sp)      #Instancia de la clase Main
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded g
+sw $t1, 12($t0)      #Setea la propiedad g con el valor de _
+#Fin De la Asignacion
+lw $v0, 4($sp)      #Return self
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+Main_main:     #
+#Parametro self en stackpoiner + 12
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_print_V@0 stackpointer 8
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_print_E@0 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Main_main
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Evalua la Expresion para el DinamicDispatch print_V
+#Get Self Property g
+lw $t0, 12($sp)      #Instancia de la clase Main
+lw $t1, 12($t0)      #Lee la propiedad g
+sw $t1, 8($sp)      #Guarda el valor de la propiedad g en la variable local instance_dynamic_to_print_V@0
+#Fin de la exprecion previa al DinamicDispatch print_V
+lw $t0, 8($sp)      #Lee el valor de la var instance_dynamic_to_print_V@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_print_V@0
+lw $t0, 12($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Graph
+lw $t3, 32($t1)      #Buscando el metodo dinamico para la funcion print_V
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#Inicio del paso 1 de una sequencia Block
+#Evalua la Expresion para el DinamicDispatch print_E
+#Get Self Property g
+lw $t0, 12($sp)      #Instancia de la clase Main
+lw $t1, 12($t0)      #Lee la propiedad g
+sw $t1, 4($sp)      #Guarda el valor de la propiedad g en la variable local instance_dynamic_to_print_E@0
+#Fin de la exprecion previa al DinamicDispatch print_E
+lw $t0, 4($sp)      #Lee el valor de la var instance_dynamic_to_print_E@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_print_E@0
+lw $t0, 8($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Graph
+lw $t3, 28($t1)      #Buscando el metodo dinamico para la funcion print_E
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 16     #
+jr $ra                               #
+
+new_ctr_Parse:     #
+#Parametro self en stackpoiner + 8
+addi $sp, $sp, -4     #Push local var new_BoolOp@0 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_Parse
+lw $t0, 8($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+jal new_ctr_IO                               #
+#Assignando el resultado de la expression al atributo boolop de la clase Parse
+#Creando instancia de tipo BoolOp
+#Allocate a una class BoolOp
+#atributo type_name en puntero + 0
+li $a0, 4      #
+li $v0, 9      #
+syscall
+sw $v0, 4($sp)      #Guardando en la variable local new_BoolOp@0 puntero de la instancia de la clase BoolOp
+#Assignacion de la insformacion de tipo a la instancia
+la $t0, BoolOp      #
+move $s4, $t0      #
+lw $t0, 4($sp)      #Instancia de la clase 
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded type_name
+sw $t1, 0($t0)      #Setea la propiedad type_name con el valor de _
+lw $t0, 4($sp)      #Lee el valor de la var new_BoolOp@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con new_BoolOp@0
+jal new_ctr_BoolOp                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+lw $t0, 8($sp)      #Instancia de la clase Parse
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded boolop
+sw $t1, 4($t0)      #Setea la propiedad boolop con el valor de _
+#Fin De la Asignacion
+la $t0, _______void_str_______      #
+move $s4, $t0      #
+lw $s6, 8($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+move $s4, $v0      #
+lw $t0, 8($sp)      #Instancia de la clase Parse
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded rest
+sw $t1, 8($t0)      #Setea la propiedad rest con el valor de _
+lw $v0, 8($sp)      #Return self
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 12     #
+jr $ra                               #
+
+Parse_read_input:     #
+#Parametro self en stackpoiner + 56
+addi $sp, $sp, -4     #Push local var g stackpointer 52
+addi $sp, $sp, -4     #Push local var new_Graph@0 stackpointer 48
+addi $sp, $sp, -4     #Push local var line stackpointer 44
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_add_vertice@0 stackpointer 40
+addi $sp, $sp, -4     #Push local var param_0_to_parse_line@0 stackpointer 36
+addi $sp, $sp, -4     #Push local var param_0_to_add_vertice@0 stackpointer 32
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_and@0 stackpointer 28
+addi $sp, $sp, -4     #Push local var str_eq@_a@0 stackpointer 24
+addi $sp, $sp, -4     #Push local var str_eq@_b@0 stackpointer 20
+addi $sp, $sp, -4     #Push local var param_0_to_and@0 stackpointer 16
+addi $sp, $sp, -4     #Push local var str_eq@_a@1 stackpointer 12
+addi $sp, $sp, -4     #Push local var str_eq@_b@1 stackpointer 8
+addi $sp, $sp, -4     #Push local var param_1_to_and@0 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Parse_read_input
+#Eval Expression to Let g
+#Creando instancia de tipo Graph
+#Allocate a una class Graph
+#atributo type_name en puntero + 0
+#atributo vertices en puntero + 4
+#atributo edges en puntero + 8
+li $a0, 12      #
+li $v0, 9      #
+syscall
+sw $v0, 48($sp)      #Guardando en la variable local new_Graph@0 puntero de la instancia de la clase Graph
+#Assignacion de la insformacion de tipo a la instancia
+la $t0, Graph      #
+move $s4, $t0      #
+lw $t0, 48($sp)      #Instancia de la clase 
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded type_name
+sw $t1, 0($t0)      #Setea la propiedad type_name con el valor de _
+lw $t0, 48($sp)      #Lee el valor de la var new_Graph@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con new_Graph@0
+jal new_ctr_Graph                               #
+sw $v0, 52($sp)      #Asigna el resultado de la funcion
+#Fin de la asignacion Let g
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Eval Expression to Let line
+#StaticDispatch in_string
+lw $t0, 56($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 60($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Parse
+lw $t3, 28($t1)      #Buscando el metodo dinamico para la funcion in_string
+jal $t3                               #
+sw $v0, 44($sp)      #Asigna el resultado de la funcion
+#Fin de la asignacion Let line
+#Inicio de un While
+j while_cond_0                               #
+while_back_0:
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Evalua la Expresion para el DinamicDispatch add_vertice
+#Get Local Var g
+lw $t0, 52($sp)      #
+sw $t0, 40($sp)      #
+#Fin de la exprecion previa al DinamicDispatch add_vertice
+#Evalua el parametro 0 para el CastingDispatch add_vertice
+#StaticDispatch parse_line
+#Evalua el parametro 0 para el CastingDispatch parse_line
+#Get Local Var line
+lw $t0, 44($sp)      #
+sw $t0, 36($sp)      #
+#Fin del paramentro 0 al CastingDispatch parse_line
+lw $t0, 56($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 40($sp)      #Lee el valor de la var param_0_to_parse_line@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_parse_line@0
+lw $t0, 64($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Parse
+lw $t3, 44($t1)      #Buscando el metodo dinamico para la funcion parse_line
+jal $t3                               #
+sw $v0, 32($sp)      #Asigna el resultado de la funcion
+#Fin del paramentro 0 al CastingDispatch add_vertice
+lw $t0, 40($sp)      #Lee el valor de la var instance_dynamic_to_add_vertice@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_add_vertice@0
+lw $t0, 36($sp)      #Lee el valor de la var param_0_to_add_vertice@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_add_vertice@0
+lw $t0, 48($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Graph
+lw $t3, 24($t1)      #Buscando el metodo dinamico para la funcion add_vertice
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#Inicio del paso 1 de una sequencia Block
+#Asignando un nuevo valor a la variable line
+#StaticDispatch in_string
+lw $t0, 56($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 60($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Parse
+lw $t3, 28($t1)      #Buscando el metodo dinamico para la funcion in_string
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+move $t0, $s4      #
+sw $t0, 44($sp)      #
+lw $t0, 44($sp)      #
+move $s4, $t0      #
+#Fin del cuerpo e inicio de la condicion de un While
+while_cond_0:
+#Evalua la Expresion para el DinamicDispatch and
+#Get Self Property boolop
+lw $t0, 56($sp)      #Instancia de la clase Parse
+lw $t1, 4($t0)      #Lee la propiedad boolop
+sw $t1, 28($sp)      #Guarda el valor de la propiedad boolop en la variable local instance_dynamic_to_and@0
+#Fin de la exprecion previa al DinamicDispatch and
+#Evalua el parametro 0 para el CastingDispatch and
+#Evaluando la expression de una operacion unaria
+#Evaluando el operado izquierdo de una operacion str_eq
+#Get Local Var line
+lw $t0, 44($sp)      #
+sw $t0, 24($sp)      #
+#Resolucion del operado izquierdo de una operacion str_eq
+#Evaluando el operado derecho de una operacion str_eq
+la $t0, string_5      #
+move $s4, $t0      #
+lw $s6, 56($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 20($sp)      #
+#Resolucion del operado derecha de una operacion str_eq
+lw $s6, 56($sp)      #Guarda self
+lw $a0, 24($sp)      #Guarda el parametro 0 -> str_eq@_a@0
+lw $a1, 20($sp)      #Guarda el parametro 1 -> str_eq@_b@0
+jal __str__cmp__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 56($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#FIN expression de una operacion unaria
+lw $s6, 56($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__neg__                               #
+sw $v0, 16($sp)      #
+move $a0, $v0      #
+lw $s6, 56($sp)      #Guarda self
+jal __bool__new__                               #
+sw $v0, 16($sp)      #
+#Fin del paramentro 0 al CastingDispatch and
+#Evalua el parametro 1 para el CastingDispatch and
+#Evaluando la expression de una operacion unaria
+#Evaluando el operado izquierdo de una operacion str_eq
+#Get Local Var line
+lw $t0, 44($sp)      #
+sw $t0, 12($sp)      #
+#Resolucion del operado izquierdo de una operacion str_eq
+#Evaluando el operado derecho de una operacion str_eq
+la $t0, string_6      #
+move $s4, $t0      #
+lw $s6, 56($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 8($sp)      #
+#Resolucion del operado derecha de una operacion str_eq
+lw $s6, 56($sp)      #Guarda self
+lw $a0, 12($sp)      #Guarda el parametro 0 -> str_eq@_a@1
+lw $a1, 8($sp)      #Guarda el parametro 1 -> str_eq@_b@1
+jal __str__cmp__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 56($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#FIN expression de una operacion unaria
+lw $s6, 56($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__neg__                               #
+sw $v0, 4($sp)      #
+move $a0, $v0      #
+lw $s6, 56($sp)      #Guarda self
+jal __bool__new__                               #
+sw $v0, 4($sp)      #
+#Fin del paramentro 1 al CastingDispatch and
+lw $t0, 28($sp)      #Lee el valor de la var instance_dynamic_to_and@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_and@0
+lw $t0, 20($sp)      #Lee el valor de la var param_0_to_and@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_and@0
+lw $t0, 12($sp)      #Lee el valor de la var param_1_to_and@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_1_to_and@0
+lw $t0, 40($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de BoolOp
+lw $t3, 24($t1)      #Buscando el metodo dinamico para la funcion and
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, while_back_0     #
+#Fin de la condicion de un While
+lw $t0, 56($sp)      #
+move $s4, $t0      #
+#Inicio del paso 1 de una sequencia Block
+#Get Local Var g
+lw $t0, 52($sp)      #
+move $s4, $t0      #
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 60     #
+jr $ra                               #
+
+Graph_print_V:     #
+#Parametro self en stackpoiner + 8
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_print@0 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Graph_print_V
+#Evalua la Expresion para el DinamicDispatch print
+#Get Self Property vertices
+lw $t0, 8($sp)      #Instancia de la clase Graph
+lw $t1, 4($t0)      #Lee la propiedad vertices
+sw $t1, 4($sp)      #Guarda el valor de la propiedad vertices en la variable local instance_dynamic_to_print@0
+#Fin de la exprecion previa al DinamicDispatch print
+lw $t0, 4($sp)      #Lee el valor de la var instance_dynamic_to_print@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_print@0
+lw $t0, 8($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de VList
+lw $t3, 56($t1)      #Buscando el metodo dinamico para la funcion print
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 12     #
+jr $ra                               #
+
+Graph_print_E:     #
+#Parametro self en stackpoiner + 8
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_print@0 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Graph_print_E
+#Evalua la Expresion para el DinamicDispatch print
+#Get Self Property edges
+lw $t0, 8($sp)      #Instancia de la clase Graph
+lw $t1, 8($t0)      #Lee la propiedad edges
+sw $t1, 4($sp)      #Guarda el valor de la propiedad edges en la variable local instance_dynamic_to_print@0
+#Fin de la exprecion previa al DinamicDispatch print
+lw $t0, 4($sp)      #Lee el valor de la var instance_dynamic_to_print@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_print@0
+lw $t0, 8($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de EList
+lw $t3, 60($t1)      #Buscando el metodo dinamico para la funcion print
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 12     #
+jr $ra                               #
+
+new_ctr_IO:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_IO
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+jal new_ctr_Object                               #
+lw $v0, 4($sp)      #Return self
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+new_ctr_BoolOp:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_BoolOp
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+jal new_ctr_Object                               #
+lw $v0, 4($sp)      #Return self
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+new_ctr_Graph:     #
+#Parametro self en stackpoiner + 12
+addi $sp, $sp, -4     #Push local var new_VList@0 stackpointer 8
+addi $sp, $sp, -4     #Push local var new_EList@0 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_Graph
+lw $t0, 12($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+jal new_ctr_Object                               #
+#Assignando el resultado de la expression al atributo vertices de la clase Graph
+#Creando instancia de tipo VList
+#Allocate a una class VList
+#atributo type_name en puntero + 0
+#atributo car en puntero + 4
+li $a0, 8      #
+li $v0, 9      #
+syscall
+sw $v0, 8($sp)      #Guardando en la variable local new_VList@0 puntero de la instancia de la clase VList
+#Assignacion de la insformacion de tipo a la instancia
+la $t0, VList      #
+move $s4, $t0      #
+lw $t0, 8($sp)      #Instancia de la clase 
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded type_name
+sw $t1, 0($t0)      #Setea la propiedad type_name con el valor de _
+lw $t0, 8($sp)      #Lee el valor de la var new_VList@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con new_VList@0
+jal new_ctr_VList                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+lw $t0, 12($sp)      #Instancia de la clase Graph
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded vertices
+sw $t1, 4($t0)      #Setea la propiedad vertices con el valor de _
+#Fin De la Asignacion
+#Assignando el resultado de la expression al atributo edges de la clase Graph
+#Creando instancia de tipo EList
+#Allocate a una class EList
+#atributo type_name en puntero + 0
+#atributo car en puntero + 4
+li $a0, 8      #
+li $v0, 9      #
+syscall
+sw $v0, 4($sp)      #Guardando en la variable local new_EList@0 puntero de la instancia de la clase EList
+#Assignacion de la insformacion de tipo a la instancia
+la $t0, EList      #
+move $s4, $t0      #
+lw $t0, 4($sp)      #Instancia de la clase 
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded type_name
+sw $t1, 0($t0)      #Setea la propiedad type_name con el valor de _
+lw $t0, 4($sp)      #Lee el valor de la var new_EList@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con new_EList@0
+jal new_ctr_EList                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+lw $t0, 12($sp)      #Instancia de la clase Graph
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded edges
+sw $t1, 8($t0)      #Setea la propiedad edges con el valor de _
+#Fin De la Asignacion
+lw $v0, 12($sp)      #Return self
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 16     #
+jr $ra                               #
+
+IO_in_string:     #
+#Parametro self en stackpoiner + 0
+addi $sp, $sp, -4     #Push local var $ra stackpointer -4
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion IO_in_string
+lw $s6, 4($sp)      #Guarda self
+jal __str__input__                               #
+lw $ra, 0($sp)      #
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+Parse_parse_line:     #
+#Parametro self en stackpoiner + 88
+#Parametro s@0 en stackpoiner + 84
+addi $sp, $sp, -4     #Push local var v stackpointer 80
+addi $sp, $sp, -4     #Push local var new_Vertice@0 stackpointer 76
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_init@0 stackpointer 72
+addi $sp, $sp, -4     #Push local var param_0_to_a2i@0 stackpointer 68
+addi $sp, $sp, -4     #Push local var param_0_to_init@0 stackpointer 64
+addi $sp, $sp, -4     #Push local var succ stackpointer 60
+addi $sp, $sp, -4     #Push local var param_0_to_a2i@1 stackpointer 56
+addi $sp, $sp, -4     #Push local var weight stackpointer 52
+addi $sp, $sp, -4     #Push local var param_0_to_a2i@2 stackpointer 48
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_add_out@0 stackpointer 44
+addi $sp, $sp, -4     #Push local var new_Edge@0 stackpointer 40
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_init@1 stackpointer 36
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_number@0 stackpointer 32
+addi $sp, $sp, -4     #Push local var param_0_to_init@1 stackpointer 28
+addi $sp, $sp, -4     #Push local var param_1_to_init@0 stackpointer 24
+addi $sp, $sp, -4     #Push local var param_2_to_init@0 stackpointer 20
+addi $sp, $sp, -4     #Push local var param_0_to_add_out@0 stackpointer 16
+addi $sp, $sp, -4     #Push local var int_eq@_a@0 stackpointer 12
+addi $sp, $sp, -4     #Push local var int_eq@_b@0 stackpointer 8
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_length@0 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Parse_parse_line
+#Eval Expression to Let v
+#Evalua la Expresion para el DinamicDispatch init
+#Creando instancia de tipo Vertice
+#Allocate a una class Vertice
+#atributo type_name en puntero + 0
+#atributo num en puntero + 4
+#atributo out en puntero + 8
+li $a0, 12      #
+li $v0, 9      #
+syscall
+sw $v0, 76($sp)      #Guardando en la variable local new_Vertice@0 puntero de la instancia de la clase Vertice
+#Assignacion de la insformacion de tipo a la instancia
+la $t0, Vertice      #
+move $s4, $t0      #
+lw $t0, 76($sp)      #Instancia de la clase 
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded type_name
+sw $t1, 0($t0)      #Setea la propiedad type_name con el valor de _
+lw $t0, 76($sp)      #Lee el valor de la var new_Vertice@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con new_Vertice@0
+jal new_ctr_Vertice                               #
+sw $v0, 72($sp)      #Asigna el resultado de la funcion
+#Fin de la exprecion previa al DinamicDispatch init
+#Evalua el parametro 0 para el CastingDispatch init
+#StaticDispatch a2i
+#Evalua el parametro 0 para el CastingDispatch a2i
+#Get Local Var s
+lw $t0, 84($sp)      #
+sw $t0, 68($sp)      #
+#Fin del paramentro 0 al CastingDispatch a2i
+lw $t0, 88($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 72($sp)      #Lee el valor de la var param_0_to_a2i@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_a2i@0
+lw $t0, 96($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Parse
+lw $t3, 52($t1)      #Buscando el metodo dinamico para la funcion a2i
+jal $t3                               #
+sw $v0, 64($sp)      #Asigna el resultado de la funcion
+#Fin del paramentro 0 al CastingDispatch init
+lw $t0, 72($sp)      #Lee el valor de la var instance_dynamic_to_init@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_init@0
+lw $t0, 68($sp)      #Lee el valor de la var param_0_to_init@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_init@0
+lw $t0, 80($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Vertice
+lw $t3, 48($t1)      #Buscando el metodo dinamico para la funcion init
+jal $t3                               #
+sw $v0, 80($sp)      #Asigna el resultado de la funcion
+#Fin de la asignacion Let v
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Inicio de un While
+j while_cond_1                               #
+while_back_1:
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Eval Expression to Let succ
+#StaticDispatch a2i
+#Evalua el parametro 0 para el CastingDispatch a2i
+#Get Self Property rest
+lw $t0, 88($sp)      #Instancia de la clase Parse
+lw $t1, 8($t0)      #Lee la propiedad rest
+sw $t1, 56($sp)      #Guarda el valor de la propiedad rest en la variable local param_0_to_a2i@1
+#Fin del paramentro 0 al CastingDispatch a2i
+lw $t0, 88($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 60($sp)      #Lee el valor de la var param_0_to_a2i@1
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_a2i@1
+lw $t0, 96($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Parse
+lw $t3, 52($t1)      #Buscando el metodo dinamico para la funcion a2i
+jal $t3                               #
+sw $v0, 60($sp)      #Asigna el resultado de la funcion
+#Fin de la asignacion Let succ
+#Eval Expression to Let weight
+#StaticDispatch a2i
+#Evalua el parametro 0 para el CastingDispatch a2i
+#Get Self Property rest
+lw $t0, 88($sp)      #Instancia de la clase Parse
+lw $t1, 8($t0)      #Lee la propiedad rest
+sw $t1, 48($sp)      #Guarda el valor de la propiedad rest en la variable local param_0_to_a2i@2
+#Fin del paramentro 0 al CastingDispatch a2i
+lw $t0, 88($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 52($sp)      #Lee el valor de la var param_0_to_a2i@2
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_a2i@2
+lw $t0, 96($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Parse
+lw $t3, 52($t1)      #Buscando el metodo dinamico para la funcion a2i
+jal $t3                               #
+sw $v0, 52($sp)      #Asigna el resultado de la funcion
+#Fin de la asignacion Let weight
+#Evalua la Expresion para el DinamicDispatch add_out
+#Get Local Var v
+lw $t0, 80($sp)      #
+sw $t0, 44($sp)      #
+#Fin de la exprecion previa al DinamicDispatch add_out
+#Evalua el parametro 0 para el CastingDispatch add_out
+#Evalua la Expresion para el DinamicDispatch init
+#Creando instancia de tipo Edge
+#Allocate a una class Edge
+#atributo type_name en puntero + 0
+#atributo from en puntero + 4
+#atributo to en puntero + 8
+#atributo weight en puntero + 12
+li $a0, 16      #
+li $v0, 9      #
+syscall
+sw $v0, 40($sp)      #Guardando en la variable local new_Edge@0 puntero de la instancia de la clase Edge
+#Assignacion de la insformacion de tipo a la instancia
+la $t0, Edge      #
+move $s4, $t0      #
+lw $t0, 40($sp)      #Instancia de la clase 
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded type_name
+sw $t1, 0($t0)      #Setea la propiedad type_name con el valor de _
+lw $t0, 40($sp)      #Lee el valor de la var new_Edge@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con new_Edge@0
+jal new_ctr_Edge                               #
+sw $v0, 36($sp)      #Asigna el resultado de la funcion
+#Fin de la exprecion previa al DinamicDispatch init
+#Evalua el parametro 0 para el CastingDispatch init
+#Evalua la Expresion para el DinamicDispatch number
+#Get Local Var v
+#Fin de la exprecion previa al DinamicDispatch number
+lw $t0, 80($sp)      #Lee el valor de la var v
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con v
+lw $t0, 84($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Vertice
+lw $t3, 44($t1)      #Buscando el metodo dinamico para la funcion number
+jal $t3                               #
+sw $v0, 28($sp)      #Asigna el resultado de la funcion
+#Fin del paramentro 0 al CastingDispatch init
+#Evalua el parametro 1 para el CastingDispatch init
+#Get Local Var succ
+lw $t0, 60($sp)      #
+sw $t0, 24($sp)      #
+#Fin del paramentro 1 al CastingDispatch init
+#Evalua el parametro 2 para el CastingDispatch init
+#Get Local Var weight
+lw $t0, 52($sp)      #
+sw $t0, 20($sp)      #
+#Fin del paramentro 2 al CastingDispatch init
+lw $t0, 36($sp)      #Lee el valor de la var instance_dynamic_to_init@1
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_init@1
+lw $t0, 32($sp)      #Lee el valor de la var param_0_to_init@1
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_init@1
+lw $t0, 32($sp)      #Lee el valor de la var param_1_to_init@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_1_to_init@0
+lw $t0, 32($sp)      #Lee el valor de la var param_2_to_init@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_2_to_init@0
+lw $t0, 52($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Edge
+lw $t3, 40($t1)      #Buscando el metodo dinamico para la funcion init
+jal $t3                               #
+sw $v0, 16($sp)      #Asigna el resultado de la funcion
+#Fin del paramentro 0 al CastingDispatch add_out
+lw $t0, 44($sp)      #Lee el valor de la var instance_dynamic_to_add_out@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_add_out@0
+lw $t0, 20($sp)      #Lee el valor de la var param_0_to_add_out@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_add_out@0
+lw $t0, 52($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Vertice
+lw $t3, 52($t1)      #Buscando el metodo dinamico para la funcion add_out
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#Fin del cuerpo e inicio de la condicion de un While
+while_cond_1:
+#Evaluando la expression de una operacion unaria
+#Evaluando el operado izquierdo de una operacion int_eq
+#Evalua la Expresion para el DinamicDispatch length
+#Get Self Property rest
+lw $t0, 88($sp)      #Instancia de la clase Parse
+lw $t1, 8($t0)      #Lee la propiedad rest
+sw $t1, 4($sp)      #Guarda el valor de la propiedad rest en la variable local instance_dynamic_to_length@0
+#Fin de la exprecion previa al DinamicDispatch length
+lw $t0, 4($sp)      #Lee el valor de la var instance_dynamic_to_length@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_length@0
+lw $t0, 8($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de String
+lw $t3, 28($t1)      #Buscando el metodo dinamico para la funcion length
+jal $t3                               #
+sw $v0, 12($sp)      #Asigna el resultado de la funcion
+#Resolucion del operado izquierdo de una operacion int_eq
+#Evaluando el operado derecho de una operacion int_eq
+li $s4, 0      #
+lw $s6, 88($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 8($sp)      #
+#Resolucion del operado derecha de una operacion int_eq
+lw $s6, 88($sp)      #Guarda self
+lw $a0, 12($sp)      #Guarda el parametro 0 -> int_eq@_a@0
+lw $a1, 8($sp)      #Guarda el parametro 1 -> int_eq@_b@0
+jal __int__eq__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 88($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#FIN expression de una operacion unaria
+lw $s6, 88($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__neg__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 88($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, while_back_1     #
+#Fin de la condicion de un While
+lw $t0, 88($sp)      #
+move $s4, $t0      #
+#Inicio del paso 1 de una sequencia Block
+#Get Local Var v
+lw $t0, 80($sp)      #
+move $s4, $t0      #
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 92     #
+jr $ra                               #
+
+Graph_add_vertice:     #
+#Parametro self en stackpoiner + 28
+#Parametro v@0 en stackpoiner + 24
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_outgoing@0 stackpointer 20
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_append@0 stackpointer 16
+addi $sp, $sp, -4     #Push local var param_0_to_append@0 stackpointer 12
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_cons@0 stackpointer 8
+addi $sp, $sp, -4     #Push local var param_0_to_cons@0 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Graph_add_vertice
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Asignando un nuevo valor a la variable edges
+#Evalua la Expresion para el DinamicDispatch append
+#Evalua la Expresion para el DinamicDispatch outgoing
+#Get Local Var v
+#Fin de la exprecion previa al DinamicDispatch outgoing
+lw $t0, 24($sp)      #Lee el valor de la var v@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con v@0
+lw $t0, 28($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Vertice
+lw $t3, 40($t1)      #Buscando el metodo dinamico para la funcion outgoing
+jal $t3                               #
+sw $v0, 16($sp)      #Asigna el resultado de la funcion
+#Fin de la exprecion previa al DinamicDispatch append
+#Evalua el parametro 0 para el CastingDispatch append
+#Get Self Property edges
+lw $t0, 28($sp)      #Instancia de la clase Graph
+lw $t1, 8($t0)      #Lee la propiedad edges
+sw $t1, 12($sp)      #Guarda el valor de la propiedad edges en la variable local param_0_to_append@0
+#Fin del paramentro 0 al CastingDispatch append
+lw $t0, 16($sp)      #Lee el valor de la var instance_dynamic_to_append@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_append@0
+lw $t0, 16($sp)      #Lee el valor de la var param_0_to_append@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_append@0
+lw $t0, 24($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de EList
+lw $t3, 56($t1)      #Buscando el metodo dinamico para la funcion append
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+lw $t0, 28($sp)      #Instancia de la clase Graph
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded edges
+sw $t1, 8($t0)      #Setea la propiedad edges con el valor de _
+lw $t0, 28($sp)      #Instancia de la clase Graph
+lw $t1, 8($t0)      #Lee la propiedad edges
+move $s4, $t1      #Guarda el valor de la propiedad edges en la variable local _
+#Inicio del paso 1 de una sequencia Block
+#Asignando un nuevo valor a la variable vertices
+#Evalua la Expresion para el DinamicDispatch cons
+#Get Self Property vertices
+lw $t0, 28($sp)      #Instancia de la clase Graph
+lw $t1, 4($t0)      #Lee la propiedad vertices
+sw $t1, 8($sp)      #Guarda el valor de la propiedad vertices en la variable local instance_dynamic_to_cons@0
+#Fin de la exprecion previa al DinamicDispatch cons
+#Evalua el parametro 0 para el CastingDispatch cons
+#Get Local Var v
+lw $t0, 24($sp)      #
+sw $t0, 4($sp)      #
+#Fin del paramentro 0 al CastingDispatch cons
+lw $t0, 8($sp)      #Lee el valor de la var instance_dynamic_to_cons@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_cons@0
+lw $t0, 8($sp)      #Lee el valor de la var param_0_to_cons@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_cons@0
+lw $t0, 16($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de VList
+lw $t3, 52($t1)      #Buscando el metodo dinamico para la funcion cons
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+lw $t0, 28($sp)      #Instancia de la clase Graph
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded vertices
+sw $t1, 4($t0)      #Setea la propiedad vertices con el valor de _
+lw $t0, 28($sp)      #Instancia de la clase Graph
+lw $t1, 4($t0)      #Lee la propiedad vertices
+move $s4, $t1      #Guarda el valor de la propiedad vertices en la variable local _
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 32     #
+jr $ra                               #
+
+BoolOp_and:     #
+#Parametro self en stackpoiner + 12
+#Parametro b1@0 en stackpoiner + 8
+#Parametro b2@0 en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion BoolOp_and
+#Evalua la condicion de un If
+#Get Local Var b1
+lw $t0, 8($sp)      #
+move $s4, $t0      #
+#Fin de la evaluacion de la condicion de un IF
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, then_BoolOp_and_0     #
+#Else case
+li $s4, 0      #
+lw $s6, 12($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+lw $s6, 12($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __bool__new__                               #
+move $s4, $v0      #
+j fin_BoolOp_and_0                               #
+then_BoolOp_and_0:
+#Then case
+#Get Local Var b2
+lw $t0, 4($sp)      #
+move $s4, $t0      #
+fin_BoolOp_and_0:
+#Fin de un If
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 16     #
+jr $ra                               #
+
+Vertice_print:     #
+#Parametro self en stackpoiner + 12
+addi $sp, $sp, -4     #Push local var param_0_to_out_int@0 stackpointer 8
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_print@0 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Vertice_print
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#StaticDispatch out_int
+#Evalua el parametro 0 para el CastingDispatch out_int
+#Get Self Property num
+lw $t0, 12($sp)      #Instancia de la clase Vertice
+lw $t1, 4($t0)      #Lee la propiedad num
+sw $t1, 8($sp)      #Guarda el valor de la propiedad num en la variable local param_0_to_out_int@0
+#Fin del paramentro 0 al CastingDispatch out_int
+lw $t0, 12($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 12($sp)      #Lee el valor de la var param_0_to_out_int@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_out_int@0
+lw $t0, 20($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Vertice
+lw $t3, 32($t1)      #Buscando el metodo dinamico para la funcion out_int
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#Inicio del paso 1 de una sequencia Block
+#Evalua la Expresion para el DinamicDispatch print
+#Get Self Property out
+lw $t0, 12($sp)      #Instancia de la clase Vertice
+lw $t1, 8($t0)      #Lee la propiedad out
+sw $t1, 4($sp)      #Guarda el valor de la propiedad out en la variable local instance_dynamic_to_print@0
+#Fin de la exprecion previa al DinamicDispatch print
+lw $t0, 4($sp)      #Lee el valor de la var instance_dynamic_to_print@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_print@0
+lw $t0, 8($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de EList
+lw $t3, 60($t1)      #Buscando el metodo dinamico para la funcion print
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 16     #
+jr $ra                               #
+
+Edge_print:     #
+#Parametro self en stackpoiner + 28
+addi $sp, $sp, -4     #Push local var param_0_to_out_string@0 stackpointer 24
+addi $sp, $sp, -4     #Push local var param_0_to_out_int@0 stackpointer 20
+addi $sp, $sp, -4     #Push local var param_0_to_out_string@1 stackpointer 16
+addi $sp, $sp, -4     #Push local var param_0_to_out_int@1 stackpointer 12
+addi $sp, $sp, -4     #Push local var param_0_to_out_string@2 stackpointer 8
+addi $sp, $sp, -4     #Push local var param_0_to_out_int@2 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Edge_print
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#StaticDispatch out_string
+#Evalua el parametro 0 para el CastingDispatch out_string
+la $t0, string_0      #
+move $s4, $t0      #
+lw $s6, 28($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 24($sp)      #
+#Fin del paramentro 0 al CastingDispatch out_string
+lw $t0, 28($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 28($sp)      #Lee el valor de la var param_0_to_out_string@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_out_string@0
+lw $t0, 36($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Edge
+lw $t3, 36($t1)      #Buscando el metodo dinamico para la funcion out_string
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#Inicio del paso 1 de una sequencia Block
+#StaticDispatch out_int
+#Evalua el parametro 0 para el CastingDispatch out_int
+#Get Self Property from
+lw $t0, 28($sp)      #Instancia de la clase Edge
+lw $t1, 4($t0)      #Lee la propiedad from
+sw $t1, 20($sp)      #Guarda el valor de la propiedad from en la variable local param_0_to_out_int@0
+#Fin del paramentro 0 al CastingDispatch out_int
+lw $t0, 28($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 24($sp)      #Lee el valor de la var param_0_to_out_int@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_out_int@0
+lw $t0, 36($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Edge
+lw $t3, 32($t1)      #Buscando el metodo dinamico para la funcion out_int
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#Inicio del paso 2 de una sequencia Block
+#StaticDispatch out_string
+#Evalua el parametro 0 para el CastingDispatch out_string
+la $t0, string_1      #
+move $s4, $t0      #
+lw $s6, 28($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 16($sp)      #
+#Fin del paramentro 0 al CastingDispatch out_string
+lw $t0, 28($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 20($sp)      #Lee el valor de la var param_0_to_out_string@1
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_out_string@1
+lw $t0, 36($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Edge
+lw $t3, 36($t1)      #Buscando el metodo dinamico para la funcion out_string
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#Inicio del paso 3 de una sequencia Block
+#StaticDispatch out_int
+#Evalua el parametro 0 para el CastingDispatch out_int
+#Get Self Property to
+lw $t0, 28($sp)      #Instancia de la clase Edge
+lw $t1, 8($t0)      #Lee la propiedad to
+sw $t1, 12($sp)      #Guarda el valor de la propiedad to en la variable local param_0_to_out_int@1
+#Fin del paramentro 0 al CastingDispatch out_int
+lw $t0, 28($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 16($sp)      #Lee el valor de la var param_0_to_out_int@1
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_out_int@1
+lw $t0, 36($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Edge
+lw $t3, 32($t1)      #Buscando el metodo dinamico para la funcion out_int
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#Inicio del paso 4 de una sequencia Block
+#StaticDispatch out_string
+#Evalua el parametro 0 para el CastingDispatch out_string
+la $t0, string_2      #
+move $s4, $t0      #
+lw $s6, 28($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 8($sp)      #
+#Fin del paramentro 0 al CastingDispatch out_string
+lw $t0, 28($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 12($sp)      #Lee el valor de la var param_0_to_out_string@2
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_out_string@2
+lw $t0, 36($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Edge
+lw $t3, 36($t1)      #Buscando el metodo dinamico para la funcion out_string
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#Inicio del paso 5 de una sequencia Block
+#StaticDispatch out_int
+#Evalua el parametro 0 para el CastingDispatch out_int
+#Get Self Property weight
+lw $t0, 28($sp)      #Instancia de la clase Edge
+lw $t1, 12($t0)      #Lee la propiedad weight
+sw $t1, 4($sp)      #Guarda el valor de la propiedad weight en la variable local param_0_to_out_int@2
+#Fin del paramentro 0 al CastingDispatch out_int
+lw $t0, 28($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 8($sp)      #Lee el valor de la var param_0_to_out_int@2
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_out_int@2
+lw $t0, 36($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Edge
+lw $t3, 32($t1)      #Buscando el metodo dinamico para la funcion out_int
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 32     #
+jr $ra                               #
+
+EList_print:     #
+#Parametro self en stackpoiner + 8
+addi $sp, $sp, -4     #Push local var param_0_to_out_string@0 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion EList_print
+#StaticDispatch out_string
+#Evalua el parametro 0 para el CastingDispatch out_string
+la $t0, string_3      #
+move $s4, $t0      #
+lw $s6, 8($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 4($sp)      #
+#Fin del paramentro 0 al CastingDispatch out_string
+lw $t0, 8($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 8($sp)      #Lee el valor de la var param_0_to_out_string@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_out_string@0
+lw $t0, 16($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de EList
+lw $t3, 36($t1)      #Buscando el metodo dinamico para la funcion out_string
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 12     #
+jr $ra                               #
+
+ECons_print:     #
+#Parametro self en stackpoiner + 12
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_print@0 stackpointer 8
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_print@1 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion ECons_print
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Evalua la Expresion para el DinamicDispatch print
+#Get Self Property car
+lw $t0, 12($sp)      #Instancia de la clase EList
+lw $t1, 4($t0)      #Lee la propiedad car
+sw $t1, 8($sp)      #Guarda el valor de la propiedad car en la variable local instance_dynamic_to_print@0
+#Fin de la exprecion previa al DinamicDispatch print
+lw $t0, 8($sp)      #Lee el valor de la var instance_dynamic_to_print@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_print@0
+lw $t0, 12($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Edge
+lw $t3, 44($t1)      #Buscando el metodo dinamico para la funcion print
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#Inicio del paso 1 de una sequencia Block
+#Evalua la Expresion para el DinamicDispatch print
+#Get Self Property cdr
+lw $t0, 12($sp)      #Instancia de la clase ECons
+lw $t1, 8($t0)      #Lee la propiedad cdr
+sw $t1, 4($sp)      #Guarda el valor de la propiedad cdr en la variable local instance_dynamic_to_print@1
+#Fin de la exprecion previa al DinamicDispatch print
+lw $t0, 4($sp)      #Lee el valor de la var instance_dynamic_to_print@1
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_print@1
+lw $t0, 8($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de EList
+lw $t3, 60($t1)      #Buscando el metodo dinamico para la funcion print
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 16     #
+jr $ra                               #
+
+VList_print:     #
+#Parametro self en stackpoiner + 8
+addi $sp, $sp, -4     #Push local var param_0_to_out_string@0 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion VList_print
+#StaticDispatch out_string
+#Evalua el parametro 0 para el CastingDispatch out_string
+la $t0, string_4      #
+move $s4, $t0      #
+lw $s6, 8($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 4($sp)      #
+#Fin del paramentro 0 al CastingDispatch out_string
+lw $t0, 8($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 8($sp)      #Lee el valor de la var param_0_to_out_string@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_out_string@0
+lw $t0, 16($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de VList
+lw $t3, 36($t1)      #Buscando el metodo dinamico para la funcion out_string
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 12     #
+jr $ra                               #
+
+VCons_print:     #
+#Parametro self en stackpoiner + 12
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_print@0 stackpointer 8
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_print@1 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion VCons_print
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Evalua la Expresion para el DinamicDispatch print
+#Get Self Property car
+lw $t0, 12($sp)      #Instancia de la clase VList
+lw $t1, 4($t0)      #Lee la propiedad car
+sw $t1, 8($sp)      #Guarda el valor de la propiedad car en la variable local instance_dynamic_to_print@0
+#Fin de la exprecion previa al DinamicDispatch print
+lw $t0, 8($sp)      #Lee el valor de la var instance_dynamic_to_print@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_print@0
+lw $t0, 12($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Vertice
+lw $t3, 56($t1)      #Buscando el metodo dinamico para la funcion print
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#Inicio del paso 1 de una sequencia Block
+#Evalua la Expresion para el DinamicDispatch print
+#Get Self Property cdr
+lw $t0, 12($sp)      #Instancia de la clase VCons
+lw $t1, 8($t0)      #Lee la propiedad cdr
+sw $t1, 4($sp)      #Guarda el valor de la propiedad cdr en la variable local instance_dynamic_to_print@1
+#Fin de la exprecion previa al DinamicDispatch print
+lw $t0, 4($sp)      #Lee el valor de la var instance_dynamic_to_print@1
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_print@1
+lw $t0, 8($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de VList
+lw $t3, 56($t1)      #Buscando el metodo dinamico para la funcion print
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 16     #
+jr $ra                               #
+
+new_ctr_Object:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_Object
+lw $v0, 4($sp)      #Return self
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+new_ctr_VList:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_VList
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+jal new_ctr_IO                               #
+la $t0, _______null_______      #
+move $s4, $t0      #
+lw $t0, 4($sp)      #Instancia de la clase VList
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded car
+sw $t1, 4($t0)      #Setea la propiedad car con el valor de _
+lw $v0, 4($sp)      #Return self
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+new_ctr_EList:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_EList
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+jal new_ctr_IO                               #
+la $t0, _______null_______      #
+move $s4, $t0      #
+lw $t0, 4($sp)      #Instancia de la clase EList
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded car
+sw $t1, 4($t0)      #Setea la propiedad car con el valor de _
+lw $v0, 4($sp)      #Return self
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+new_ctr_Vertice:     #
+#Parametro self en stackpoiner + 8
+addi $sp, $sp, -4     #Push local var new_EList@0 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_Vertice
+lw $t0, 8($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+jal new_ctr_IO                               #
+li $s4, 0      #
+lw $s6, 8($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+lw $t0, 8($sp)      #Instancia de la clase Vertice
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded num
+sw $t1, 4($t0)      #Setea la propiedad num con el valor de _
+#Assignando el resultado de la expression al atributo out de la clase Vertice
+#Creando instancia de tipo EList
+#Allocate a una class EList
+#atributo type_name en puntero + 0
+#atributo car en puntero + 4
+li $a0, 8      #
+li $v0, 9      #
+syscall
+sw $v0, 4($sp)      #Guardando en la variable local new_EList@0 puntero de la instancia de la clase EList
+#Assignacion de la insformacion de tipo a la instancia
+la $t0, EList      #
+move $s4, $t0      #
+lw $t0, 4($sp)      #Instancia de la clase 
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded type_name
+sw $t1, 0($t0)      #Setea la propiedad type_name con el valor de _
+lw $t0, 4($sp)      #Lee el valor de la var new_EList@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con new_EList@0
+jal new_ctr_EList                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+lw $t0, 8($sp)      #Instancia de la clase Vertice
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded out
+sw $t1, 8($t0)      #Setea la propiedad out con el valor de _
+#Fin De la Asignacion
+lw $v0, 8($sp)      #Return self
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 12     #
+jr $ra                               #
+
+Parse_a2i:     #
+#Parametro self en stackpoiner + 120
+#Parametro s@0 en stackpoiner + 116
+addi $sp, $sp, -4     #Push local var int_eq@_a@0 stackpointer 112
+addi $sp, $sp, -4     #Push local var int_eq@_b@0 stackpointer 108
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_length@0 stackpointer 104
+addi $sp, $sp, -4     #Push local var str_eq@_a@0 stackpointer 100
+addi $sp, $sp, -4     #Push local var str_eq@_b@0 stackpointer 96
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_substr@0 stackpointer 92
+addi $sp, $sp, -4     #Push local var param_0_to_substr@0 stackpointer 88
+addi $sp, $sp, -4     #Push local var param_1_to_substr@0 stackpointer 84
+addi $sp, $sp, -4     #Push local var str_eq@_a@1 stackpointer 80
+addi $sp, $sp, -4     #Push local var str_eq@_b@1 stackpointer 76
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_substr@1 stackpointer 72
+addi $sp, $sp, -4     #Push local var param_0_to_substr@1 stackpointer 68
+addi $sp, $sp, -4     #Push local var param_1_to_substr@1 stackpointer 64
+addi $sp, $sp, -4     #Push local var param_0_to_a2i_aux@0 stackpointer 60
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_substr@2 stackpointer 56
+addi $sp, $sp, -4     #Push local var param_0_to_substr@2 stackpointer 52
+addi $sp, $sp, -4     #Push local var rest@_a@0 stackpointer 48
+addi $sp, $sp, -4     #Push local var rest@_b@0 stackpointer 44
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_length@1 stackpointer 40
+addi $sp, $sp, -4     #Push local var param_1_to_substr@2 stackpointer 36
+addi $sp, $sp, -4     #Push local var param_0_to_a2i@0 stackpointer 32
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_substr@3 stackpointer 28
+addi $sp, $sp, -4     #Push local var param_0_to_substr@3 stackpointer 24
+addi $sp, $sp, -4     #Push local var rest@_a@1 stackpointer 20
+addi $sp, $sp, -4     #Push local var rest@_b@1 stackpointer 16
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_length@2 stackpointer 12
+addi $sp, $sp, -4     #Push local var param_1_to_substr@3 stackpointer 8
+addi $sp, $sp, -4     #Push local var param_0_to_a2i_aux@1 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Parse_a2i
+#Evalua la condicion de un If
+#Evaluando el operado izquierdo de una operacion int_eq
+#Evalua la Expresion para el DinamicDispatch length
+#Get Local Var s
+#Fin de la exprecion previa al DinamicDispatch length
+lw $t0, 116($sp)      #Lee el valor de la var s@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con s@0
+lw $t0, 120($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de String
+lw $t3, 28($t1)      #Buscando el metodo dinamico para la funcion length
+jal $t3                               #
+sw $v0, 112($sp)      #Asigna el resultado de la funcion
+#Resolucion del operado izquierdo de una operacion int_eq
+#Evaluando el operado derecho de una operacion int_eq
+li $s4, 0      #
+lw $s6, 120($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 108($sp)      #
+#Resolucion del operado derecha de una operacion int_eq
+lw $s6, 120($sp)      #Guarda self
+lw $a0, 112($sp)      #Guarda el parametro 0 -> int_eq@_a@0
+lw $a1, 108($sp)      #Guarda el parametro 1 -> int_eq@_b@0
+jal __int__eq__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 120($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Fin de la evaluacion de la condicion de un IF
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, then_Parse_a2i_0     #
+#Else case
+#Evalua la condicion de un If
+#Evaluando el operado izquierdo de una operacion str_eq
+#Evalua la Expresion para el DinamicDispatch substr
+#Get Local Var s
+lw $t0, 116($sp)      #
+sw $t0, 92($sp)      #
+#Fin de la exprecion previa al DinamicDispatch substr
+#Evalua el parametro 0 para el CastingDispatch substr
+li $s4, 0      #
+lw $s6, 120($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 88($sp)      #
+#Fin del paramentro 0 al CastingDispatch substr
+#Evalua el parametro 1 para el CastingDispatch substr
+li $s4, 1      #
+lw $s6, 120($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 84($sp)      #
+#Fin del paramentro 1 al CastingDispatch substr
+lw $t0, 92($sp)      #Lee el valor de la var instance_dynamic_to_substr@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_substr@0
+lw $t0, 92($sp)      #Lee el valor de la var param_0_to_substr@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_substr@0
+lw $t0, 92($sp)      #Lee el valor de la var param_1_to_substr@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_1_to_substr@0
+lw $t0, 104($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de String
+lw $t3, 32($t1)      #Buscando el metodo dinamico para la funcion substr
+jal $t3                               #
+sw $v0, 100($sp)      #Asigna el resultado de la funcion
+#Resolucion del operado izquierdo de una operacion str_eq
+#Evaluando el operado derecho de una operacion str_eq
+la $t0, string_17      #
+move $s4, $t0      #
+lw $s6, 120($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 96($sp)      #
+#Resolucion del operado derecha de una operacion str_eq
+lw $s6, 120($sp)      #Guarda self
+lw $a0, 100($sp)      #Guarda el parametro 0 -> str_eq@_a@0
+lw $a1, 96($sp)      #Guarda el parametro 1 -> str_eq@_b@0
+jal __str__cmp__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 120($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Fin de la evaluacion de la condicion de un IF
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, then_Parse_a2i_1     #
+#Else case
+#Evalua la condicion de un If
+#Evaluando el operado izquierdo de una operacion str_eq
+#Evalua la Expresion para el DinamicDispatch substr
+#Get Local Var s
+lw $t0, 116($sp)      #
+sw $t0, 72($sp)      #
+#Fin de la exprecion previa al DinamicDispatch substr
+#Evalua el parametro 0 para el CastingDispatch substr
+li $s4, 0      #
+lw $s6, 120($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 68($sp)      #
+#Fin del paramentro 0 al CastingDispatch substr
+#Evalua el parametro 1 para el CastingDispatch substr
+li $s4, 1      #
+lw $s6, 120($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 64($sp)      #
+#Fin del paramentro 1 al CastingDispatch substr
+lw $t0, 72($sp)      #Lee el valor de la var instance_dynamic_to_substr@1
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_substr@1
+lw $t0, 72($sp)      #Lee el valor de la var param_0_to_substr@1
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_substr@1
+lw $t0, 72($sp)      #Lee el valor de la var param_1_to_substr@1
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_1_to_substr@1
+lw $t0, 84($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de String
+lw $t3, 32($t1)      #Buscando el metodo dinamico para la funcion substr
+jal $t3                               #
+sw $v0, 80($sp)      #Asigna el resultado de la funcion
+#Resolucion del operado izquierdo de una operacion str_eq
+#Evaluando el operado derecho de una operacion str_eq
+la $t0, string_18      #
+move $s4, $t0      #
+lw $s6, 120($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 76($sp)      #
+#Resolucion del operado derecha de una operacion str_eq
+lw $s6, 120($sp)      #Guarda self
+lw $a0, 80($sp)      #Guarda el parametro 0 -> str_eq@_a@1
+lw $a1, 76($sp)      #Guarda el parametro 1 -> str_eq@_b@1
+jal __str__cmp__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 120($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Fin de la evaluacion de la condicion de un IF
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, then_Parse_a2i_2     #
+#Else case
+#StaticDispatch a2i_aux
+#Evalua el parametro 0 para el CastingDispatch a2i_aux
+#Get Local Var s
+lw $t0, 116($sp)      #
+sw $t0, 60($sp)      #
+#Fin del paramentro 0 al CastingDispatch a2i_aux
+lw $t0, 120($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 64($sp)      #Lee el valor de la var param_0_to_a2i_aux@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_a2i_aux@0
+lw $t0, 128($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Parse
+lw $t3, 56($t1)      #Buscando el metodo dinamico para la funcion a2i_aux
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+j fin_Parse_a2i_2                               #
+then_Parse_a2i_2:
+#Then case
+#StaticDispatch a2i
+#Evalua el parametro 0 para el CastingDispatch a2i
+#Evalua la Expresion para el DinamicDispatch substr
+#Get Local Var s
+lw $t0, 116($sp)      #
+sw $t0, 56($sp)      #
+#Fin de la exprecion previa al DinamicDispatch substr
+#Evalua el parametro 0 para el CastingDispatch substr
+li $s4, 1      #
+lw $s6, 120($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 52($sp)      #
+#Fin del paramentro 0 al CastingDispatch substr
+#Evalua el parametro 1 para el CastingDispatch substr
+#Evaluando el operado izquierdo de una operacion rest
+#Evalua la Expresion para el DinamicDispatch length
+#Get Local Var s
+#Fin de la exprecion previa al DinamicDispatch length
+lw $t0, 116($sp)      #Lee el valor de la var s@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con s@0
+lw $t0, 120($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de String
+lw $t3, 28($t1)      #Buscando el metodo dinamico para la funcion length
+jal $t3                               #
+sw $v0, 48($sp)      #Asigna el resultado de la funcion
+#Resolucion del operado izquierdo de una operacion rest
+#Evaluando el operado derecho de una operacion rest
+li $s4, 1      #
+lw $s6, 120($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 44($sp)      #
+#Resolucion del operado derecha de una operacion rest
+lw $s6, 120($sp)      #Guarda self
+lw $a0, 48($sp)      #Guarda el parametro 0 -> rest@_a@0
+lw $a1, 44($sp)      #Guarda el parametro 1 -> rest@_b@0
+jal __int__sub__                               #
+sw $v0, 36($sp)      #
+#Fin del paramentro 1 al CastingDispatch substr
+lw $t0, 56($sp)      #Lee el valor de la var instance_dynamic_to_substr@2
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_substr@2
+lw $t0, 56($sp)      #Lee el valor de la var param_0_to_substr@2
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_substr@2
+lw $t0, 44($sp)      #Lee el valor de la var param_1_to_substr@2
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_1_to_substr@2
+lw $t0, 68($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de String
+lw $t3, 32($t1)      #Buscando el metodo dinamico para la funcion substr
+jal $t3                               #
+sw $v0, 32($sp)      #Asigna el resultado de la funcion
+#Fin del paramentro 0 al CastingDispatch a2i
+lw $t0, 120($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 36($sp)      #Lee el valor de la var param_0_to_a2i@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_a2i@0
+lw $t0, 128($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Parse
+lw $t3, 52($t1)      #Buscando el metodo dinamico para la funcion a2i
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+fin_Parse_a2i_2:
+#Fin de un If
+j fin_Parse_a2i_1                               #
+then_Parse_a2i_1:
+#Then case
+#Evaluando la expression de una operacion unaria
+#StaticDispatch a2i_aux
+#Evalua el parametro 0 para el CastingDispatch a2i_aux
+#Evalua la Expresion para el DinamicDispatch substr
+#Get Local Var s
+lw $t0, 116($sp)      #
+sw $t0, 28($sp)      #
+#Fin de la exprecion previa al DinamicDispatch substr
+#Evalua el parametro 0 para el CastingDispatch substr
+li $s4, 1      #
+lw $s6, 120($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 24($sp)      #
+#Fin del paramentro 0 al CastingDispatch substr
+#Evalua el parametro 1 para el CastingDispatch substr
+#Evaluando el operado izquierdo de una operacion rest
+#Evalua la Expresion para el DinamicDispatch length
+#Get Local Var s
+#Fin de la exprecion previa al DinamicDispatch length
+lw $t0, 116($sp)      #Lee el valor de la var s@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con s@0
+lw $t0, 120($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de String
+lw $t3, 28($t1)      #Buscando el metodo dinamico para la funcion length
+jal $t3                               #
+sw $v0, 20($sp)      #Asigna el resultado de la funcion
+#Resolucion del operado izquierdo de una operacion rest
+#Evaluando el operado derecho de una operacion rest
+li $s4, 1      #
+lw $s6, 120($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 16($sp)      #
+#Resolucion del operado derecha de una operacion rest
+lw $s6, 120($sp)      #Guarda self
+lw $a0, 20($sp)      #Guarda el parametro 0 -> rest@_a@1
+lw $a1, 16($sp)      #Guarda el parametro 1 -> rest@_b@1
+jal __int__sub__                               #
+sw $v0, 8($sp)      #
+#Fin del paramentro 1 al CastingDispatch substr
+lw $t0, 28($sp)      #Lee el valor de la var instance_dynamic_to_substr@3
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_substr@3
+lw $t0, 28($sp)      #Lee el valor de la var param_0_to_substr@3
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_substr@3
+lw $t0, 16($sp)      #Lee el valor de la var param_1_to_substr@3
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_1_to_substr@3
+lw $t0, 40($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de String
+lw $t3, 32($t1)      #Buscando el metodo dinamico para la funcion substr
+jal $t3                               #
+sw $v0, 4($sp)      #Asigna el resultado de la funcion
+#Fin del paramentro 0 al CastingDispatch a2i_aux
+lw $t0, 120($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 8($sp)      #Lee el valor de la var param_0_to_a2i_aux@1
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_a2i_aux@1
+lw $t0, 128($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Parse
+lw $t3, 56($t1)      #Buscando el metodo dinamico para la funcion a2i_aux
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#FIN expression de una operacion unaria
+lw $s6, 120($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__complement__                               #
+move $s4, $v0      #
+fin_Parse_a2i_1:
+#Fin de un If
+j fin_Parse_a2i_0                               #
+then_Parse_a2i_0:
+#Then case
+li $s4, 0      #
+lw $s6, 120($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+fin_Parse_a2i_0:
+#Fin de un If
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 124     #
+jr $ra                               #
+
+Parse_a2i_aux:     #
+#Parametro self en stackpoiner + 192
+#Parametro s@0 en stackpoiner + 188
+addi $sp, $sp, -4     #Push local var int stackpointer 184
+addi $sp, $sp, -4     #Push local var j stackpointer 180
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_length@0 stackpointer 176
+addi $sp, $sp, -4     #Push local var i stackpointer 172
+addi $sp, $sp, -4     #Push local var c stackpointer 168
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_substr@0 stackpointer 164
+addi $sp, $sp, -4     #Push local var param_0_to_substr@0 stackpointer 160
+addi $sp, $sp, -4     #Push local var param_1_to_substr@0 stackpointer 156
+addi $sp, $sp, -4     #Push local var str_eq@_a@0 stackpointer 152
+addi $sp, $sp, -4     #Push local var str_eq@_b@0 stackpointer 148
+addi $sp, $sp, -4     #Push local var str_eq@_a@1 stackpointer 144
+addi $sp, $sp, -4     #Push local var str_eq@_b@1 stackpointer 140
+addi $sp, $sp, -4     #Push local var sum@_a@0 stackpointer 136
+addi $sp, $sp, -4     #Push local var sum@_b@0 stackpointer 132
+addi $sp, $sp, -4     #Push local var factor@_a@0 stackpointer 128
+addi $sp, $sp, -4     #Push local var factor@_b@0 stackpointer 124
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_substr@1 stackpointer 120
+addi $sp, $sp, -4     #Push local var param_0_to_substr@1 stackpointer 116
+addi $sp, $sp, -4     #Push local var param_1_to_substr@1 stackpointer 112
+addi $sp, $sp, -4     #Push local var param_0_to_c2i@0 stackpointer 108
+addi $sp, $sp, -4     #Push local var sum@_a@1 stackpointer 104
+addi $sp, $sp, -4     #Push local var sum@_b@1 stackpointer 100
+addi $sp, $sp, -4     #Push local var int_eq@_a@0 stackpointer 96
+addi $sp, $sp, -4     #Push local var int_eq@_b@0 stackpointer 92
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_substr@2 stackpointer 88
+addi $sp, $sp, -4     #Push local var sum@_a@2 stackpointer 84
+addi $sp, $sp, -4     #Push local var sum@_b@2 stackpointer 80
+addi $sp, $sp, -4     #Push local var param_0_to_substr@2 stackpointer 76
+addi $sp, $sp, -4     #Push local var rest@_a@0 stackpointer 72
+addi $sp, $sp, -4     #Push local var rest@_b@0 stackpointer 68
+addi $sp, $sp, -4     #Push local var rest@_a@1 stackpointer 64
+addi $sp, $sp, -4     #Push local var rest@_b@1 stackpointer 60
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_length@1 stackpointer 56
+addi $sp, $sp, -4     #Push local var param_1_to_substr@2 stackpointer 52
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_substr@3 stackpointer 48
+addi $sp, $sp, -4     #Push local var sum@_a@3 stackpointer 44
+addi $sp, $sp, -4     #Push local var sum@_b@3 stackpointer 40
+addi $sp, $sp, -4     #Push local var param_0_to_substr@3 stackpointer 36
+addi $sp, $sp, -4     #Push local var rest@_a@2 stackpointer 32
+addi $sp, $sp, -4     #Push local var rest@_b@2 stackpointer 28
+addi $sp, $sp, -4     #Push local var rest@_a@3 stackpointer 24
+addi $sp, $sp, -4     #Push local var rest@_b@3 stackpointer 20
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_length@2 stackpointer 16
+addi $sp, $sp, -4     #Push local var param_1_to_substr@3 stackpointer 12
+addi $sp, $sp, -4     #Push local var less@_a@0 stackpointer 8
+addi $sp, $sp, -4     #Push local var less@_b@0 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Parse_a2i_aux
+#Eval Expression to Let int
+li $s4, 0      #
+lw $s6, 192($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 184($sp)      #
+#Fin de la asignacion Let int
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Eval Expression to Let j
+#Evalua la Expresion para el DinamicDispatch length
+#Get Local Var s
+#Fin de la exprecion previa al DinamicDispatch length
+lw $t0, 188($sp)      #Lee el valor de la var s@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con s@0
+lw $t0, 192($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de String
+lw $t3, 28($t1)      #Buscando el metodo dinamico para la funcion length
+jal $t3                               #
+sw $v0, 180($sp)      #Asigna el resultado de la funcion
+#Fin de la asignacion Let j
+#Eval Expression to Let i
+li $s4, 0      #
+lw $s6, 192($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 172($sp)      #
+#Fin de la asignacion Let i
+#Inicio de un While
+j while_cond_2                               #
+while_back_2:
+#Eval Expression to Let c
+#Evalua la Expresion para el DinamicDispatch substr
+#Get Local Var s
+lw $t0, 188($sp)      #
+sw $t0, 164($sp)      #
+#Fin de la exprecion previa al DinamicDispatch substr
+#Evalua el parametro 0 para el CastingDispatch substr
+#Get Local Var i
+lw $t0, 172($sp)      #
+sw $t0, 160($sp)      #
+#Fin del paramentro 0 al CastingDispatch substr
+#Evalua el parametro 1 para el CastingDispatch substr
+li $s4, 1      #
+lw $s6, 192($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 156($sp)      #
+#Fin del paramentro 1 al CastingDispatch substr
+lw $t0, 164($sp)      #Lee el valor de la var instance_dynamic_to_substr@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_substr@0
+lw $t0, 164($sp)      #Lee el valor de la var param_0_to_substr@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_substr@0
+lw $t0, 164($sp)      #Lee el valor de la var param_1_to_substr@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_1_to_substr@0
+lw $t0, 176($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de String
+lw $t3, 32($t1)      #Buscando el metodo dinamico para la funcion substr
+jal $t3                               #
+sw $v0, 168($sp)      #Asigna el resultado de la funcion
+#Fin de la asignacion Let c
+#Evalua la condicion de un If
+#Evaluando el operado izquierdo de una operacion str_eq
+#Get Local Var c
+lw $t0, 168($sp)      #
+sw $t0, 152($sp)      #
+#Resolucion del operado izquierdo de una operacion str_eq
+#Evaluando el operado derecho de una operacion str_eq
+la $t0, string_19      #
+move $s4, $t0      #
+lw $s6, 192($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 148($sp)      #
+#Resolucion del operado derecha de una operacion str_eq
+lw $s6, 192($sp)      #Guarda self
+lw $a0, 152($sp)      #Guarda el parametro 0 -> str_eq@_a@0
+lw $a1, 148($sp)      #Guarda el parametro 1 -> str_eq@_b@0
+jal __str__cmp__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 192($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Fin de la evaluacion de la condicion de un IF
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, then_Parse_a2i_aux_0     #
+#Else case
+#Evalua la condicion de un If
+#Evaluando el operado izquierdo de una operacion str_eq
+#Get Local Var c
+lw $t0, 168($sp)      #
+sw $t0, 144($sp)      #
+#Resolucion del operado izquierdo de una operacion str_eq
+#Evaluando el operado derecho de una operacion str_eq
+la $t0, string_20      #
+move $s4, $t0      #
+lw $s6, 192($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 140($sp)      #
+#Resolucion del operado derecha de una operacion str_eq
+lw $s6, 192($sp)      #Guarda self
+lw $a0, 144($sp)      #Guarda el parametro 0 -> str_eq@_a@1
+lw $a1, 140($sp)      #Guarda el parametro 1 -> str_eq@_b@1
+jal __str__cmp__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 192($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Fin de la evaluacion de la condicion de un IF
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, then_Parse_a2i_aux_1     #
+#Else case
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Asignando un nuevo valor a la variable int
+#Evaluando el operado izquierdo de una operacion sum
+#Evaluando el operado izquierdo de una operacion factor
+#Get Local Var int
+lw $t0, 184($sp)      #
+sw $t0, 128($sp)      #
+#Resolucion del operado izquierdo de una operacion factor
+#Evaluando el operado derecho de una operacion factor
+li $s4, 10      #
+lw $s6, 192($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 124($sp)      #
+#Resolucion del operado derecha de una operacion factor
+lw $s6, 192($sp)      #Guarda self
+lw $a0, 128($sp)      #Guarda el parametro 0 -> factor@_a@0
+lw $a1, 124($sp)      #Guarda el parametro 1 -> factor@_b@0
+jal __int__mul__                               #
+sw $v0, 136($sp)      #
+#Resolucion del operado izquierdo de una operacion sum
+#Evaluando el operado derecho de una operacion sum
+#StaticDispatch c2i
+#Evalua el parametro 0 para el CastingDispatch c2i
+#Evalua la Expresion para el DinamicDispatch substr
+#Get Local Var s
+lw $t0, 188($sp)      #
+sw $t0, 120($sp)      #
+#Fin de la exprecion previa al DinamicDispatch substr
+#Evalua el parametro 0 para el CastingDispatch substr
+#Get Local Var i
+lw $t0, 172($sp)      #
+sw $t0, 116($sp)      #
+#Fin del paramentro 0 al CastingDispatch substr
+#Evalua el parametro 1 para el CastingDispatch substr
+li $s4, 1      #
+lw $s6, 192($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 112($sp)      #
+#Fin del paramentro 1 al CastingDispatch substr
+lw $t0, 120($sp)      #Lee el valor de la var instance_dynamic_to_substr@1
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_substr@1
+lw $t0, 120($sp)      #Lee el valor de la var param_0_to_substr@1
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_substr@1
+lw $t0, 120($sp)      #Lee el valor de la var param_1_to_substr@1
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_1_to_substr@1
+lw $t0, 132($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de String
+lw $t3, 32($t1)      #Buscando el metodo dinamico para la funcion substr
+jal $t3                               #
+sw $v0, 108($sp)      #Asigna el resultado de la funcion
+#Fin del paramentro 0 al CastingDispatch c2i
+lw $t0, 192($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 112($sp)      #Lee el valor de la var param_0_to_c2i@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_c2i@0
+lw $t0, 200($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Parse
+lw $t3, 48($t1)      #Buscando el metodo dinamico para la funcion c2i
+jal $t3                               #
+sw $v0, 132($sp)      #Asigna el resultado de la funcion
+#Resolucion del operado derecha de una operacion sum
+lw $s6, 192($sp)      #Guarda self
+lw $a0, 136($sp)      #Guarda el parametro 0 -> sum@_a@0
+lw $a1, 132($sp)      #Guarda el parametro 1 -> sum@_b@0
+jal __int__sum__                               #
+move $s4, $v0      #
+move $t0, $s4      #
+sw $t0, 184($sp)      #
+lw $t0, 184($sp)      #
+move $s4, $t0      #
+#Inicio del paso 1 de una sequencia Block
+#Asignando un nuevo valor a la variable i
+#Evaluando el operado izquierdo de una operacion sum
+#Get Local Var i
+lw $t0, 172($sp)      #
+sw $t0, 104($sp)      #
+#Resolucion del operado izquierdo de una operacion sum
+#Evaluando el operado derecho de una operacion sum
+li $s4, 1      #
+lw $s6, 192($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 100($sp)      #
+#Resolucion del operado derecha de una operacion sum
+lw $s6, 192($sp)      #Guarda self
+lw $a0, 104($sp)      #Guarda el parametro 0 -> sum@_a@1
+lw $a1, 100($sp)      #Guarda el parametro 1 -> sum@_b@1
+jal __int__sum__                               #
+move $s4, $v0      #
+move $t0, $s4      #
+sw $t0, 172($sp)      #
+lw $t0, 172($sp)      #
+move $s4, $t0      #
+#Inicio del paso 2 de una sequencia Block
+#Evalua la condicion de un If
+#Evaluando el operado izquierdo de una operacion int_eq
+#Get Local Var i
+lw $t0, 172($sp)      #
+sw $t0, 96($sp)      #
+#Resolucion del operado izquierdo de una operacion int_eq
+#Evaluando el operado derecho de una operacion int_eq
+#Get Local Var j
+lw $t0, 180($sp)      #
+sw $t0, 92($sp)      #
+#Resolucion del operado derecha de una operacion int_eq
+lw $s6, 192($sp)      #Guarda self
+lw $a0, 96($sp)      #Guarda el parametro 0 -> int_eq@_a@0
+lw $a1, 92($sp)      #Guarda el parametro 1 -> int_eq@_b@0
+jal __int__eq__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 192($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Fin de la evaluacion de la condicion de un IF
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, then_Parse_a2i_aux_2     #
+#Else case
+la $t0, string_21      #
+move $s4, $t0      #
+lw $s6, 192($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+move $s4, $v0      #
+j fin_Parse_a2i_aux_2                               #
+then_Parse_a2i_aux_2:
+#Then case
+#Asignando un nuevo valor a la variable rest
+la $t0, string_22      #
+move $s4, $t0      #
+lw $s6, 192($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+move $s4, $v0      #
+lw $t0, 192($sp)      #Instancia de la clase Parse
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded rest
+sw $t1, 8($t0)      #Setea la propiedad rest con el valor de _
+lw $t0, 192($sp)      #Instancia de la clase Parse
+lw $t1, 8($t0)      #Lee la propiedad rest
+move $s4, $t1      #Guarda el valor de la propiedad rest en la variable local _
+fin_Parse_a2i_aux_2:
+#Fin de un If
+j fin_Parse_a2i_aux_1                               #
+then_Parse_a2i_aux_1:
+#Then case
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Asignando un nuevo valor a la variable rest
+#Evalua la Expresion para el DinamicDispatch substr
+#Get Local Var s
+lw $t0, 188($sp)      #
+sw $t0, 88($sp)      #
+#Fin de la exprecion previa al DinamicDispatch substr
+#Evalua el parametro 0 para el CastingDispatch substr
+#Evaluando el operado izquierdo de una operacion sum
+#Get Local Var i
+lw $t0, 172($sp)      #
+sw $t0, 84($sp)      #
+#Resolucion del operado izquierdo de una operacion sum
+#Evaluando el operado derecho de una operacion sum
+li $s4, 1      #
+lw $s6, 192($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 80($sp)      #
+#Resolucion del operado derecha de una operacion sum
+lw $s6, 192($sp)      #Guarda self
+lw $a0, 84($sp)      #Guarda el parametro 0 -> sum@_a@2
+lw $a1, 80($sp)      #Guarda el parametro 1 -> sum@_b@2
+jal __int__sum__                               #
+sw $v0, 76($sp)      #
+#Fin del paramentro 0 al CastingDispatch substr
+#Evalua el parametro 1 para el CastingDispatch substr
+#Evaluando el operado izquierdo de una operacion rest
+#Evaluando el operado izquierdo de una operacion rest
+#Evalua la Expresion para el DinamicDispatch length
+#Get Local Var s
+#Fin de la exprecion previa al DinamicDispatch length
+lw $t0, 188($sp)      #Lee el valor de la var s@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con s@0
+lw $t0, 192($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de String
+lw $t3, 28($t1)      #Buscando el metodo dinamico para la funcion length
+jal $t3                               #
+sw $v0, 64($sp)      #Asigna el resultado de la funcion
+#Resolucion del operado izquierdo de una operacion rest
+#Evaluando el operado derecho de una operacion rest
+#Get Local Var i
+lw $t0, 172($sp)      #
+sw $t0, 60($sp)      #
+#Resolucion del operado derecha de una operacion rest
+lw $s6, 192($sp)      #Guarda self
+lw $a0, 64($sp)      #Guarda el parametro 0 -> rest@_a@1
+lw $a1, 60($sp)      #Guarda el parametro 1 -> rest@_b@1
+jal __int__sub__                               #
+sw $v0, 72($sp)      #
+#Resolucion del operado izquierdo de una operacion rest
+#Evaluando el operado derecho de una operacion rest
+li $s4, 1      #
+lw $s6, 192($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 68($sp)      #
+#Resolucion del operado derecha de una operacion rest
+lw $s6, 192($sp)      #Guarda self
+lw $a0, 72($sp)      #Guarda el parametro 0 -> rest@_a@0
+lw $a1, 68($sp)      #Guarda el parametro 1 -> rest@_b@0
+jal __int__sub__                               #
+sw $v0, 52($sp)      #
+#Fin del paramentro 1 al CastingDispatch substr
+lw $t0, 88($sp)      #Lee el valor de la var instance_dynamic_to_substr@2
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_substr@2
+lw $t0, 80($sp)      #Lee el valor de la var param_0_to_substr@2
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_substr@2
+lw $t0, 60($sp)      #Lee el valor de la var param_1_to_substr@2
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_1_to_substr@2
+lw $t0, 100($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de String
+lw $t3, 32($t1)      #Buscando el metodo dinamico para la funcion substr
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+lw $t0, 192($sp)      #Instancia de la clase Parse
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded rest
+sw $t1, 8($t0)      #Setea la propiedad rest con el valor de _
+lw $t0, 192($sp)      #Instancia de la clase Parse
+lw $t1, 8($t0)      #Lee la propiedad rest
+move $s4, $t1      #Guarda el valor de la propiedad rest en la variable local _
+#Inicio del paso 1 de una sequencia Block
+#Asignando un nuevo valor a la variable i
+#Get Local Var j
+lw $t0, 180($sp)      #
+move $s4, $t0      #
+move $t0, $s4      #
+sw $t0, 172($sp)      #
+lw $t0, 172($sp)      #
+move $s4, $t0      #
+fin_Parse_a2i_aux_1:
+#Fin de un If
+j fin_Parse_a2i_aux_0                               #
+then_Parse_a2i_aux_0:
+#Then case
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Asignando un nuevo valor a la variable rest
+#Evalua la Expresion para el DinamicDispatch substr
+#Get Local Var s
+lw $t0, 188($sp)      #
+sw $t0, 48($sp)      #
+#Fin de la exprecion previa al DinamicDispatch substr
+#Evalua el parametro 0 para el CastingDispatch substr
+#Evaluando el operado izquierdo de una operacion sum
+#Get Local Var i
+lw $t0, 172($sp)      #
+sw $t0, 44($sp)      #
+#Resolucion del operado izquierdo de una operacion sum
+#Evaluando el operado derecho de una operacion sum
+li $s4, 1      #
+lw $s6, 192($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 40($sp)      #
+#Resolucion del operado derecha de una operacion sum
+lw $s6, 192($sp)      #Guarda self
+lw $a0, 44($sp)      #Guarda el parametro 0 -> sum@_a@3
+lw $a1, 40($sp)      #Guarda el parametro 1 -> sum@_b@3
+jal __int__sum__                               #
+sw $v0, 36($sp)      #
+#Fin del paramentro 0 al CastingDispatch substr
+#Evalua el parametro 1 para el CastingDispatch substr
+#Evaluando el operado izquierdo de una operacion rest
+#Evaluando el operado izquierdo de una operacion rest
+#Evalua la Expresion para el DinamicDispatch length
+#Get Local Var s
+#Fin de la exprecion previa al DinamicDispatch length
+lw $t0, 188($sp)      #Lee el valor de la var s@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con s@0
+lw $t0, 192($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de String
+lw $t3, 28($t1)      #Buscando el metodo dinamico para la funcion length
+jal $t3                               #
+sw $v0, 24($sp)      #Asigna el resultado de la funcion
+#Resolucion del operado izquierdo de una operacion rest
+#Evaluando el operado derecho de una operacion rest
+#Get Local Var i
+lw $t0, 172($sp)      #
+sw $t0, 20($sp)      #
+#Resolucion del operado derecha de una operacion rest
+lw $s6, 192($sp)      #Guarda self
+lw $a0, 24($sp)      #Guarda el parametro 0 -> rest@_a@3
+lw $a1, 20($sp)      #Guarda el parametro 1 -> rest@_b@3
+jal __int__sub__                               #
+sw $v0, 32($sp)      #
+#Resolucion del operado izquierdo de una operacion rest
+#Evaluando el operado derecho de una operacion rest
+li $s4, 1      #
+lw $s6, 192($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+sw $v0, 28($sp)      #
+#Resolucion del operado derecha de una operacion rest
+lw $s6, 192($sp)      #Guarda self
+lw $a0, 32($sp)      #Guarda el parametro 0 -> rest@_a@2
+lw $a1, 28($sp)      #Guarda el parametro 1 -> rest@_b@2
+jal __int__sub__                               #
+sw $v0, 12($sp)      #
+#Fin del paramentro 1 al CastingDispatch substr
+lw $t0, 48($sp)      #Lee el valor de la var instance_dynamic_to_substr@3
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_substr@3
+lw $t0, 40($sp)      #Lee el valor de la var param_0_to_substr@3
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_substr@3
+lw $t0, 20($sp)      #Lee el valor de la var param_1_to_substr@3
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_1_to_substr@3
+lw $t0, 60($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de String
+lw $t3, 32($t1)      #Buscando el metodo dinamico para la funcion substr
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+lw $t0, 192($sp)      #Instancia de la clase Parse
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded rest
+sw $t1, 8($t0)      #Setea la propiedad rest con el valor de _
+lw $t0, 192($sp)      #Instancia de la clase Parse
+lw $t1, 8($t0)      #Lee la propiedad rest
+move $s4, $t1      #Guarda el valor de la propiedad rest en la variable local _
+#Inicio del paso 1 de una sequencia Block
+#Asignando un nuevo valor a la variable i
+#Get Local Var j
+lw $t0, 180($sp)      #
+move $s4, $t0      #
+move $t0, $s4      #
+sw $t0, 172($sp)      #
+lw $t0, 172($sp)      #
+move $s4, $t0      #
+fin_Parse_a2i_aux_0:
+#Fin de un If
+#Fin del cuerpo e inicio de la condicion de un While
+while_cond_2:
+#Evaluando el operado izquierdo de una operacion less
+#Get Local Var i
+lw $t0, 172($sp)      #
+sw $t0, 8($sp)      #
+#Resolucion del operado izquierdo de una operacion less
+#Evaluando el operado derecho de una operacion less
+#Get Local Var j
+lw $t0, 180($sp)      #
+sw $t0, 4($sp)      #
+#Resolucion del operado derecha de una operacion less
+lw $s6, 192($sp)      #Guarda self
+lw $a0, 8($sp)      #Guarda el parametro 0 -> less@_a@0
+lw $a1, 4($sp)      #Guarda el parametro 1 -> less@_b@0
+jal __int__le__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 192($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, while_back_2     #
+#Fin de la condicion de un While
+lw $t0, 192($sp)      #
+move $s4, $t0      #
+#Inicio del paso 1 de una sequencia Block
+#Get Local Var int
+lw $t0, 184($sp)      #
+move $s4, $t0      #
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 196     #
+jr $ra                               #
+
+Vertice_init:     #
+#Parametro self en stackpoiner + 8
+#Parametro n@0 en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Vertice_init
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Asignando un nuevo valor a la variable num
+#Get Local Var n
+lw $t0, 4($sp)      #
+move $s4, $t0      #
+lw $t0, 8($sp)      #Instancia de la clase Vertice
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded num
+sw $t1, 4($t0)      #Setea la propiedad num con el valor de _
+lw $t0, 8($sp)      #Instancia de la clase Vertice
+lw $t1, 4($t0)      #Lee la propiedad num
+move $s4, $t1      #Guarda el valor de la propiedad num en la variable local _
+#Inicio del paso 1 de una sequencia Block
+#Get Local Var self
+lw $t0, 8($sp)      #
+move $s4, $t0      #
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 12     #
+jr $ra                               #
+
+Edge_init:     #
+#Parametro self en stackpoiner + 16
+#Parametro f@0 en stackpoiner + 12
+#Parametro t@0 en stackpoiner + 8
+#Parametro w@0 en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Edge_init
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Asignando un nuevo valor a la variable from
+#Get Local Var f
+lw $t0, 12($sp)      #
+move $s4, $t0      #
+lw $t0, 16($sp)      #Instancia de la clase Edge
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded from
+sw $t1, 4($t0)      #Setea la propiedad from con el valor de _
+lw $t0, 16($sp)      #Instancia de la clase Edge
+lw $t1, 4($t0)      #Lee la propiedad from
+move $s4, $t1      #Guarda el valor de la propiedad from en la variable local _
+#Inicio del paso 1 de una sequencia Block
+#Asignando un nuevo valor a la variable to
+#Get Local Var t
+lw $t0, 8($sp)      #
+move $s4, $t0      #
+lw $t0, 16($sp)      #Instancia de la clase Edge
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded to
+sw $t1, 8($t0)      #Setea la propiedad to con el valor de _
+lw $t0, 16($sp)      #Instancia de la clase Edge
+lw $t1, 8($t0)      #Lee la propiedad to
+move $s4, $t1      #Guarda el valor de la propiedad to en la variable local _
+#Inicio del paso 2 de una sequencia Block
+#Asignando un nuevo valor a la variable weight
+#Get Local Var w
+lw $t0, 4($sp)      #
+move $s4, $t0      #
+lw $t0, 16($sp)      #Instancia de la clase Edge
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded weight
+sw $t1, 12($t0)      #Setea la propiedad weight con el valor de _
+lw $t0, 16($sp)      #Instancia de la clase Edge
+lw $t1, 12($t0)      #Lee la propiedad weight
+move $s4, $t1      #Guarda el valor de la propiedad weight en la variable local _
+#Inicio del paso 3 de una sequencia Block
+#Get Local Var self
+lw $t0, 16($sp)      #
+move $s4, $t0      #
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 20     #
+jr $ra                               #
+
+ECons_init:     #
+#Parametro self en stackpoiner + 12
+#Parametro e@0 en stackpoiner + 8
+#Parametro rest@0 en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion ECons_init
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Asignando un nuevo valor a la variable car
+#Get Local Var e
+lw $t0, 8($sp)      #
+move $s4, $t0      #
+lw $t0, 12($sp)      #Instancia de la clase EList
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded car
+sw $t1, 4($t0)      #Setea la propiedad car con el valor de _
+lw $t0, 12($sp)      #Instancia de la clase EList
+lw $t1, 4($t0)      #Lee la propiedad car
+move $s4, $t1      #Guarda el valor de la propiedad car en la variable local _
+#Inicio del paso 1 de una sequencia Block
+#Asignando un nuevo valor a la variable cdr
+#Get Local Var rest
+lw $t0, 4($sp)      #
+move $s4, $t0      #
+lw $t0, 12($sp)      #Instancia de la clase ECons
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded cdr
+sw $t1, 8($t0)      #Setea la propiedad cdr con el valor de _
+lw $t0, 12($sp)      #Instancia de la clase ECons
+lw $t1, 8($t0)      #Lee la propiedad cdr
+move $s4, $t1      #Guarda el valor de la propiedad cdr en la variable local _
+#Inicio del paso 2 de una sequencia Block
+#Get Local Var self
+lw $t0, 12($sp)      #
+move $s4, $t0      #
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 16     #
+jr $ra                               #
+
+VCons_init:     #
+#Parametro self en stackpoiner + 12
+#Parametro v@0 en stackpoiner + 8
+#Parametro rest@0 en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion VCons_init
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Asignando un nuevo valor a la variable car
+#Get Local Var v
+lw $t0, 8($sp)      #
+move $s4, $t0      #
+lw $t0, 12($sp)      #Instancia de la clase VList
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded car
+sw $t1, 4($t0)      #Setea la propiedad car con el valor de _
+lw $t0, 12($sp)      #Instancia de la clase VList
+lw $t1, 4($t0)      #Lee la propiedad car
+move $s4, $t1      #Guarda el valor de la propiedad car en la variable local _
+#Inicio del paso 1 de una sequencia Block
+#Asignando un nuevo valor a la variable cdr
+#Get Local Var rest
+lw $t0, 4($sp)      #
+move $s4, $t0      #
+lw $t0, 12($sp)      #Instancia de la clase VCons
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded cdr
+sw $t1, 8($t0)      #Setea la propiedad cdr con el valor de _
+lw $t0, 12($sp)      #Instancia de la clase VCons
+lw $t1, 8($t0)      #Lee la propiedad cdr
+move $s4, $t1      #Guarda el valor de la propiedad cdr en la variable local _
+#Inicio del paso 2 de una sequencia Block
+#Get Local Var self
+lw $t0, 12($sp)      #
+move $s4, $t0      #
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 16     #
+jr $ra                               #
+
+new_ctr_Edge:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_Edge
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+jal new_ctr_IO                               #
+li $s4, 0      #
+lw $s6, 4($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+lw $t0, 4($sp)      #Instancia de la clase Edge
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded from
+sw $t1, 4($t0)      #Setea la propiedad from con el valor de _
+li $s4, 0      #
+lw $s6, 4($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+lw $t0, 4($sp)      #Instancia de la clase Edge
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded to
+sw $t1, 8($t0)      #Setea la propiedad to con el valor de _
+li $s4, 0      #
+lw $s6, 4($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+lw $t0, 4($sp)      #Instancia de la clase Edge
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded weight
+sw $t1, 12($t0)      #Setea la propiedad weight con el valor de _
+lw $v0, 4($sp)      #Return self
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+Vertice_number:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Vertice_number
+#Get Self Property num
+lw $t0, 4($sp)      #Instancia de la clase Vertice
+lw $t1, 4($t0)      #Lee la propiedad num
+move $s4, $t1      #Guarda el valor de la propiedad num en la variable local _
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+Vertice_add_out:     #
+#Parametro self en stackpoiner + 16
+#Parametro s@0 en stackpoiner + 12
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_cons@0 stackpointer 8
+addi $sp, $sp, -4     #Push local var param_0_to_cons@0 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Vertice_add_out
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#Asignando un nuevo valor a la variable out
+#Evalua la Expresion para el DinamicDispatch cons
+#Get Self Property out
+lw $t0, 16($sp)      #Instancia de la clase Vertice
+lw $t1, 8($t0)      #Lee la propiedad out
+sw $t1, 8($sp)      #Guarda el valor de la propiedad out en la variable local instance_dynamic_to_cons@0
+#Fin de la exprecion previa al DinamicDispatch cons
+#Evalua el parametro 0 para el CastingDispatch cons
+#Get Local Var s
+lw $t0, 12($sp)      #
+sw $t0, 4($sp)      #
+#Fin del paramentro 0 al CastingDispatch cons
+lw $t0, 8($sp)      #Lee el valor de la var instance_dynamic_to_cons@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_cons@0
+lw $t0, 8($sp)      #Lee el valor de la var param_0_to_cons@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_cons@0
+lw $t0, 16($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de EList
+lw $t3, 52($t1)      #Buscando el metodo dinamico para la funcion cons
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+lw $t0, 16($sp)      #Instancia de la clase Vertice
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded out
+sw $t1, 8($t0)      #Setea la propiedad out con el valor de _
+lw $t0, 16($sp)      #Instancia de la clase Vertice
+lw $t1, 8($t0)      #Lee la propiedad out
+move $s4, $t1      #Guarda el valor de la propiedad out en la variable local _
+#Inicio del paso 1 de una sequencia Block
+#Get Local Var self
+lw $t0, 16($sp)      #
+move $s4, $t0      #
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 20     #
+jr $ra                               #
+
+String_length:     #
+#Parametro self en stackpoiner + 0
+addi $sp, $sp, -4     #Push local var $ra stackpointer -4
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion String_length
+lw $s6, 4($sp)      #Guarda self
+jal __str__length__                               #
+lw $ra, 0($sp)      #
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+Vertice_outgoing:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Vertice_outgoing
+#Get Self Property out
+lw $t0, 4($sp)      #Instancia de la clase Vertice
+lw $t1, 8($t0)      #Lee la propiedad out
+move $s4, $t1      #Guarda el valor de la propiedad out en la variable local _
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+EList_append:     #
+#Parametro self en stackpoiner + 28
+#Parametro l@0 en stackpoiner + 24
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_isNil@0 stackpointer 20
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_append@0 stackpointer 16
+addi $sp, $sp, -4     #Push local var param_0_to_append@0 stackpointer 12
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_cons@0 stackpointer 8
+addi $sp, $sp, -4     #Push local var param_0_to_cons@0 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion EList_append
+#Evalua la condicion de un If
+#Evalua la Expresion para el DinamicDispatch isNil
+#Get Local Var self
+#Fin de la exprecion previa al DinamicDispatch isNil
+lw $t0, 28($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 32($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de EList
+lw $t3, 40($t1)      #Buscando el metodo dinamico para la funcion isNil
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#Fin de la evaluacion de la condicion de un IF
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, then_EList_append_0     #
+#Else case
+#Evalua la Expresion para el DinamicDispatch cons
+#Evalua la Expresion para el DinamicDispatch append
+#StaticDispatch tail
+lw $t0, 28($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 32($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de EList
+lw $t3, 48($t1)      #Buscando el metodo dinamico para la funcion tail
+jal $t3                               #
+sw $v0, 16($sp)      #Asigna el resultado de la funcion
+#Fin de la exprecion previa al DinamicDispatch append
+#Evalua el parametro 0 para el CastingDispatch append
+#Get Local Var l
+lw $t0, 24($sp)      #
+sw $t0, 12($sp)      #
+#Fin del paramentro 0 al CastingDispatch append
+lw $t0, 16($sp)      #Lee el valor de la var instance_dynamic_to_append@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_append@0
+lw $t0, 16($sp)      #Lee el valor de la var param_0_to_append@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_append@0
+lw $t0, 24($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de EList
+lw $t3, 56($t1)      #Buscando el metodo dinamico para la funcion append
+jal $t3                               #
+sw $v0, 8($sp)      #Asigna el resultado de la funcion
+#Fin de la exprecion previa al DinamicDispatch cons
+#Evalua el parametro 0 para el CastingDispatch cons
+#StaticDispatch head
+lw $t0, 28($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 32($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de EList
+lw $t3, 44($t1)      #Buscando el metodo dinamico para la funcion head
+jal $t3                               #
+sw $v0, 4($sp)      #Asigna el resultado de la funcion
+#Fin del paramentro 0 al CastingDispatch cons
+lw $t0, 8($sp)      #Lee el valor de la var instance_dynamic_to_cons@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_cons@0
+lw $t0, 8($sp)      #Lee el valor de la var param_0_to_cons@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_cons@0
+lw $t0, 16($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de EList
+lw $t3, 52($t1)      #Buscando el metodo dinamico para la funcion cons
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+j fin_EList_append_0                               #
+then_EList_append_0:
+#Then case
+#Get Local Var l
+lw $t0, 24($sp)      #
+move $s4, $t0      #
+fin_EList_append_0:
+#Fin de un If
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 32     #
+jr $ra                               #
+
+EList_cons:     #
+#Parametro self en stackpoiner + 24
+#Parametro e@0 en stackpoiner + 20
+addi $sp, $sp, -4     #Push local var new_ECons@0 stackpointer 16
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_init@0 stackpointer 12
+addi $sp, $sp, -4     #Push local var param_0_to_init@0 stackpointer 8
+addi $sp, $sp, -4     #Push local var param_1_to_init@0 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion EList_cons
+#Evalua la Expresion para el DinamicDispatch init
+#Creando instancia de tipo ECons
+#Allocate a una class ECons
+#atributo type_name en puntero + 0
+#atributo car en puntero + 4
+#atributo cdr en puntero + 8
+li $a0, 12      #
+li $v0, 9      #
+syscall
+sw $v0, 16($sp)      #Guardando en la variable local new_ECons@0 puntero de la instancia de la clase ECons
+#Assignacion de la insformacion de tipo a la instancia
+la $t0, ECons      #
+move $s4, $t0      #
+lw $t0, 16($sp)      #Instancia de la clase 
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded type_name
+sw $t1, 0($t0)      #Setea la propiedad type_name con el valor de _
+lw $t0, 16($sp)      #Lee el valor de la var new_ECons@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con new_ECons@0
+jal new_ctr_ECons                               #
+sw $v0, 12($sp)      #Asigna el resultado de la funcion
+#Fin de la exprecion previa al DinamicDispatch init
+#Evalua el parametro 0 para el CastingDispatch init
+#Get Local Var e
+lw $t0, 20($sp)      #
+sw $t0, 8($sp)      #
+#Fin del paramentro 0 al CastingDispatch init
+#Evalua el parametro 1 para el CastingDispatch init
+#Get Local Var self
+lw $t0, 24($sp)      #
+sw $t0, 4($sp)      #
+#Fin del paramentro 1 al CastingDispatch init
+lw $t0, 12($sp)      #Lee el valor de la var instance_dynamic_to_init@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_init@0
+lw $t0, 12($sp)      #Lee el valor de la var param_0_to_init@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_init@0
+lw $t0, 12($sp)      #Lee el valor de la var param_1_to_init@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_1_to_init@0
+lw $t0, 24($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de ECons
+lw $t3, 64($t1)      #Buscando el metodo dinamico para la funcion init
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 28     #
+jr $ra                               #
+
+VList_cons:     #
+#Parametro self en stackpoiner + 24
+#Parametro v@0 en stackpoiner + 20
+addi $sp, $sp, -4     #Push local var new_VCons@0 stackpointer 16
+addi $sp, $sp, -4     #Push local var instance_dynamic_to_init@0 stackpointer 12
+addi $sp, $sp, -4     #Push local var param_0_to_init@0 stackpointer 8
+addi $sp, $sp, -4     #Push local var param_1_to_init@0 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion VList_cons
+#Evalua la Expresion para el DinamicDispatch init
+#Creando instancia de tipo VCons
+#Allocate a una class VCons
+#atributo type_name en puntero + 0
+#atributo car en puntero + 4
+#atributo cdr en puntero + 8
+li $a0, 12      #
+li $v0, 9      #
+syscall
+sw $v0, 16($sp)      #Guardando en la variable local new_VCons@0 puntero de la instancia de la clase VCons
+#Assignacion de la insformacion de tipo a la instancia
+la $t0, VCons      #
+move $s4, $t0      #
+lw $t0, 16($sp)      #Instancia de la clase 
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded type_name
+sw $t1, 0($t0)      #Setea la propiedad type_name con el valor de _
+lw $t0, 16($sp)      #Lee el valor de la var new_VCons@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con new_VCons@0
+jal new_ctr_VCons                               #
+sw $v0, 12($sp)      #Asigna el resultado de la funcion
+#Fin de la exprecion previa al DinamicDispatch init
+#Evalua el parametro 0 para el CastingDispatch init
+#Get Local Var v
+lw $t0, 20($sp)      #
+sw $t0, 8($sp)      #
+#Fin del paramentro 0 al CastingDispatch init
+#Evalua el parametro 1 para el CastingDispatch init
+#Get Local Var self
+lw $t0, 24($sp)      #
+sw $t0, 4($sp)      #
+#Fin del paramentro 1 al CastingDispatch init
+lw $t0, 12($sp)      #Lee el valor de la var instance_dynamic_to_init@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con instance_dynamic_to_init@0
+lw $t0, 12($sp)      #Lee el valor de la var param_0_to_init@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_0_to_init@0
+lw $t0, 12($sp)      #Lee el valor de la var param_1_to_init@0
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con param_1_to_init@0
+lw $t0, 24($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de VCons
+lw $t3, 60($t1)      #Buscando el metodo dinamico para la funcion init
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 28     #
+jr $ra                               #
+
+IO_out_int:     #
+#Parametro self en stackpoiner + 4
+#Parametro number en stackpoiner + 0
+addi $sp, $sp, -4     #Push local var $ra stackpointer -4
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion IO_out_int
+lw $s6, 8($sp)      #Guarda self
+lw $a0, 4($sp)      #Guarda el parametro 0 -> number
+jal __int__print__                               #
+lw $ra, 0($sp)      #
+addi $sp, $sp, 12     #
+jr $ra                               #
+
+IO_out_string:     #
+#Parametro self en stackpoiner + 4
+#Parametro string en stackpoiner + 0
+addi $sp, $sp, -4     #Push local var $ra stackpointer -4
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion IO_out_string
+lw $s6, 8($sp)      #Guarda self
+lw $a0, 4($sp)      #Guarda el parametro 0 -> string
+jal __str__print__                               #
+lw $ra, 0($sp)      #
+addi $sp, $sp, 12     #
+jr $ra                               #
+
+String_substr:     #
+#Parametro self en stackpoiner + 8
+#Parametro index en stackpoiner + 4
+#Parametro count en stackpoiner + 0
+addi $sp, $sp, -4     #Push local var $ra stackpointer -4
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion String_substr
+lw $s6, 12($sp)      #Guarda self
+lw $a0, 8($sp)      #Guarda el parametro 0 -> index
+lw $a1, 4($sp)      #Guarda el parametro 1 -> count
+jal __str__substr__                               #
+lw $ra, 0($sp)      #
+addi $sp, $sp, 16     #
+jr $ra                               #
+
+Parse_c2i:     #
+#Parametro self en stackpoiner + 88
+#Parametro char@0 en stackpoiner + 84
+addi $sp, $sp, -4     #Push local var str_eq@_a@0 stackpointer 80
+addi $sp, $sp, -4     #Push local var str_eq@_b@0 stackpointer 76
+addi $sp, $sp, -4     #Push local var str_eq@_a@1 stackpointer 72
+addi $sp, $sp, -4     #Push local var str_eq@_b@1 stackpointer 68
+addi $sp, $sp, -4     #Push local var str_eq@_a@2 stackpointer 64
+addi $sp, $sp, -4     #Push local var str_eq@_b@2 stackpointer 60
+addi $sp, $sp, -4     #Push local var str_eq@_a@3 stackpointer 56
+addi $sp, $sp, -4     #Push local var str_eq@_b@3 stackpointer 52
+addi $sp, $sp, -4     #Push local var str_eq@_a@4 stackpointer 48
+addi $sp, $sp, -4     #Push local var str_eq@_b@4 stackpointer 44
+addi $sp, $sp, -4     #Push local var str_eq@_a@5 stackpointer 40
+addi $sp, $sp, -4     #Push local var str_eq@_b@5 stackpointer 36
+addi $sp, $sp, -4     #Push local var str_eq@_a@6 stackpointer 32
+addi $sp, $sp, -4     #Push local var str_eq@_b@6 stackpointer 28
+addi $sp, $sp, -4     #Push local var str_eq@_a@7 stackpointer 24
+addi $sp, $sp, -4     #Push local var str_eq@_b@7 stackpointer 20
+addi $sp, $sp, -4     #Push local var str_eq@_a@8 stackpointer 16
+addi $sp, $sp, -4     #Push local var str_eq@_b@8 stackpointer 12
+addi $sp, $sp, -4     #Push local var str_eq@_a@9 stackpointer 8
+addi $sp, $sp, -4     #Push local var str_eq@_b@9 stackpointer 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Parse_c2i
+#Evalua la condicion de un If
+#Evaluando el operado izquierdo de una operacion str_eq
+#Get Local Var char
+lw $t0, 84($sp)      #
+sw $t0, 80($sp)      #
+#Resolucion del operado izquierdo de una operacion str_eq
+#Evaluando el operado derecho de una operacion str_eq
+la $t0, string_7      #
+move $s4, $t0      #
+lw $s6, 88($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 76($sp)      #
+#Resolucion del operado derecha de una operacion str_eq
+lw $s6, 88($sp)      #Guarda self
+lw $a0, 80($sp)      #Guarda el parametro 0 -> str_eq@_a@0
+lw $a1, 76($sp)      #Guarda el parametro 1 -> str_eq@_b@0
+jal __str__cmp__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 88($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Fin de la evaluacion de la condicion de un IF
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, then_Parse_c2i_0     #
+#Else case
+#Evalua la condicion de un If
+#Evaluando el operado izquierdo de una operacion str_eq
+#Get Local Var char
+lw $t0, 84($sp)      #
+sw $t0, 72($sp)      #
+#Resolucion del operado izquierdo de una operacion str_eq
+#Evaluando el operado derecho de una operacion str_eq
+la $t0, string_8      #
+move $s4, $t0      #
+lw $s6, 88($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 68($sp)      #
+#Resolucion del operado derecha de una operacion str_eq
+lw $s6, 88($sp)      #Guarda self
+lw $a0, 72($sp)      #Guarda el parametro 0 -> str_eq@_a@1
+lw $a1, 68($sp)      #Guarda el parametro 1 -> str_eq@_b@1
+jal __str__cmp__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 88($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Fin de la evaluacion de la condicion de un IF
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, then_Parse_c2i_1     #
+#Else case
+#Evalua la condicion de un If
+#Evaluando el operado izquierdo de una operacion str_eq
+#Get Local Var char
+lw $t0, 84($sp)      #
+sw $t0, 64($sp)      #
+#Resolucion del operado izquierdo de una operacion str_eq
+#Evaluando el operado derecho de una operacion str_eq
+la $t0, string_9      #
+move $s4, $t0      #
+lw $s6, 88($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 60($sp)      #
+#Resolucion del operado derecha de una operacion str_eq
+lw $s6, 88($sp)      #Guarda self
+lw $a0, 64($sp)      #Guarda el parametro 0 -> str_eq@_a@2
+lw $a1, 60($sp)      #Guarda el parametro 1 -> str_eq@_b@2
+jal __str__cmp__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 88($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Fin de la evaluacion de la condicion de un IF
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, then_Parse_c2i_2     #
+#Else case
+#Evalua la condicion de un If
+#Evaluando el operado izquierdo de una operacion str_eq
+#Get Local Var char
+lw $t0, 84($sp)      #
+sw $t0, 56($sp)      #
+#Resolucion del operado izquierdo de una operacion str_eq
+#Evaluando el operado derecho de una operacion str_eq
+la $t0, string_10      #
+move $s4, $t0      #
+lw $s6, 88($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 52($sp)      #
+#Resolucion del operado derecha de una operacion str_eq
+lw $s6, 88($sp)      #Guarda self
+lw $a0, 56($sp)      #Guarda el parametro 0 -> str_eq@_a@3
+lw $a1, 52($sp)      #Guarda el parametro 1 -> str_eq@_b@3
+jal __str__cmp__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 88($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Fin de la evaluacion de la condicion de un IF
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, then_Parse_c2i_3     #
+#Else case
+#Evalua la condicion de un If
+#Evaluando el operado izquierdo de una operacion str_eq
+#Get Local Var char
+lw $t0, 84($sp)      #
+sw $t0, 48($sp)      #
+#Resolucion del operado izquierdo de una operacion str_eq
+#Evaluando el operado derecho de una operacion str_eq
+la $t0, string_11      #
+move $s4, $t0      #
+lw $s6, 88($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 44($sp)      #
+#Resolucion del operado derecha de una operacion str_eq
+lw $s6, 88($sp)      #Guarda self
+lw $a0, 48($sp)      #Guarda el parametro 0 -> str_eq@_a@4
+lw $a1, 44($sp)      #Guarda el parametro 1 -> str_eq@_b@4
+jal __str__cmp__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 88($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Fin de la evaluacion de la condicion de un IF
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, then_Parse_c2i_4     #
+#Else case
+#Evalua la condicion de un If
+#Evaluando el operado izquierdo de una operacion str_eq
+#Get Local Var char
+lw $t0, 84($sp)      #
+sw $t0, 40($sp)      #
+#Resolucion del operado izquierdo de una operacion str_eq
+#Evaluando el operado derecho de una operacion str_eq
+la $t0, string_12      #
+move $s4, $t0      #
+lw $s6, 88($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 36($sp)      #
+#Resolucion del operado derecha de una operacion str_eq
+lw $s6, 88($sp)      #Guarda self
+lw $a0, 40($sp)      #Guarda el parametro 0 -> str_eq@_a@5
+lw $a1, 36($sp)      #Guarda el parametro 1 -> str_eq@_b@5
+jal __str__cmp__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 88($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Fin de la evaluacion de la condicion de un IF
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, then_Parse_c2i_5     #
+#Else case
+#Evalua la condicion de un If
+#Evaluando el operado izquierdo de una operacion str_eq
+#Get Local Var char
+lw $t0, 84($sp)      #
+sw $t0, 32($sp)      #
+#Resolucion del operado izquierdo de una operacion str_eq
+#Evaluando el operado derecho de una operacion str_eq
+la $t0, string_13      #
+move $s4, $t0      #
+lw $s6, 88($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 28($sp)      #
+#Resolucion del operado derecha de una operacion str_eq
+lw $s6, 88($sp)      #Guarda self
+lw $a0, 32($sp)      #Guarda el parametro 0 -> str_eq@_a@6
+lw $a1, 28($sp)      #Guarda el parametro 1 -> str_eq@_b@6
+jal __str__cmp__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 88($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Fin de la evaluacion de la condicion de un IF
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, then_Parse_c2i_6     #
+#Else case
+#Evalua la condicion de un If
+#Evaluando el operado izquierdo de una operacion str_eq
+#Get Local Var char
+lw $t0, 84($sp)      #
+sw $t0, 24($sp)      #
+#Resolucion del operado izquierdo de una operacion str_eq
+#Evaluando el operado derecho de una operacion str_eq
+la $t0, string_14      #
+move $s4, $t0      #
+lw $s6, 88($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 20($sp)      #
+#Resolucion del operado derecha de una operacion str_eq
+lw $s6, 88($sp)      #Guarda self
+lw $a0, 24($sp)      #Guarda el parametro 0 -> str_eq@_a@7
+lw $a1, 20($sp)      #Guarda el parametro 1 -> str_eq@_b@7
+jal __str__cmp__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 88($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Fin de la evaluacion de la condicion de un IF
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, then_Parse_c2i_7     #
+#Else case
+#Evalua la condicion de un If
+#Evaluando el operado izquierdo de una operacion str_eq
+#Get Local Var char
+lw $t0, 84($sp)      #
+sw $t0, 16($sp)      #
+#Resolucion del operado izquierdo de una operacion str_eq
+#Evaluando el operado derecho de una operacion str_eq
+la $t0, string_15      #
+move $s4, $t0      #
+lw $s6, 88($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 12($sp)      #
+#Resolucion del operado derecha de una operacion str_eq
+lw $s6, 88($sp)      #Guarda self
+lw $a0, 16($sp)      #Guarda el parametro 0 -> str_eq@_a@8
+lw $a1, 12($sp)      #Guarda el parametro 1 -> str_eq@_b@8
+jal __str__cmp__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 88($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Fin de la evaluacion de la condicion de un IF
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, then_Parse_c2i_8     #
+#Else case
+#Evalua la condicion de un If
+#Evaluando el operado izquierdo de una operacion str_eq
+#Get Local Var char
+lw $t0, 84($sp)      #
+sw $t0, 8($sp)      #
+#Resolucion del operado izquierdo de una operacion str_eq
+#Evaluando el operado derecho de una operacion str_eq
+la $t0, string_16      #
+move $s4, $t0      #
+lw $s6, 88($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __str__new__                               #
+sw $v0, 4($sp)      #
+#Resolucion del operado derecha de una operacion str_eq
+lw $s6, 88($sp)      #Guarda self
+lw $a0, 8($sp)      #Guarda el parametro 0 -> str_eq@_a@9
+lw $a1, 4($sp)      #Guarda el parametro 1 -> str_eq@_b@9
+jal __str__cmp__                               #
+move $s4, $v0      #
+move $a0, $v0      #
+lw $s6, 88($sp)      #Guarda self
+jal __bool__new__                               #
+move $s4, $v0      #
+#Fin de la evaluacion de la condicion de un IF
+#Check Condition And Try Jump
+move $t0, $s4      #Guarda el parametro 0 -> _
+lw $t1, 4($t0)      #Lee la propiedad **value** del bool
+li $t0, 1      #Carga un 1 para comparar
+beq $t0, $t1, then_Parse_c2i_9     #
+#Else case
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#StaticDispatch abort
+lw $t0, 88($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 92($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de Parse
+lw $t3, 12($t1)      #Buscando el metodo dinamico para la funcion abort
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#Inicio del paso 1 de una sequencia Block
+li $s4, 0      #
+lw $s6, 88($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+j fin_Parse_c2i_9                               #
+then_Parse_c2i_9:
+#Then case
+li $s4, 9      #
+lw $s6, 88($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+fin_Parse_c2i_9:
+#Fin de un If
+j fin_Parse_c2i_8                               #
+then_Parse_c2i_8:
+#Then case
+li $s4, 8      #
+lw $s6, 88($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+fin_Parse_c2i_8:
+#Fin de un If
+j fin_Parse_c2i_7                               #
+then_Parse_c2i_7:
+#Then case
+li $s4, 7      #
+lw $s6, 88($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+fin_Parse_c2i_7:
+#Fin de un If
+j fin_Parse_c2i_6                               #
+then_Parse_c2i_6:
+#Then case
+li $s4, 6      #
+lw $s6, 88($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+fin_Parse_c2i_6:
+#Fin de un If
+j fin_Parse_c2i_5                               #
+then_Parse_c2i_5:
+#Then case
+li $s4, 5      #
+lw $s6, 88($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+fin_Parse_c2i_5:
+#Fin de un If
+j fin_Parse_c2i_4                               #
+then_Parse_c2i_4:
+#Then case
+li $s4, 4      #
+lw $s6, 88($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+fin_Parse_c2i_4:
+#Fin de un If
+j fin_Parse_c2i_3                               #
+then_Parse_c2i_3:
+#Then case
+li $s4, 3      #
+lw $s6, 88($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+fin_Parse_c2i_3:
+#Fin de un If
+j fin_Parse_c2i_2                               #
+then_Parse_c2i_2:
+#Then case
+li $s4, 2      #
+lw $s6, 88($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+fin_Parse_c2i_2:
+#Fin de un If
+j fin_Parse_c2i_1                               #
+then_Parse_c2i_1:
+#Then case
+li $s4, 1      #
+lw $s6, 88($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+fin_Parse_c2i_1:
+#Fin de un If
+j fin_Parse_c2i_0                               #
+then_Parse_c2i_0:
+#Then case
+li $s4, 0      #
+lw $s6, 88($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+fin_Parse_c2i_0:
+#Fin de un If
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 92     #
+jr $ra                               #
+
+EList_isNil:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion EList_isNil
+li $s4, 1      #
+lw $s6, 4($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+lw $s6, 4($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __bool__new__                               #
+move $s4, $v0      #
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+ECons_isNil:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion ECons_isNil
+li $s4, 0      #
+lw $s6, 4($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+lw $s6, 4($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __bool__new__                               #
+move $s4, $v0      #
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+VList_isNil:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion VList_isNil
+li $s4, 1      #
+lw $s6, 4($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+lw $s6, 4($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __bool__new__                               #
+move $s4, $v0      #
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+VCons_isNil:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion VCons_isNil
+li $s4, 0      #
+lw $s6, 4($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __int__new__                               #
+move $s4, $v0      #
+lw $s6, 4($sp)      #Guarda self
+move $a0, $s4      #Guarda el parametro 0 -> _
+jal __bool__new__                               #
+move $s4, $v0      #
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+EList_tail:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion EList_tail
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#StaticDispatch abort
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 8($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de EList
+lw $t3, 12($t1)      #Buscando el metodo dinamico para la funcion abort
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#Inicio del paso 1 de una sequencia Block
+#Get Local Var self
+lw $t0, 4($sp)      #
+move $s4, $t0      #
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+ECons_tail:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion ECons_tail
+#Get Self Property cdr
+lw $t0, 4($sp)      #Instancia de la clase ECons
+lw $t1, 8($t0)      #Lee la propiedad cdr
+move $s4, $t1      #Guarda el valor de la propiedad cdr en la variable local _
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+VList_tail:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion VList_tail
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#StaticDispatch abort
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 8($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de VList
+lw $t3, 12($t1)      #Buscando el metodo dinamico para la funcion abort
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#Inicio del paso 1 de una sequencia Block
+#Get Local Var self
+lw $t0, 4($sp)      #
+move $s4, $t0      #
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+VCons_tail:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion VCons_tail
+#Get Self Property cdr
+lw $t0, 4($sp)      #Instancia de la clase VCons
+lw $t1, 8($t0)      #Lee la propiedad cdr
+move $s4, $t1      #Guarda el valor de la propiedad cdr en la variable local _
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+EList_head:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion EList_head
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#StaticDispatch abort
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 8($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de EList
+lw $t3, 12($t1)      #Buscando el metodo dinamico para la funcion abort
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#Inicio del paso 1 de una sequencia Block
+#Get Self Property car
+lw $t0, 4($sp)      #Instancia de la clase EList
+lw $t1, 4($t0)      #Lee la propiedad car
+move $s4, $t1      #Guarda el valor de la propiedad car en la variable local _
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+ECons_head:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion ECons_head
+#Get Self Property car
+lw $t0, 4($sp)      #Instancia de la clase EList
+lw $t1, 4($t0)      #Lee la propiedad car
+move $s4, $t1      #Guarda el valor de la propiedad car en la variable local _
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+VList_head:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion VList_head
+#Inicio de una secuencia Block
+#Inicio del paso 0 de una sequencia Block
+#StaticDispatch abort
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+lw $t0, 8($sp)      #
+lw $t1, 0($t0)      #Leyendo el tipo dinamico de la instancia que hereda de VList
+lw $t3, 12($t1)      #Buscando el metodo dinamico para la funcion abort
+jal $t3                               #
+move $s4, $v0      #Asigna el resultado de la funcion
+#Inicio del paso 1 de una sequencia Block
+#Get Self Property car
+lw $t0, 4($sp)      #Instancia de la clase VList
+lw $t1, 4($t0)      #Lee la propiedad car
+move $s4, $t1      #Guarda el valor de la propiedad car en la variable local _
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+VCons_head:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion VCons_head
+#Get Self Property car
+lw $t0, 4($sp)      #Instancia de la clase VList
+lw $t1, 4($t0)      #Lee la propiedad car
+move $s4, $t1      #Guarda el valor de la propiedad car en la variable local _
+move $v0, $s4      #Return _
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+new_ctr_ECons:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_ECons
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+jal new_ctr_EList                               #
+la $t0, _______null_______      #
+move $s4, $t0      #
+lw $t0, 4($sp)      #Instancia de la clase ECons
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded cdr
+sw $t1, 8($t0)      #Setea la propiedad cdr con el valor de _
+lw $v0, 4($sp)      #Return self
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+new_ctr_VCons:     #
+#Parametro self en stackpoiner + 4
+addi $sp, $sp, -4     #Push local var $ra stackpointer 0
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion new_ctr_VCons
+lw $t0, 4($sp)      #Lee el valor de la var self
+addi $sp, $sp, -4     #
+sw $t0, 0($sp)      #Push a la pila con self
+jal new_ctr_VList                               #
+la $t0, _______null_______      #
+move $s4, $t0      #
+lw $t0, 4($sp)      #Instancia de la clase VCons
+move $t1, $s4      #Guarda el valor que se le asignara a la propieded cdr
+sw $t1, 8($t0)      #Setea la propiedad cdr con el valor de _
+lw $v0, 4($sp)      #Return self
+lw $ra, 0($sp)      #Lee $ra de la pila para retornar a la funcion anterior
+addi $sp, $sp, 8     #
+jr $ra                               #
+
+Object_abort:     #
+#Parametro self en stackpoiner + 0
+addi $sp, $sp, -4     #Push local var $ra stackpointer -4
+sw $ra, 0($sp)      #Agrega $ra a la pila para salvar el punto de retorno de la funcion Object_abort
+lw $s6, 4($sp)      #Guarda self
+la $a0, _______error______      #
+jal __str__new__                               #
+move $a0, $v0      #
+jal __str__print__                               #Print "Abort called from class "
+lw $t0, ($s6)      #Read type property of self
+lw $a0, ($t0)      #Read type_name of self type
+jal __str__new__                               #
+move $a0, $v0      #
+jal __str__print__                               #Type class"
+la $a0, _______endline_______      #
+jal __str__new__                               #
+move $a0, $v0      #
+jal __str__print__                               #Print "endline"
+li $v0, 10      #
+syscall
+
+new_ctr_Bool:     #Esta funcion no se invoca en la ejecucion del programa
+
+new_ctr_Int:     #Esta funcion no se invoca en la ejecucion del programa
+
+new_ctr_String:     #Esta funcion no se invoca en la ejecucion del programa
+
+new_ctr_SELF_TYPE:     #Esta funcion no se invoca en la ejecucion del programa
+
+BoolOp_or:     #Esta funcion no se invoca en la ejecucion del programa
+
+IO_in_int:     #Esta funcion no se invoca en la ejecucion del programa
+
+String_concat:     #Esta funcion no se invoca en la ejecucion del programa
+
+Object_copy:     #Esta funcion no se invoca en la ejecucion del programa
+
+Object_type_name:     #Esta funcion no se invoca en la ejecucion del programa
+
+###########################################################################region
+#########################################################################################################
+___fin___:
+li		$v0, 10		# system call #4 - print string
+syscall				# execute
+
+#########################################################################################################
+
+__int__new__:
+# En $s6 self
+# En $a0 el valor del entero	
+# Return $v0 la instancia del nuevo int
+
+move $t2, $a0  #Salva el valor del entero  
+
+#Allocate a una class Int
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall  #en $v0 la instancia del nuevo Int
+
+la $t0, Int     #Carga la direccion de memoria de la definicion de tipo Int
+sw $t0, ($v0)   #Guarda en la pocision cero de la instancia la direccion de la definicion del tipo
+sw $t2, 4($v0)  #Guarda en la pocicion 4 de la instancia el valor del la propiedad **value** 
+
+# No modifica la pila 
+jr $ra # Esta funcion no tiene saltos internos y en $v0 esta la instancia del nuevo Int
+
+##########################################################################################################
+__int__print__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a pintar 	
+# Return $v0 **self**
+
+lw $t0, 4($a0)  #Lee la propiedad **value**
+
+li $v0, 1
+move $a0, $t0  #Pinta el valor la propiedad **value** del int
+syscall
+
+move $v0, $s6  #Guarda en $v0 **self** para retornar 
+# No modifica la pila 
+jr $ra # Esta funcion no tiene saltos internos y en $v0 esta self
+
+##########################################################################################################
+__int__input__:
+# En $s6 **self**
+# Return $v0 la instancia del nuevo **Int**
+
+li $v0, 5   #Lee un entero por la consola 
+syscall     #Guarda el entero en $v0
+
+move $s5, $ra    #Salva $ra en $s5 para saltar a crear un Int con el valor leido
+move $a0, $v0
+jal __int__new__ #En $v0 la instancia del nuevo entero 
+
+move $ra, $s5   #Reasigna $ra para salir de **input** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__sum__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a sumando A 	
+# En $a1 la direccion del **Int** a sumando B 	
+# Return $v0 new **Int** con **value** A+B
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del sumando A
+lw $t1, 4($a1)      #Lee la propiedad **value** del sumando B
+add $a0, $t0, $t1  #$a0 =  A + B
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A+B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **sum** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__sub__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# En $a1 la direccion del **Int** a operador B 	
+# Return $v0 new **Int** con **value** A-B
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+lw $t1, 4($a1)      #Lee la propiedad **value** del operador B
+sub	$a0, $t0, $t1   #$a0 =  A - B
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A-B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **rest** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__mul__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# En $a1 la direccion del **Int** a operador B 	
+# Return $v0 new **Int** con **value** A*B
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+lw $t1, 4($a1)      #Lee la propiedad **value** del operador B
+mul	$a0, $t0, $t1   #$a0 =  A * B
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A*B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **mul** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__div__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# En $a1 la direccion del **Int** a operador B 	
+# Return $v0 new **Int** con **value** A/B
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+lw $t1, 4($a1)      #Lee la propiedad **value** del operador B
+div	$a0, $t0, $t1   #$a0 =  A/B
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A/B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **div** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__le__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# En $a1 la direccion del **Int** a operador B 	
+# Return $v0 new **Int** con **value** A-B
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+lw $t1, 4($a1)      #Lee la propiedad **value** del operador B
+slt	$a0, $t0, $t1   #$a0 =  A < B
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A<B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **less** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__leq__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# En $a1 la direccion del **Int** a operador B 	
+# Return $v0 new **Int** con **value** A-B
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+lw $t1, 4($a1)      #Lee la propiedad **value** del operador B
+sle	$a0, $t0, $t1   #$a0 =  A <= B
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A<=B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **less_or_equal** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__eq__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# En $a1 la direccion del **Int** a operador B 	
+# Return $v0 new **Int** con **value** A-B
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+lw $t1, 4($a1)      #Lee la propiedad **value** del operador B
+seq	$a0, $t0, $t1   #$a0 =  A == B
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A==B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **equal** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__complement__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# Return $v0 new **Int** con **value** ~A
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+li $t1, 4294967295  # guarda 2^31 + 1
+xor $a0, $t1, $t0   
+add $a0, $a0, 1     
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con ~A en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **complement** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__neg__:
+# En $s6 **self**
+# En $a0 la direccion del **Int** a operador A 	
+# Return $v0 new **Int** con **value** !A
+
+lw $t0, 4($a0)      #Lee la propiedad **value** del operador A
+addi $a0, $t0, -1   #$a0 =  A - 1 => if A == 0 then $a0 = -1 else $a0 = 0
+mul  $a0, $a0, -1   #$a0 = -$a0   => if $a0 == 0 then $a0 = 0 else 1
+
+move $s5, $ra       #Guardando $ra para saltar a crear en **Int**
+jal __int__new__    #Con A+B en $a0 instancia el **Int** con el valor y devuelve en $v0
+
+move $ra, $s5   #Reasigna $ra para salir de **rest** volver a la funcion anterior 
+# No modifica la pila 
+jr $ra          #Esta funcion tiene saltos internos y en $v0 esta la instancia del nuevo **Int**
+
+##########################################################################################################
+__int__clone__:
+# En $s6 self
+
+
+
+#region
+##########################################################################################
+__bool__new__:
+# En $s6 self
+# En $a0 instancia de Int para convertir 	
+# Return $v0 la instancia del nuevo Bool
+
+lw $t0, 4($a0) # Guardando el valor la propiedad de **value**
+
+li $t1, 1
+beq $t0, $t1, __bool__ok_value__  #Comparando el valor con 1
+li $t1, 0
+beq $t0, $t1, __bool__ok_value__  #Comparando el valor con 0
+
+# Si el valor no es ni cero ni uno cierra el programa 
+li		$v0, 4		# system call #4 - print string
+la		$a0, Bool_Name
+syscall				# execute
+li		$v0, 1		# system call #4 - print string
+move	$a0, $t0
+syscall				# execute
+li		$v0, 10		# system call #4 - print string
+syscall				# execute
+
+__bool__ok_value__:
+la $t0, Bool     #Carga la direccion de memoria de la definicion de tipo Bool
+sw $t0, ($a0)    #Guarda en la pocision cero de la instancia la direccion de la definicion del tipo
+
+move $v0, $a0
+# No modifica la pila 
+jr $ra # Esta funcion no tiene saltos internos y en $v0 esta la instancia del nuevo Bool
+
+##########################################################################################################
+__bool__if_go_to__:
+# En $s6 self
+# En $a0 instancia de Bool a evaluar 
+# En $a1 direccion a la que saltar  
+# Return $v0 la instancia del nuevo Bool
+
+lw $t0, 4($a0)  #Guarda el valor de la propiedad **value** del Bool
+li $t1, 1       #Guarda 1 en $t0 para comparar con la propiedad **value**
+
+beq	$t0, $t1, __go_to__	# if $t0 == $t1 then __go_to__
+jr $ra          #esta funcion solo termina si el bool es false 
+__go_to__:
+j $a1   # La condicion se cumple salta hacia el segundo parametro
+
+##########################################################################################################
+__bool__check__type__:
+# En $s6 **self**
+# En $a0 direccion de memoria de la lista de ancestro de un typo 
+# En $a1 identificador numerico de un tipo
+
+li $v0, 1       # Por default devuelve 1
+__check__type__loop__:
+    lw $t0, ($a0)       #Lee el id de un typo 
+    beq $t0, $zero, __check__type__false__
+    beq $t0, $a1, __check__type__end__
+    addi $a0, $a0, 4
+    j __check__type__loop__
+
+__check__type__false__: 
+    li $v0, 0
+__check__type__end__:
+    jr $ra
+
+#region
+#############################################################################################
+__str__new__:
+# En $s6 self
+# En $a0 el direccion de memoria que apunta a un string	
+# Return $v0 la instancia del nuevo string
+
+move $t2, $a0  #Salva la direccion de memoria  
+
+#Allocate a una class String
+#atributo type_name en puntero + 0
+#atributo value en puntero + 4
+li $a0, 8
+li $v0, 9
+syscall  #en $v0 la instancia del nuevo String
+
+la $t0, String     #Carga la direccion de memoria de la definicion de tipo Int
+sw $t0, ($v0)   #Guarda en la pocision cero de la instancia la direccion de la definicion del tipo
+sw $t2, 4($v0)  #Guarda en la pocicion 4 de la instancia el valor del la propiedad **value** 
+
+# No modifica la pila 
+jr $ra # Esta funcion no tiene saltos internos y en $v0 esta la instancia del nuevo Int
+
+##########################################################################################################
+__str__print__:
+# En $s6 **self**
+# En $a0 la direccion del **String** a pintar 	
+# Return $v0 **self**
+
+lw $t0, 4($a0)  #Lee la propiedad **value**
+
+li $v0, 4
+move $a0, $t0  #Pinta el valor la propiedad **value** del String
+syscall
+
+move $v0, $s6  #Guarda en $v0 **self** para retornar 
+# No modifica la pila 
+jr $ra # Esta funcion no tiene saltos internos y en $v0 esta self
+
+##########################################################################################################
+__str__input__:
+# En $s6 **self**
+# Return $v0 la instancia del nuevo **String**
+
+addi $sp, $sp, -4
+sw $ra ($sp)   #Salva $ra en 12($sp)
+addi $sp, $sp, -4
+sw $s6, ($sp)    #Salva self en 8($sp)
+
+li $a0, 1000    # reserva memoria para el string
+li $v0, 9       
+syscall         # En $v0 direccion de memoria del nuevo string
+
+move $a0, $v0   # Asigan la direccion del nuevo string para llamar a la funcion de leer
+li $v0, 8       # Leer un string de la consola 
+li $a1 , 1000   
+syscall         # En $a0 el string leido en la consola 
+jal __str__new__ #En $v0 la instancia del nuevo entero 
+move $a0, $v0
+
+addi $sp, $sp, -4
+sw $v0, ($sp)    #Salva el nuevo string en 4($sp)
+
+move $s6, $v0   #cambia sefl por el nuevo string 
+jal __str__length__
+
+lw $t0, 4($v0)      #Lee la propiedad **value** del **Int** que devuelve length 
+
+beq $t0,$zero, jline
+addi $t0, $t0, -1   #Resta uno al length para eliminar el '\n'
+
+jline:
+sw $t0, 4($v0)      #Actualiza la propieded **value** del **Int** length
+
+addi $sp, $sp, -4
+sw $v0, ($sp)       #Salva el length en ($sp)
+
+li $a0, 0
+jal __int__new__    #Crea un nuevo entero con **value** 0
+
+lw $s6, 4($sp)      #Self = al string leido en la consola 
+move $a0, $v0       #index = 0 
+lw $a1, ($sp)       #count = length - 1 
+
+jal __str__substr__ #En $v0 el substring sin '\n'
+
+lw $s6, 8($sp)   #Reasigna Self para salir de **input** volver a la funcion anterior 
+lw $ra, 12($sp)  #Reasigna $ra para salir de **input** volver a la funcion anterior
+addi $sp, $sp, 16 #Limpia la pila 
+jr $ra          #Devuelve en $v0 el subsstring leido por la consola 
+
+##########################################################################################################
+__str__length__:
+# En $s6 **self**
+# Return $v0 la instancia del nuevo **Int**
+
+li $t0 , 0       # len result
+lw $t2 , 4($s6)  # Leer la propiedad value a self
+
+loop_len:
+lb  $t3, ($t2)  # Guarda la primara letra
+beq $t3, $zero, end_len  
+add $t0, $t0, 1 # Suma al contador 
+add $t2, $t2, 1  # Mueve el punteron del string en 1 
+j loop_len
+
+end_len:
+move $a0, $t0
+move $s5, $ra
+jal __int__new__
+move $ra, $s5
+jr $ra
+
+###########################################################################################################
+__str__substr__:
+# En $s6 **self**
+# En $a0 **Int** el indece en el que inicia el sub
+# En $a1 **Int** cantidad de caracteres que tiene el sub
+
+lw $t0, 4($s6)  # Lee la propiedad value de **sefl**
+lw $t1, 4($a0)  # Lee la propiedad value del **Int** indice 
+lw $t2, 4($a1)  # Lee la propiedad value del **Int** length 
+
+li $t3, 0        # Contador para iterar el string en busqueda de indice  
+li $t4, 1        # Contador para iterar el string hasta llegar al length
+
+addi $t5, $t2, 1
+move $a0, $t5      # reserva memoria para el string
+li $v0,9
+syscall           # En $v0 la direccion de memoria del nuevo string
+move $t5, $v0    
+
+beq $t2, $zero, end_sub_string
+
+find_index:
+    beq	 $t3, $t1, find_length	# si el contador es el indice comiensa a crear el sub
+    add	 $t0, $t0, 1		    # mueve el puntero del string de self
+    add	 $t3, $t3, 1	        # mueve el contador 
+    j find_index
+
+find_length:
+    lb	 $t6, ($t0)			# Lee la primera letra del string self  
+    sb	 $t6, ($t5)         # guarda la primera letra del string self en el nuevo string
+    beq	 $t2, $t4, end_sub_string	# si el contador del tamaño es igual a j end
+    add	 $t5, $t5, 1		# Mueve el puntero del nuevo string 
+    add	 $t0, $t0, 1		# Mueve el puntero del string self
+    add	 $t4, $t4, 1	    # Contador de tamaño += 1 
+    j find_length
+    
+end_sub_string:
+    add	 $t5, $t5, 1		# Mueve el puntero del nuevo string 
+    sb	 $zero, ($t5)         # guarda la primera letra del string self en el nuevo string
+
+    addi $sp, $sp, -4
+    sw $ra, ($sp)   # Guarda en la pila $ra
+
+    move $a0, $v0       # Pasa como parametros la direccion de memoria del string
+    jal __str__new__    # En $v0 la instancia del nuevos string
+
+    lw $ra, ($sp)       # Reasigna $ra para volver al la funcion anterior 
+    addi $sp, $sp, 4    #  Limpia la pila 
+    jr $ra              # Return instancia del substring en $v0
+
+############################################################################################################
+__str__concat__:
+# En $s6 **self**
+# En #a0 instancia de otro string
+
+addi $sp, $sp, -4
+sw $s6, ($sp)       #Salva **self**
+addi $sp, $sp, -4
+sw $a0, ($sp)       #Salva el string que se paso como parametro 
+addi $sp, $sp, -4
+sw $ra, ($sp)       #Salva $ra para saber a donde retornar 
+
+jal __str__length__
+addi $sp, $sp, -4
+lw $t0, 4($v0)      #Lee el valor de la propiedad **value**
+sw $t0, ($sp)       #Salva el valor del primer length 
+
+lw $t0, 8($sp)
+move $s6, $t0       #Cambia self por el otro string
+jal __str__length__
+lw $t0, ($sp)       #Lee el lenght del string self
+lw $t1, 4($v0)      #Lee el valor de la pripiedad value del resultado de la funcion length 
+add $t0, $t0, $t1   # Suma los length de ambos string
+
+add $t0, $t0, 1 
+move $a0, $t0
+li $v0, 9
+syscall             # Reserva espacion para un string de tamaño length1 + length2
+#En $v0 el nuevo string 
+
+move $t3, $v0
+lw $t2, 8($sp)      #Lee el string que se paso por parametro  
+lw $t1, 4($t2)      #Lee la propiedad **value** del string
+lw $t2, 12($sp)     #Lee self
+lw $t0, 4($t2)      #Lee la propiedad **value** de self 
+
+loop_str1:
+    lb   $t2, ($t0)       # primera letra del puntero al string self
+    beq  $t2, $zero, loop_str2 
+    add  $t0, $t0, 1      # mueve el puntero del string self
+    sb   $t2, ($t3)       # guarda la letra en el nuevo string 
+    add  $t3, $t3, 1      # mueve el puntero del nuevo string
+    j loop_str1
+
+loop_str2:
+    lb   $t2, ($t1)       # primera letra del puntero al string str1
+    beq  $t2, $zero, end_concat
+    add  $t1, $t1, 1    # mueve el puntero del string str1
+    sb   $t2, ($t3)     # guarda la letra en el nuevo string 
+    add  $t3,  $t3, 1   # mueve el puntero del nuevo string
+    j loop_str1
+
+end_concat:
+    move $a0, $v0
+    jal __str__new__
+    lw $ra, 4($sp)
+    lw $s6, 12($sp)
+    addi $sp, $sp, 16 #Limpia la pila
+    jr $ra            # Return en $v0 la nueva instancia de self
+
+############################################################################################################
+__str__cmp__:
+# En $s6 **self**
+# En $a0 instancia de str1
+# En $a1 instancia de str2
+
+addi $sp, $sp -4
+sw $ra, ($sp)
+
+lw $t0, 4($a0)     #Lee la propiedad **value** de str1
+lw $t1, 4($a1)     #Lee la propiedad **value** de str2
+li $a0, 1       # True por default
+
+str_cmp_loop:
+    lb $t2, ($t0)   #Lee una letra de str1
+    lb $t3, ($t1)   #Lee una letra de str2
+    addi $t0, $t0, 1
+    addi $t1, $t1, 1
+    beq $t2, $zero, cmp_end_to_zero     #Se llego al fin del str1
+    beq $t3, $zero, cmp_end_to_zero     #Se llego al fin del str2
+    beq $t2, $t3,   str_cmp_loop        #Continua comparando si son iguales 
+    j str_cmp_false
+
+cmp_end_to_zero:
+    beq $t2, $t3,  end_str_cmp         #Chequea que ambos hallan llegado al final 
+    j str_cmp_false
+
+str_cmp_false:
+    li $a0, 0       #Cambia el defaul True por False 
+end_str_cmp:
+    jal __int__new__    #Crea un Int que luego se debe cambiar por bool
+    lw $ra, ($sp)       #Lee $ra para retornar 
+    addi $sp, $sp, 4    #Limpia la pila 
+    jr $ra              #En $v0 un Int que hay que cambiar por Bool
+
