@@ -38,7 +38,8 @@ En el colector y constructor de tipos se recopilan los mismos, tanto los existen
 En este punto ya tenemos un AST sintáctica y semánticamente correcto, y que quiere generar un programan en MIPS equivalente al código de entrada que COOL.
 
 ### Transformación del AST:
-Primeramente se hacen modificaciones en el AST actual agregando una nueva funcionalidad en la que los atributos declarados pero no asignados que no perteneden a un tipo build-in (Int, Str, Bool) se les asigna una expresión nula, también en esta transformación se le asigna un constructor a las clases con el cual posteriormente se realizará la inicialización de la instancia de clase requerida.\
+Primeramente se hacen modificaciones en el AST actual agregando una nueva funcionalidad en la que los atributos declarados pero no asignados que no perteneden a un tipo build-in (Int, Str, Bool) se les asigna una expresión nula, también en esta transformación se le asigna un constructor a las clases con el cual posteriormente se realizará la inicialización de la instancia de clase requerida.
+
 Como pasar de COOL a MIPS directamente resulta complicado, se pasa primero del AST de COOL a un AST de CIL y luego a partir de este último se construye un AST de MIPS a partir del cual se obtiene un archivo `.mips` listo para ser ejecutado. 
 
 ### AST COOL-CIL: 
@@ -49,7 +50,8 @@ Un ejemplo donde se evidencia la utilidad de este puente es en caso del `CaseNod
 Luego de lograr una reducción intermedia del lenguaje hacia CIL se convierten cada uno de los nuevos nodos de este AST en un conjunto de intrucciones que seran llevadas directamente a lenguaje MIPS
 
 ### Puntos a destacar a nivel de implementación:
-Manejo de la memoria:\
+Manejo de la memoria:
+
 El manejo de la memoria se realiza mediante el convenio de C, este hace creer a cada uno de los métodos que es dueño del stack
 
 La sección de .data se encuentran contenidos los diferentes tipos con la siguiente estructura:
@@ -61,7 +63,8 @@ La sección de .data se encuentran contenidos los diferentes tipos con la siguie
 
 El contructor es de gran ayuda ya que ayuda a aligerar código llamando a su etiqueta correspondiente cuando necesite crear una instancia de la clase en cuestión.
 
-Con respecto a los métodos que son sobreescritos mediante herencia estos referencian a la dirección de memoria del método (la etiqueta) al cual le hacen override.\
+Con respecto a los métodos que son sobreescritos mediante herencia estos referencian a la dirección de memoria del método (la etiqueta) al cual le hacen override.
+
 Un ejemplo visual sería el siguiente:
 
 >   ...\
