@@ -1,2 +1,5 @@
 pytest
 pytest-ordering
+ply==3.11
+typer==0.3.2
+typer-cli==0.0.11

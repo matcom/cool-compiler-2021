@@ -1,0 +1,10068 @@
+.data
+	
+	################
+	# DATA SECTION #
+	################
+
+	####################
+	# Types declaration #
+	####################
+
+	type_Object: .word 24
+	type_Object_inherits_from: .word 0
+	type_Object_name_address: .word type_Object_name_size
+	type_Object___init__: .word function___init___at_Object
+	type_Object_abort: .word function_abort_at_Object
+	type_Object_type_name: .word function_type_name_at_Object
+	type_Object_copy: .word function_copy_at_Object
+	
+	type_IO: .word 40
+	type_IO_inherits_from: .word type_Object
+	type_IO_name_address: .word type_IO_name_size
+	type_IO___init__: .word function___init___at_IO
+	type_IO_abort: .word function_abort_at_Object
+	type_IO_type_name: .word function_type_name_at_Object
+	type_IO_copy: .word function_copy_at_Object
+	type_IO_out_string: .word function_out_string_at_IO
+	type_IO_out_int: .word function_out_int_at_IO
+	type_IO_in_string: .word function_in_string_at_IO
+	type_IO_in_int: .word function_in_int_at_IO
+	
+	type_String: .word 36
+	type_String_inherits_from: .word type_Object
+	type_String_name_address: .word type_String_name_size
+	type_String___init__: .word function___init___at_String
+	type_String_abort: .word function_abort_at_Object
+	type_String_type_name: .word function_type_name_at_Object
+	type_String_copy: .word function_copy_at_Object
+	type_String_length: .word function_length_at_String
+	type_String_concat: .word function_concat_at_String
+	type_String_substr: .word function_substr_at_String
+	
+	type_Int: .word 24
+	type_Int_inherits_from: .word type_Object
+	type_Int_name_address: .word type_Int_name_size
+	type_Int___init__: .word function___init___at_Int
+	type_Int_abort: .word function_abort_at_Object
+	type_Int_type_name: .word function_type_name_at_Object
+	type_Int_copy: .word function_copy_at_Object
+	
+	type_Bool: .word 24
+	type_Bool_inherits_from: .word type_Object
+	type_Bool_name_address: .word type_Bool_name_size
+	type_Bool___init__: .word function___init___at_Bool
+	type_Bool_abort: .word function_abort_at_Object
+	type_Bool_type_name: .word function_type_name_at_Object
+	type_Bool_copy: .word function_copy_at_Object
+	
+	type_Graph: .word 44
+	type_Graph_inherits_from: .word type_Object
+	type_Graph_name_address: .word type_Graph_name_size
+	type_Graph___init__: .word function___init___at_Graph
+	type_Graph_abort: .word function_abort_at_Object
+	type_Graph_type_name: .word function_type_name_at_Object
+	type_Graph_copy: .word function_copy_at_Object
+	type_Graph_add_vertice: .word function_add_vertice_at_Graph
+	type_Graph_print_E: .word function_print_E_at_Graph
+	type_Graph_print_V: .word function_print_V_at_Graph
+	
+	type_Vertice: .word 68
+	type_Vertice_inherits_from: .word type_IO
+	type_Vertice_name_address: .word type_Vertice_name_size
+	type_Vertice___init__: .word function___init___at_Vertice
+	type_Vertice_abort: .word function_abort_at_Object
+	type_Vertice_type_name: .word function_type_name_at_Object
+	type_Vertice_copy: .word function_copy_at_Object
+	type_Vertice_out_string: .word function_out_string_at_IO
+	type_Vertice_out_int: .word function_out_int_at_IO
+	type_Vertice_in_string: .word function_in_string_at_IO
+	type_Vertice_in_int: .word function_in_int_at_IO
+	type_Vertice_outgoing: .word function_outgoing_at_Vertice
+	type_Vertice_number: .word function_number_at_Vertice
+	type_Vertice_init: .word function_init_at_Vertice
+	type_Vertice_add_out: .word function_add_out_at_Vertice
+	type_Vertice_print: .word function_print_at_Vertice
+	
+	type_Edge: .word 60
+	type_Edge_inherits_from: .word type_IO
+	type_Edge_name_address: .word type_Edge_name_size
+	type_Edge___init__: .word function___init___at_Edge
+	type_Edge_abort: .word function_abort_at_Object
+	type_Edge_type_name: .word function_type_name_at_Object
+	type_Edge_copy: .word function_copy_at_Object
+	type_Edge_out_string: .word function_out_string_at_IO
+	type_Edge_out_int: .word function_out_int_at_IO
+	type_Edge_in_string: .word function_in_string_at_IO
+	type_Edge_in_int: .word function_in_int_at_IO
+	type_Edge_init: .word function_init_at_Edge
+	type_Edge_print: .word function_print_at_Edge
+	
+	type_EList: .word 68
+	type_EList_inherits_from: .word type_IO
+	type_EList_name_address: .word type_EList_name_size
+	type_EList___init__: .word function___init___at_EList
+	type_EList_abort: .word function_abort_at_Object
+	type_EList_type_name: .word function_type_name_at_Object
+	type_EList_copy: .word function_copy_at_Object
+	type_EList_out_string: .word function_out_string_at_IO
+	type_EList_out_int: .word function_out_int_at_IO
+	type_EList_in_string: .word function_in_string_at_IO
+	type_EList_in_int: .word function_in_int_at_IO
+	type_EList_isNil: .word function_isNil_at_EList
+	type_EList_head: .word function_head_at_EList
+	type_EList_tail: .word function_tail_at_EList
+	type_EList_cons: .word function_cons_at_EList
+	type_EList_append: .word function_append_at_EList
+	type_EList_print: .word function_print_at_EList
+	
+	type_ECons: .word 76
+	type_ECons_inherits_from: .word type_EList
+	type_ECons_name_address: .word type_ECons_name_size
+	type_ECons___init__: .word function___init___at_ECons
+	type_ECons_abort: .word function_abort_at_Object
+	type_ECons_type_name: .word function_type_name_at_Object
+	type_ECons_copy: .word function_copy_at_Object
+	type_ECons_out_string: .word function_out_string_at_IO
+	type_ECons_out_int: .word function_out_int_at_IO
+	type_ECons_in_string: .word function_in_string_at_IO
+	type_ECons_in_int: .word function_in_int_at_IO
+	type_ECons_isNil: .word function_isNil_at_ECons
+	type_ECons_head: .word function_head_at_ECons
+	type_ECons_tail: .word function_tail_at_ECons
+	type_ECons_cons: .word function_cons_at_EList
+	type_ECons_append: .word function_append_at_EList
+	type_ECons_print: .word function_print_at_ECons
+	type_ECons_init: .word function_init_at_ECons
+	
+	type_VList: .word 64
+	type_VList_inherits_from: .word type_IO
+	type_VList_name_address: .word type_VList_name_size
+	type_VList___init__: .word function___init___at_VList
+	type_VList_abort: .word function_abort_at_Object
+	type_VList_type_name: .word function_type_name_at_Object
+	type_VList_copy: .word function_copy_at_Object
+	type_VList_out_string: .word function_out_string_at_IO
+	type_VList_out_int: .word function_out_int_at_IO
+	type_VList_in_string: .word function_in_string_at_IO
+	type_VList_in_int: .word function_in_int_at_IO
+	type_VList_isNil: .word function_isNil_at_VList
+	type_VList_head: .word function_head_at_VList
+	type_VList_tail: .word function_tail_at_VList
+	type_VList_cons: .word function_cons_at_VList
+	type_VList_print: .word function_print_at_VList
+	
+	type_VCons: .word 72
+	type_VCons_inherits_from: .word type_VList
+	type_VCons_name_address: .word type_VCons_name_size
+	type_VCons___init__: .word function___init___at_VCons
+	type_VCons_abort: .word function_abort_at_Object
+	type_VCons_type_name: .word function_type_name_at_Object
+	type_VCons_copy: .word function_copy_at_Object
+	type_VCons_out_string: .word function_out_string_at_IO
+	type_VCons_out_int: .word function_out_int_at_IO
+	type_VCons_in_string: .word function_in_string_at_IO
+	type_VCons_in_int: .word function_in_int_at_IO
+	type_VCons_isNil: .word function_isNil_at_VCons
+	type_VCons_head: .word function_head_at_VCons
+	type_VCons_tail: .word function_tail_at_VCons
+	type_VCons_cons: .word function_cons_at_VList
+	type_VCons_print: .word function_print_at_VCons
+	type_VCons_init: .word function_init_at_VCons
+	
+	type_Parse: .word 68
+	type_Parse_inherits_from: .word type_IO
+	type_Parse_name_address: .word type_Parse_name_size
+	type_Parse___init__: .word function___init___at_Parse
+	type_Parse_abort: .word function_abort_at_Object
+	type_Parse_type_name: .word function_type_name_at_Object
+	type_Parse_copy: .word function_copy_at_Object
+	type_Parse_out_string: .word function_out_string_at_IO
+	type_Parse_out_int: .word function_out_int_at_IO
+	type_Parse_in_string: .word function_in_string_at_IO
+	type_Parse_in_int: .word function_in_int_at_IO
+	type_Parse_read_input: .word function_read_input_at_Parse
+	type_Parse_parse_line: .word function_parse_line_at_Parse
+	type_Parse_c2i: .word function_c2i_at_Parse
+	type_Parse_a2i: .word function_a2i_at_Parse
+	type_Parse_a2i_aux: .word function_a2i_aux_at_Parse
+	
+	type_Main: .word 76
+	type_Main_inherits_from: .word type_Parse
+	type_Main_name_address: .word type_Main_name_size
+	type_Main___init__: .word function___init___at_Main
+	type_Main_abort: .word function_abort_at_Object
+	type_Main_type_name: .word function_type_name_at_Object
+	type_Main_copy: .word function_copy_at_Object
+	type_Main_out_string: .word function_out_string_at_IO
+	type_Main_out_int: .word function_out_int_at_IO
+	type_Main_in_string: .word function_in_string_at_IO
+	type_Main_in_int: .word function_in_int_at_IO
+	type_Main_read_input: .word function_read_input_at_Parse
+	type_Main_parse_line: .word function_parse_line_at_Parse
+	type_Main_c2i: .word function_c2i_at_Parse
+	type_Main_a2i: .word function_a2i_at_Parse
+	type_Main_a2i_aux: .word function_a2i_aux_at_Parse
+	type_Main_main: .word function_main_at_Main
+	
+	type_BoolOp: .word 32
+	type_BoolOp_inherits_from: .word type_Object
+	type_BoolOp_name_address: .word type_BoolOp_name_size
+	type_BoolOp___init__: .word function___init___at_BoolOp
+	type_BoolOp_abort: .word function_abort_at_Object
+	type_BoolOp_type_name: .word function_type_name_at_Object
+	type_BoolOp_copy: .word function_copy_at_Object
+	type_BoolOp_and: .word function_and_at_BoolOp
+	type_BoolOp_or: .word function_or_at_BoolOp
+	
+	type_Object_name_size: .word 6
+	type_Object_name: .asciiz "Object"
+	
+	type_IO_name_size: .word 2
+	type_IO_name: .asciiz "IO"
+	
+	type_String_name_size: .word 6
+	type_String_name: .asciiz "String"
+	
+	type_Int_name_size: .word 3
+	type_Int_name: .asciiz "Int"
+	
+	type_Bool_name_size: .word 4
+	type_Bool_name: .asciiz "Bool"
+	
+	type_Graph_name_size: .word 5
+	type_Graph_name: .asciiz "Graph"
+	
+	type_Vertice_name_size: .word 7
+	type_Vertice_name: .asciiz "Vertice"
+	
+	type_Edge_name_size: .word 4
+	type_Edge_name: .asciiz "Edge"
+	
+	type_EList_name_size: .word 5
+	type_EList_name: .asciiz "EList"
+	
+	type_ECons_name_size: .word 5
+	type_ECons_name: .asciiz "ECons"
+	
+	type_VList_name_size: .word 5
+	type_VList_name: .asciiz "VList"
+	
+	type_VCons_name_size: .word 5
+	type_VCons_name: .asciiz "VCons"
+	
+	type_Parse_name_size: .word 5
+	type_Parse_name: .asciiz "Parse"
+	
+	type_Main_name_size: .word 4
+	type_Main_name: .asciiz "Main"
+	
+	type_BoolOp_name_size: .word 6
+	type_BoolOp_name: .asciiz "BoolOp"
+	
+	buffer_input: .space 1024
+	debug_log: .asciiz "debug_log\n"
+
+.text
+	
+	################
+	# TEXT SECTION #
+	################
+
+	#########################
+	# Functions declaration #
+	#########################
+
+	function_add:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -4
+		
+		# ALLOCATING INT -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 0($sp)
+		
+		# ADD FUNCT
+		lw $t0, 8($sp)
+		lw $t0, 8($t0)
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		add $t2, $t0, $t1
+		
+		lw $t0, 0($sp)
+		sw $t2, 8($t0)
+		
+		lw $v1, 0($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_sub:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -4
+		
+		# ALLOCATING INT -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 0($sp)
+		
+		# SUB FUNCT
+		lw $t0, 8($sp)
+		lw $t0, 8($t0)
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sub $t2, $t0, $t1
+		
+		lw $t0, 0($sp)
+		sw $t2, 8($t0)
+		
+		lw $v1, 0($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_mult:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -4
+		
+		# ALLOCATING INT -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 0($sp)
+		
+		# TIMES FUNCT
+		lw $t0, 8($sp)
+		lw $t0, 8($t0)
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		mult $t0, $t1
+		mflo $t2
+		
+		lw $t0, 0($sp)
+		sw $t2, 8($t0)
+		
+		lw $v1, 0($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_div:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -4
+		
+		# ALLOCATING INT -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 0($sp)
+		
+		# DIV FUNCT
+		lw $t0, 8($sp)
+		lw $t0, 8($t0)
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		div $t0, $t1
+		mflo $t2
+		
+		lw $t0, 0($sp)
+		sw $t2, 8($t0)
+		
+		lw $v1, 0($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_xor:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -4
+		
+		# ALLOCATING INT -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 0($sp)
+		
+		# XOR FUNCT
+		lw $t0, 8($sp)
+		lw $t0, 8($t0)
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		xor $t2, $t0, $t1
+		
+		lw $t0, 0($sp)
+		sw $t2, 8($t0)
+		
+		lw $v1, 0($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_less_than:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -4
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 0($sp)
+		
+		# LESS FUNCT
+		lw $t0, 8($sp)
+		lw $t0, 8($t0)
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		slt $t2, $t0, $t1
+		
+		lw $t0, 0($sp)
+		sw $t2, 8($t0)
+		
+		lw $v1, 0($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_less_than_or_equal:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -4
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 0($sp)
+		
+		# LESS EQ FUNCT
+		lw $t0, 8($sp)
+		lw $t0, 8($t0)
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sle $t2, $t0, $t1
+		
+		lw $t0, 0($sp)
+		sw $t2, 8($t0)
+		
+		lw $v1, 0($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_equal:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -40
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 36($sp)
+		
+		# ALLOCATING NUll INTO -> internal_1
+		sw $zero, 32($sp)
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 28($sp)
+		
+		# internal_2 <- EQUALADDRESS (a, internal_1)
+		lw $t0, 44($sp)
+		lw $t1, 32($sp)
+		seq $t2, $t0, $t1
+		lw $t0, 28($sp)
+		sw $t2, 8($t0)
+		
+		# internal_2 <- EQUALADDRESS (b, internal_1)
+		lw $t0, 40($sp)
+		lw $t1, 32($sp)
+		seq $t2, $t0, $t1
+		lw $t0, 28($sp)
+		sw $t2, 8($t0)
+		
+		# IF internal_2 THEN GOTO a_is_type_object
+		lw $t0, 28($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, a_is_type_object
+		
+		# internal_3 <- TYPEOF a
+		lw $t0, 44($sp)
+		lw $t0, 0($t0)
+		sw $t0, 24($sp)
+		
+		# internal_4 <- DIRECTION OF Int
+		la $t0, type_Int
+		sw $t0, 20($sp)
+		
+		# internal_5 <- DIRECTION OF Bool
+		la $t0, type_Bool
+		sw $t0, 16($sp)
+		
+		# internal_6 <- DIRECTION OF String
+		la $t0, type_String
+		sw $t0, 12($sp)
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 8($sp)
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 0($sp)
+		
+		# internal_7 <- EQUALADDRESS (internal_3, internal_4)
+		lw $t0, 24($sp)
+		lw $t1, 20($sp)
+		seq $t2, $t0, $t1
+		lw $t0, 8($sp)
+		sw $t2, 8($t0)
+		
+		# internal_8 <- EQUALADDRESS (internal_3, internal_5)
+		lw $t0, 24($sp)
+		lw $t1, 16($sp)
+		seq $t2, $t0, $t1
+		lw $t0, 4($sp)
+		sw $t2, 8($t0)
+		
+		# internal_9 <- EQUALADDRESS (internal_3, internal_6)
+		lw $t0, 24($sp)
+		lw $t1, 12($sp)
+		seq $t2, $t0, $t1
+		lw $t0, 0($sp)
+		sw $t2, 8($t0)
+		
+		# IF internal_7 THEN GOTO a_is_type_int_or_bool
+		lw $t0, 8($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, a_is_type_int_or_bool
+		
+		# IF internal_8 THEN GOTO a_is_type_int_or_bool
+		lw $t0, 4($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, a_is_type_int_or_bool
+		
+		# IF internal_9 THEN GOTO a_is_type_string
+		lw $t0, 0($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, a_is_type_string
+		
+		# JUMP TO a_is_type_object
+		j a_is_type_object
+		
+		a_is_type_int_or_bool:
+		
+		# internal_0 <- EQUALINT (a, b)
+		lw $t0, 44($sp)
+		lw $t0, 8($t0)
+		lw $t1, 40($sp)
+		lw $t1, 8($t1)
+		seq $t2, $t0, $t1
+		lw $t0, 36($sp)
+		sw $t2, 8($t0)
+		
+		# JUMP TO end_of_equal
+		j end_of_equal
+		
+		a_is_type_string:
+		
+		# internal_0 <- EQUALSTRING (a, b)
+		lw $t0, 44($sp)
+		lw $t1, 40($sp)
+		addi $t0, $t0, 8
+		addi $t1, $t1, 8
+		
+		addi $t4, $zero, 1
+		lw $t5, 36($sp)
+		sw $t4, 8($t5)
+		
+		while_compare_strings_start:
+		lb $t2, 0($t0)
+		lb $t3, 0($t1)
+		beq $t2, $t3, while_compare_strings_update
+		
+		lw $t5, 36($sp)
+		sw $zero, 8($t5)
+		j while_compare_strings_end
+		
+		while_compare_strings_update:
+		addi $t0, $t0, 1
+		addi $t1, $t1, 1
+		beq $t2, $zero, while_compare_strings_end
+		beq $t3, $zero, while_compare_strings_end
+		j while_compare_strings_start
+		while_compare_strings_end:
+		
+		# JUMP TO end_of_equal
+		j end_of_equal
+		
+		a_is_type_object:
+		
+		# EQUAL FUNCT
+		lw $t0, 44($sp)
+		lw $t1, 40($sp)
+		seq $t2, $t0, $t1
+		
+		lw $t0, 36($sp)
+		sw $t2, 8($t0)
+		
+		# JUMP TO end_of_equal
+		j end_of_equal
+		
+		end_of_equal:
+		
+		lw $v1, 36($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 40
+		
+		jr $ra
+		
+	function_assign:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -28
+		
+		# ALLOCATING NUll INTO -> internal_0
+		sw $zero, 24($sp)
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 20($sp)
+		
+		# internal_1 <- EQUALADDRESS (source, internal_0)
+		lw $t0, 28($sp)
+		lw $t1, 24($sp)
+		seq $t2, $t0, $t1
+		lw $t0, 20($sp)
+		sw $t2, 8($t0)
+		
+		# internal_1 <- EQUALADDRESS (dest, internal_0)
+		lw $t0, 32($sp)
+		lw $t1, 24($sp)
+		seq $t2, $t0, $t1
+		lw $t0, 20($sp)
+		sw $t2, 8($t0)
+		
+		# IF internal_1 THEN GOTO source_is_type_object
+		lw $t0, 20($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, source_is_type_object
+		
+		# internal_2 <- TYPEOF source
+		lw $t0, 28($sp)
+		lw $t0, 0($t0)
+		sw $t0, 16($sp)
+		
+		# internal_3 <- DIRECTION OF Int
+		la $t0, type_Int
+		sw $t0, 12($sp)
+		
+		# internal_4 <- DIRECTION OF Bool
+		la $t0, type_Bool
+		sw $t0, 8($sp)
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 0($sp)
+		
+		# internal_5 <- EQUALADDRESS (internal_2, internal_3)
+		lw $t0, 16($sp)
+		lw $t1, 12($sp)
+		seq $t2, $t0, $t1
+		lw $t0, 4($sp)
+		sw $t2, 8($t0)
+		
+		# internal_6 <- EQUALADDRESS (internal_2, internal_4)
+		lw $t0, 16($sp)
+		lw $t1, 8($sp)
+		seq $t2, $t0, $t1
+		lw $t0, 0($sp)
+		sw $t2, 8($t0)
+		
+		# IF internal_5 THEN GOTO source_is_type_int_or_bool
+		lw $t0, 4($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, source_is_type_int_or_bool
+		
+		# IF internal_6 THEN GOTO source_is_type_int_or_bool
+		lw $t0, 0($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, source_is_type_int_or_bool
+		
+		# JUMP TO source_is_type_object
+		j source_is_type_object
+		
+		source_is_type_int_or_bool:
+		
+		# dest <- source WHERE source IS AN INT
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		lw $t0, 28($sp)
+		lw $t1, 0($t0)
+		lw $t2, 8($t0)
+		sw $t1, 0($v0)
+		sw $a0, 4($v0)
+		sw $t2, 8($v0)
+		sw $v0, 32($sp)
+		
+		# JUMP TO source_end_of_equal
+		j source_end_of_equal
+		
+		source_is_type_object:
+		
+		# dest <- source
+		lw $t0, 28($sp)
+		sw $t0, 32($sp)
+		
+		# JUMP TO source_end_of_equal
+		j source_end_of_equal
+		
+		source_end_of_equal:
+		
+		lw $v1, 32($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 28
+		
+		jr $ra
+		
+	function___init___at_Object:
+		lw $v1, 0($sp)
+		
+		jr $ra
+		
+	function_abort_at_Object:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -24
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 33
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0)
+		
+		addi $t0, $zero, 33
+		sw $t0, 4($v0)
+		
+		addi $t0, $zero, 65
+		sb $t0, 8($v0)
+		
+		addi $t0, $zero, 98
+		sb $t0, 9($v0)
+		
+		addi $t0, $zero, 111
+		sb $t0, 10($v0)
+		
+		addi $t0, $zero, 114
+		sb $t0, 11($v0)
+		
+		addi $t0, $zero, 116
+		sb $t0, 12($v0)
+		
+		addi $t0, $zero, 32
+		sb $t0, 13($v0)
+		
+		addi $t0, $zero, 99
+		sb $t0, 14($v0)
+		
+		addi $t0, $zero, 97
+		sb $t0, 15($v0)
+		
+		addi $t0, $zero, 108
+		sb $t0, 16($v0)
+		
+		addi $t0, $zero, 108
+		sb $t0, 17($v0)
+		
+		addi $t0, $zero, 101
+		sb $t0, 18($v0)
+		
+		addi $t0, $zero, 100
+		sb $t0, 19($v0)
+		
+		addi $t0, $zero, 32
+		sb $t0, 20($v0)
+		
+		addi $t0, $zero, 102
+		sb $t0, 21($v0)
+		
+		addi $t0, $zero, 114
+		sb $t0, 22($v0)
+		
+		addi $t0, $zero, 111
+		sb $t0, 23($v0)
+		
+		addi $t0, $zero, 109
+		sb $t0, 24($v0)
+		
+		addi $t0, $zero, 32
+		sb $t0, 25($v0)
+		
+		addi $t0, $zero, 99
+		sb $t0, 26($v0)
+		
+		addi $t0, $zero, 108
+		sb $t0, 27($v0)
+		
+		addi $t0, $zero, 97
+		sb $t0, 28($v0)
+		
+		addi $t0, $zero, 115
+		sb $t0, 29($v0)
+		
+		addi $t0, $zero, 115
+		sb $t0, 30($v0)
+		
+		addi $t0, $zero, 32
+		sb $t0, 31($v0)
+		
+		sb $zero, 32($v0)
+		
+		sw $v0, 20($sp)
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 10
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0)
+		
+		addi $t0, $zero, 10
+		sw $t0, 4($v0)
+		
+		addi $t0, $zero, 10
+		sb $t0, 8($v0)
+		
+		sb $zero, 9($v0)
+		
+		sw $v0, 8($sp)
+		
+		# ALLOCATING INT -> 2
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 2
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# GET METHOD type_name OF String
+		lw $t0, 24($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 32($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_5
+		lw $t0, 8($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 24($sp)
+		addi $sp, $sp, 8
+		
+		# ALLOCATING INT -> 5
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 5
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# GET METHOD concat OF String
+		lw $t0, 24($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [internal_0]
+		lw $t0, 32($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_1]
+		lw $t0, 28($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_5
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 24($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING INT -> 5
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 5
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# GET METHOD concat OF String
+		lw $t0, 24($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [internal_2]
+		lw $t0, 24($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_3]
+		lw $t0, 20($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_5
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 24($sp)
+		addi $sp, $sp, 12
+		
+		lw $t0, 12($sp)
+		addi $t0, $t0, 8
+		
+		# PRINTING STRING: internal_2
+		li $v0, 4
+		move $a0, $t0
+		syscall
+		
+		# EXIT!
+		li $v0, 10
+		syscall
+		
+		lw $v1, 24($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 24
+		
+		jr $ra
+		
+	function_type_name_at_Object:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -4
+		
+		# internal_0 <- NAME OF self
+		lw $t0, 4($sp)
+		lw $t1, 0($t0)
+		lw $t2, 8($t1)
+		la $t3, 4($t2)
+		lw $t2, 0($t2)
+		
+		addi $t2, $t2, 9
+		li $v0, 9
+		move $a0, $t2
+		syscall
+		addi $t2, $t2, -9
+		
+		la $t4, type_String
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		
+		addi $t4, $v0, 0
+		addi $t4, $t4, 8
+		xor $t5, $t5, $t5
+		while_copy_name_start:
+		beq $t5, $t2, while_copy_name_end
+		lb $t6, 0($t3)
+		sb $t6, 0($t4)
+		addi $t4, $t4, 1
+		addi $t3, $t3, 1
+		addi $t5, $t5, 1
+		j while_copy_name_start
+		while_copy_name_end:
+		
+		sb $zero, 0($t4)
+		
+		sw $v0, 0($sp)
+		
+		lw $v1, 0($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_copy_at_Object:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -4
+		
+		# internal_0 <- COPY OF self
+		lw $t0, 4($sp)
+		lw $t1, 0($t0)
+		lw $t2, 4($t0)
+		
+		li $v0, 9
+		move $a0, $t2
+		syscall
+		move $t3, $v0
+		sw $t1, 0($v0)
+		sw $a0, 4($v0)
+		
+		addi $t0, $t0, 8
+		addi $t3, $t3, 8
+		addi $t2, $2, -8
+		xor $t4, $t4, $t4
+		
+		while_copy_start:
+		beq $t4, $t2, while_copy_end
+		lb $t5, 0($t0)
+		sb $t5, 0($t3)
+		addi $t0, $t0, 1
+		addi $t3, $t3, 1
+		addi $t4, $t4, 1
+		j while_copy_start
+		while_copy_end:
+		sw $v0, 0($sp)
+		
+		lw $v1, 0($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function___init___at_IO:
+		lw $v1, 0($sp)
+		
+		jr $ra
+		
+	function_out_string_at_IO:
+		lw $t0, 0($sp)
+		addi $t0, $t0, 8
+		
+		# PRINTING STRING: x
+		li $v0, 4
+		move $a0, $t0
+		syscall
+		
+		lw $v1, 4($sp)
+		
+		jr $ra
+		
+	function_out_int_at_IO:
+		# PRINTING INT: x
+		li $v0, 1
+		lw $a0, 0($sp)
+		lw $a0, 8($a0)
+		syscall
+		
+		lw $v1, 4($sp)
+		
+		jr $ra
+		
+	function_in_string_at_IO:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -4
+		
+		li $v0, 8
+		la $a0, buffer_input
+		li $a1, 1024
+		syscall
+		
+		xor $t0, $t0, $t0
+		while_read_start:
+		lb $t1, buffer_input($t0)
+		addi $t2, $zero, 10
+		beq $t1, $t2, while_read_end
+		addi $t2, $zero, 13
+		beq $t1, $t2, while_read_end
+		addi $t0, $t0, 1
+		j while_read_start
+		while_read_end:
+		
+		addi $t0, $t0, 9
+		li $v0, 9
+		move $a0, $t0
+		syscall
+		addi $t0, $t0, -9
+		la $t2, type_String
+		sw $t2, 0($v0)
+		sw $a0, 4($v0)
+		
+		addi $t3, $v0, 8
+		xor $t4, $t4, $t4
+		
+		while_copy_from_buffer_start:
+		beq $t4, $t0, while_copy_from_buffer_end
+		lb $t5, buffer_input($t4)
+		sb $t5, 0($t3)
+		addi $t3, $t3, 1
+		addi $t4, $t4, 1
+		j while_copy_from_buffer_start
+		while_copy_from_buffer_end:
+		
+		sb $zero, 0($t3)
+		
+		sw $v0, 0($sp)
+		
+		lw $v1, 0($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_in_int_at_IO:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -4
+		
+		# ALLOCATING INT -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 0($sp)
+		
+		li $v0, 5
+		syscall
+		lw $t0, 0($sp)
+		sw $v0, 8($t0)
+		
+		lw $v1, 0($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function___init___at_String:
+		lw $v1, 0($sp)
+		
+		jr $ra
+		
+	function_length_at_String:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -4
+		
+		# ALLOCATING INT -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 0($sp)
+		
+		# internal_0 <- LENGTH (self)
+		lw $t0, 4($sp)
+		lw $t1, 4($t0)
+		addi $t1, $t1, -9
+		lw $t0, 0($sp)
+		sw $t1, 8($t0)
+		
+		lw $v1, 0($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_concat_at_String:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -4
+		
+		# internal_0 <- self + s
+		lw $t0, 8($sp)
+		lw $t1, 4($sp)
+		lw $t2, 4($t0)
+		lw $t3, 4($t1)
+		addi $t2, $t2, -9
+		addi $t3, $t3, -9
+		add $t4, $t2, $t3
+		addi $t4, $t4, 9
+		
+		li $v0, 9
+		move $a0, $t4
+		syscall
+		addi $t4, $t4, -9
+		add $t5, $zero, $v0
+		addi $t5, $t5, 8
+		
+		la $t8, type_String
+		sw $t8, 0($v0)
+		
+		sw $a0, 4($v0)
+		
+		xor $t6, $t6, $t6
+		while_copy_str1_start:
+		beq $t6, $t2, while_copy_str1_end
+		lb $t7, 8($t0)
+		sb $t7, 0($t5)
+		add $t0, $t0, 1
+		add $t5, $t5, 1
+		addi $t6, $t6, 1
+		j while_copy_str1_start
+		while_copy_str1_end:
+		
+		while_copy_str2_start:
+		beq $t6, $t4, while_copy_str2_end
+		lb $t7, 8($t1)
+		sb $t7, 0($t5)
+		add $t1, $t1, 1
+		add $t5, $t5, 1
+		addi $t6, $t6, 1
+		j while_copy_str2_start
+		while_copy_str2_end:
+		
+		sb $zero, 0($t5)
+		
+		sw $v0, 0($sp)
+		
+		lw $v1, 0($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_substr_at_String:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -4
+		
+		# internal_0 <- self[i:i + l]
+		lw $t0, 12($sp)
+		lw $t1, 4($t0)
+		addi $t1, $t1, -9
+		lw $t2, 8($sp)
+		lw $t2, 8($t2)
+		lw $t3, 4($sp)
+		lw $t3, 8($t3)
+		add $t4, $t2, $t3
+		
+		bgt $t4, $t1, substring_out_of_bounds
+		
+		addi $t3, $t3, 9
+		li $v0, 9
+		move $a0, $t3
+		syscall
+		addi $t3, $t3, -9
+		
+		la $t5, type_String
+		sw $t5, 0($v0)
+		
+		sw $a0, 4($v0)
+		
+		addi $t0, $t0, 8
+		add $t0, $t0, $t2
+		move $t5, $v0
+		add $t5, $t5, 8
+		xor $t6, $t6, $t6
+		while_copy_substr_start:
+		beq $t6, $t3, while_copy_substr_end
+		lb $t7, 0($t0)
+		sb $t7, 0($t5)
+		addi $t0, $t0, 1
+		add $t5, $t5, 1
+		addi $t6, $t6, 1
+		j while_copy_substr_start
+		while_copy_substr_end:
+		
+		sb $zero, 0($t5)
+		
+		sw $v0, 0($sp)
+		j substring_not_out_of_bounds
+		
+		substring_out_of_bounds:
+		li $v0, 17
+		addi $a0, $zero, 1
+		syscall
+		
+		substring_not_out_of_bounds:
+		
+		lw $v1, 0($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function___init___at_Int:
+		lw $v1, 0($sp)
+		
+		jr $ra
+		
+	function___init___at_Bool:
+		lw $v1, 0($sp)
+		
+		jr $ra
+		
+	function___init___at_Graph:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -8
+		
+		# ALLOCATING -> VList
+		li $v0, 9
+		lw $a0, type_VList
+		syscall
+		la $t0, type_VList
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		sw $v0, 4($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [internal_0]
+		lw $t0, 12($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function___init___at_VList
+		jal function___init___at_VList
+		lw $ra, 4($sp)
+		sw $v1, 12($sp)
+		addi $sp, $sp, 8
+		
+		# SET ATTRIBUTE vertices OF self
+		lw $t0, 8($sp)
+		lw $t1, 4($sp)
+		beq $t1, $zero, object_set_attribute_8776066320222
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066320222
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066320222
+		j object_set_attribute_8776066320222
+		int_set_attribute_8776066320222:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0)
+		j end_set_attribute_8776066320222
+		bool_set_attribute_8776066320222:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0)
+		j end_set_attribute_8776066320222
+		object_set_attribute_8776066320222:
+		sw $t1, 8($t0)
+		end_set_attribute_8776066320222:
+		
+		# ALLOCATING -> EList
+		li $v0, 9
+		lw $a0, type_EList
+		syscall
+		la $t0, type_EList
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		sw $v0, 0($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [internal_1]
+		lw $t0, 8($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function___init___at_EList
+		jal function___init___at_EList
+		lw $ra, 4($sp)
+		sw $v1, 8($sp)
+		addi $sp, $sp, 8
+		
+		# SET ATTRIBUTE edges OF self
+		lw $t0, 8($sp)
+		lw $t1, 0($sp)
+		beq $t1, $zero, object_set_attribute_8776066320273
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066320273
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066320273
+		j object_set_attribute_8776066320273
+		int_set_attribute_8776066320273:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066320273
+		bool_set_attribute_8776066320273:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066320273
+		object_set_attribute_8776066320273:
+		sw $t1, 12($t0)
+		end_set_attribute_8776066320273:
+		
+		lw $v1, 8($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 8
+		
+		jr $ra
+		
+	function_add_vertice_at_Graph:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -44
+		
+		# ALLOCATING INT -> 8
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 8
+		sw $t0, 8($v0)
+		sw $v0, 36($sp)
+		
+		# GET METHOD outgoing OF Vertice
+		lw $t0, 44($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 36($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 32($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [v]
+		lw $t0, 52($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_2
+		lw $t0, 40($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 48($sp)
+		addi $sp, $sp, 8
+		
+		# GET ATTRIBUTE edges OF self
+		lw $t0, 48($sp)
+		lw $t1, 12($t0)
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8776066319770
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8776066319770
+		j object_get_attribute_8776066319770
+		int_get_attribute_8776066319770:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 28($sp)
+		j end_get_attribute_8776066319770
+		bool_get_attribute_8776066319770:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 28($sp)
+		j end_get_attribute_8776066319770
+		object_get_attribute_8776066319770:
+		sw $t1, 28($sp)
+		end_get_attribute_8776066319770:
+		
+		# ALLOCATING INT -> 12
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 12
+		sw $t0, 8($v0)
+		sw $v0, 20($sp)
+		
+		# GET METHOD append OF EList
+		lw $t0, 40($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 20($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 16($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [internal_0]
+		lw $t0, 52($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_3]
+		lw $t0, 40($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_6
+		lw $t0, 28($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 36($sp)
+		addi $sp, $sp, 12
+		
+		# SET ATTRIBUTE edges OF self
+		lw $t0, 48($sp)
+		lw $t1, 24($sp)
+		beq $t1, $zero, object_set_attribute_8776066320147
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066320147
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066320147
+		j object_set_attribute_8776066320147
+		int_set_attribute_8776066320147:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066320147
+		bool_set_attribute_8776066320147:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066320147
+		object_set_attribute_8776066320147:
+		sw $t1, 12($t0)
+		end_set_attribute_8776066320147:
+		
+		# GET ATTRIBUTE vertices OF self
+		lw $t0, 48($sp)
+		lw $t1, 8($t0)
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8776066319674
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8776066319674
+		j object_get_attribute_8776066319674
+		int_get_attribute_8776066319674:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($sp)
+		j end_get_attribute_8776066319674
+		bool_get_attribute_8776066319674:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($sp)
+		j end_get_attribute_8776066319674
+		object_get_attribute_8776066319674:
+		sw $t1, 12($sp)
+		end_get_attribute_8776066319674:
+		
+		# ALLOCATING INT -> 11
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 11
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# GET METHOD cons OF VList
+		lw $t0, 12($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [internal_7]
+		lw $t0, 24($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [v]
+		lw $t0, 56($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_10
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 20($sp)
+		addi $sp, $sp, 12
+		
+		# SET ATTRIBUTE vertices OF self
+		lw $t0, 48($sp)
+		lw $t1, 8($sp)
+		beq $t1, $zero, object_set_attribute_8776066319731
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066319731
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066319731
+		j object_set_attribute_8776066319731
+		int_set_attribute_8776066319731:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0)
+		j end_set_attribute_8776066319731
+		bool_set_attribute_8776066319731:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0)
+		j end_set_attribute_8776066319731
+		object_set_attribute_8776066319731:
+		sw $t1, 8($t0)
+		end_set_attribute_8776066319731:
+		
+		lw $v1, 8($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 44
+		
+		jr $ra
+		
+	function_print_E_at_Graph:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -16
+		
+		# GET ATTRIBUTE edges OF self
+		lw $t0, 16($sp)
+		lw $t1, 12($t0)
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8776066319351
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8776066319351
+		j object_get_attribute_8776066319351
+		int_get_attribute_8776066319351:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($sp)
+		j end_get_attribute_8776066319351
+		bool_get_attribute_8776066319351:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($sp)
+		j end_get_attribute_8776066319351
+		object_get_attribute_8776066319351:
+		sw $t1, 12($sp)
+		end_get_attribute_8776066319351:
+		
+		# ALLOCATING INT -> 13
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 13
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# GET METHOD print OF EList
+		lw $t0, 12($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [internal_0]
+		lw $t0, 20($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_3
+		lw $t0, 8($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 16($sp)
+		addi $sp, $sp, 8
+		
+		lw $v1, 8($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 16
+		
+		jr $ra
+		
+	function_print_V_at_Graph:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -16
+		
+		# GET ATTRIBUTE vertices OF self
+		lw $t0, 16($sp)
+		lw $t1, 8($t0)
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8776066319225
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8776066319225
+		j object_get_attribute_8776066319225
+		int_get_attribute_8776066319225:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($sp)
+		j end_get_attribute_8776066319225
+		bool_get_attribute_8776066319225:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($sp)
+		j end_get_attribute_8776066319225
+		object_get_attribute_8776066319225:
+		sw $t1, 12($sp)
+		end_get_attribute_8776066319225:
+		
+		# ALLOCATING INT -> 12
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 12
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# GET METHOD print OF VList
+		lw $t0, 12($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [internal_0]
+		lw $t0, 20($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_3
+		lw $t0, 8($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 16($sp)
+		addi $sp, $sp, 8
+		
+		lw $v1, 8($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 16
+		
+		jr $ra
+		
+	function___init___at_Vertice:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -8
+		
+		# ALLOCATING INT -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# SET ATTRIBUTE num OF self
+		lw $t0, 8($sp)
+		lw $t1, 4($sp)
+		beq $t1, $zero, object_set_attribute_8776066318499
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066318499
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066318499
+		j object_set_attribute_8776066318499
+		int_set_attribute_8776066318499:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0)
+		j end_set_attribute_8776066318499
+		bool_set_attribute_8776066318499:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0)
+		j end_set_attribute_8776066318499
+		object_set_attribute_8776066318499:
+		sw $t1, 8($t0)
+		end_set_attribute_8776066318499:
+		
+		# ALLOCATING -> EList
+		li $v0, 9
+		lw $a0, type_EList
+		syscall
+		la $t0, type_EList
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		sw $v0, 0($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [internal_1]
+		lw $t0, 8($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function___init___at_EList
+		jal function___init___at_EList
+		lw $ra, 4($sp)
+		sw $v1, 8($sp)
+		addi $sp, $sp, 8
+		
+		# SET ATTRIBUTE out OF self
+		lw $t0, 8($sp)
+		lw $t1, 0($sp)
+		beq $t1, $zero, object_set_attribute_8776066318457
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066318457
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066318457
+		j object_set_attribute_8776066318457
+		int_set_attribute_8776066318457:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066318457
+		bool_set_attribute_8776066318457:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066318457
+		object_set_attribute_8776066318457:
+		sw $t1, 12($t0)
+		end_set_attribute_8776066318457:
+		
+		lw $v1, 8($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 8
+		
+		jr $ra
+		
+	function_outgoing_at_Vertice:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -4
+		
+		# GET ATTRIBUTE out OF self
+		lw $t0, 4($sp)
+		lw $t1, 12($t0)
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8776066318517
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8776066318517
+		j object_get_attribute_8776066318517
+		int_get_attribute_8776066318517:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 0($sp)
+		j end_get_attribute_8776066318517
+		bool_get_attribute_8776066318517:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 0($sp)
+		j end_get_attribute_8776066318517
+		object_get_attribute_8776066318517:
+		sw $t1, 0($sp)
+		end_get_attribute_8776066318517:
+		
+		lw $v1, 0($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_number_at_Vertice:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -4
+		
+		# GET ATTRIBUTE num OF self
+		lw $t0, 4($sp)
+		lw $t1, 8($t0)
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8776066318406
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8776066318406
+		j object_get_attribute_8776066318406
+		int_get_attribute_8776066318406:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 0($sp)
+		j end_get_attribute_8776066318406
+		bool_get_attribute_8776066318406:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 0($sp)
+		j end_get_attribute_8776066318406
+		object_get_attribute_8776066318406:
+		sw $t1, 0($sp)
+		end_get_attribute_8776066318406:
+		
+		lw $v1, 0($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_init_at_Vertice:
+		# SET ATTRIBUTE num OF self
+		lw $t0, 4($sp)
+		lw $t1, 0($sp)
+		beq $t1, $zero, object_set_attribute_8776066318355
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066318355
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066318355
+		j object_set_attribute_8776066318355
+		int_set_attribute_8776066318355:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0)
+		j end_set_attribute_8776066318355
+		bool_set_attribute_8776066318355:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0)
+		j end_set_attribute_8776066318355
+		object_set_attribute_8776066318355:
+		sw $t1, 8($t0)
+		end_set_attribute_8776066318355:
+		
+		lw $v1, 4($sp)
+		
+		jr $ra
+		
+	function_add_out_at_Vertice:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -16
+		
+		# GET ATTRIBUTE out OF self
+		lw $t0, 20($sp)
+		lw $t1, 12($t0)
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8776066322420
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8776066322420
+		j object_get_attribute_8776066322420
+		int_get_attribute_8776066322420:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($sp)
+		j end_get_attribute_8776066322420
+		bool_get_attribute_8776066322420:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($sp)
+		j end_get_attribute_8776066322420
+		object_get_attribute_8776066322420:
+		sw $t1, 12($sp)
+		end_get_attribute_8776066322420:
+		
+		# ALLOCATING INT -> 11
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 11
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# GET METHOD cons OF EList
+		lw $t0, 12($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [internal_0]
+		lw $t0, 24($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [s]
+		lw $t0, 28($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_3
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 20($sp)
+		addi $sp, $sp, 12
+		
+		# SET ATTRIBUTE out OF self
+		lw $t0, 20($sp)
+		lw $t1, 8($sp)
+		beq $t1, $zero, object_set_attribute_8776066322276
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066322276
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066322276
+		j object_set_attribute_8776066322276
+		int_set_attribute_8776066322276:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066322276
+		bool_set_attribute_8776066322276:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066322276
+		object_set_attribute_8776066322276:
+		sw $t1, 12($t0)
+		end_set_attribute_8776066322276:
+		
+		lw $v1, 20($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 16
+		
+		jr $ra
+		
+	function_print_at_Vertice:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -32
+		
+		# GET ATTRIBUTE num OF self
+		lw $t0, 32($sp)
+		lw $t1, 8($t0)
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8776066322255
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8776066322255
+		j object_get_attribute_8776066322255
+		int_get_attribute_8776066322255:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 28($sp)
+		j end_get_attribute_8776066322255
+		bool_get_attribute_8776066322255:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 28($sp)
+		j end_get_attribute_8776066322255
+		object_get_attribute_8776066322255:
+		sw $t1, 28($sp)
+		end_get_attribute_8776066322255:
+		
+		# ALLOCATING INT -> 5
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 5
+		sw $t0, 8($v0)
+		sw $v0, 20($sp)
+		
+		# GET METHOD out_int OF Vertice
+		lw $t0, 32($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 20($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 16($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 44($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_0]
+		lw $t0, 40($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_3
+		lw $t0, 28($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 36($sp)
+		addi $sp, $sp, 12
+		
+		# GET ATTRIBUTE out OF self
+		lw $t0, 32($sp)
+		lw $t1, 12($t0)
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8776066323938
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8776066323938
+		j object_get_attribute_8776066323938
+		int_get_attribute_8776066323938:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($sp)
+		j end_get_attribute_8776066323938
+		bool_get_attribute_8776066323938:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($sp)
+		j end_get_attribute_8776066323938
+		object_get_attribute_8776066323938:
+		sw $t1, 12($sp)
+		end_get_attribute_8776066323938:
+		
+		# ALLOCATING INT -> 13
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 13
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# GET METHOD print OF EList
+		lw $t0, 12($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [internal_4]
+		lw $t0, 20($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_7
+		lw $t0, 8($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 16($sp)
+		addi $sp, $sp, 8
+		
+		lw $v1, 8($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 32
+		
+		jr $ra
+		
+	function___init___at_Edge:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -12
+		
+		# ALLOCATING INT -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 8($sp)
+		
+		# SET ATTRIBUTE from OF self
+		lw $t0, 12($sp)
+		lw $t1, 8($sp)
+		beq $t1, $zero, object_set_attribute_8776066323776
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066323776
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066323776
+		j object_set_attribute_8776066323776
+		int_set_attribute_8776066323776:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0)
+		j end_set_attribute_8776066323776
+		bool_set_attribute_8776066323776:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0)
+		j end_set_attribute_8776066323776
+		object_set_attribute_8776066323776:
+		sw $t1, 8($t0)
+		end_set_attribute_8776066323776:
+		
+		# ALLOCATING INT -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# SET ATTRIBUTE to OF self
+		lw $t0, 12($sp)
+		lw $t1, 4($sp)
+		beq $t1, $zero, object_set_attribute_8776066323803
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066323803
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066323803
+		j object_set_attribute_8776066323803
+		int_set_attribute_8776066323803:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066323803
+		bool_set_attribute_8776066323803:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066323803
+		object_set_attribute_8776066323803:
+		sw $t1, 12($t0)
+		end_set_attribute_8776066323803:
+		
+		# ALLOCATING INT -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 0($sp)
+		
+		# SET ATTRIBUTE weight OF self
+		lw $t0, 12($sp)
+		lw $t1, 0($sp)
+		beq $t1, $zero, object_set_attribute_8776066323842
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066323842
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066323842
+		j object_set_attribute_8776066323842
+		int_set_attribute_8776066323842:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 16($t0)
+		j end_set_attribute_8776066323842
+		bool_set_attribute_8776066323842:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 16($t0)
+		j end_set_attribute_8776066323842
+		object_set_attribute_8776066323842:
+		sw $t1, 16($t0)
+		end_set_attribute_8776066323842:
+		
+		lw $v1, 12($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 12
+		
+		jr $ra
+		
+	function_init_at_Edge:
+		# SET ATTRIBUTE from OF self
+		lw $t0, 12($sp)
+		lw $t1, 8($sp)
+		beq $t1, $zero, object_set_attribute_8776066318885
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066318885
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066318885
+		j object_set_attribute_8776066318885
+		int_set_attribute_8776066318885:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0)
+		j end_set_attribute_8776066318885
+		bool_set_attribute_8776066318885:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0)
+		j end_set_attribute_8776066318885
+		object_set_attribute_8776066318885:
+		sw $t1, 8($t0)
+		end_set_attribute_8776066318885:
+		
+		# SET ATTRIBUTE to OF self
+		lw $t0, 12($sp)
+		lw $t1, 4($sp)
+		beq $t1, $zero, object_set_attribute_8776066318852
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066318852
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066318852
+		j object_set_attribute_8776066318852
+		int_set_attribute_8776066318852:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066318852
+		bool_set_attribute_8776066318852:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066318852
+		object_set_attribute_8776066318852:
+		sw $t1, 12($t0)
+		end_set_attribute_8776066318852:
+		
+		# SET ATTRIBUTE weight OF self
+		lw $t0, 12($sp)
+		lw $t1, 0($sp)
+		beq $t1, $zero, object_set_attribute_8776066318909
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066318909
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066318909
+		j object_set_attribute_8776066318909
+		int_set_attribute_8776066318909:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 16($t0)
+		j end_set_attribute_8776066318909
+		bool_set_attribute_8776066318909:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 16($t0)
+		j end_set_attribute_8776066318909
+		object_set_attribute_8776066318909:
+		sw $t1, 16($t0)
+		end_set_attribute_8776066318909:
+		
+		lw $v1, 12($sp)
+		
+		jr $ra
+		
+	function_print_at_Edge:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -96
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 11
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0)
+		
+		addi $t0, $zero, 11
+		sw $t0, 4($v0)
+		
+		addi $t0, $zero, 32
+		sb $t0, 8($v0)
+		
+		addi $t0, $zero, 40
+		sb $t0, 9($v0)
+		
+		sb $zero, 10($v0)
+		
+		sw $v0, 92($sp)
+		
+		# ALLOCATING INT -> 4
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 4
+		sw $t0, 8($v0)
+		sw $v0, 84($sp)
+		
+		# GET METHOD out_string OF Edge
+		lw $t0, 96($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 84($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 80($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 108($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_0]
+		lw $t0, 104($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_3
+		lw $t0, 92($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 100($sp)
+		addi $sp, $sp, 12
+		
+		# GET ATTRIBUTE from OF self
+		lw $t0, 96($sp)
+		lw $t1, 8($t0)
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8776066315719
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8776066315719
+		j object_get_attribute_8776066315719
+		int_get_attribute_8776066315719:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 76($sp)
+		j end_get_attribute_8776066315719
+		bool_get_attribute_8776066315719:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 76($sp)
+		j end_get_attribute_8776066315719
+		object_get_attribute_8776066315719:
+		sw $t1, 76($sp)
+		end_get_attribute_8776066315719:
+		
+		# ALLOCATING INT -> 5
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 5
+		sw $t0, 8($v0)
+		sw $v0, 68($sp)
+		
+		# GET METHOD out_int OF Edge
+		lw $t0, 96($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 68($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 64($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 108($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_4]
+		lw $t0, 88($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_7
+		lw $t0, 76($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 84($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 10
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0)
+		
+		addi $t0, $zero, 10
+		sw $t0, 4($v0)
+		
+		addi $t0, $zero, 44
+		sb $t0, 8($v0)
+		
+		sb $zero, 9($v0)
+		
+		sw $v0, 60($sp)
+		
+		# ALLOCATING INT -> 4
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 4
+		sw $t0, 8($v0)
+		sw $v0, 52($sp)
+		
+		# GET METHOD out_string OF Edge
+		lw $t0, 96($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 52($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 48($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 108($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_8]
+		lw $t0, 72($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_11
+		lw $t0, 60($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 68($sp)
+		addi $sp, $sp, 12
+		
+		# GET ATTRIBUTE to OF self
+		lw $t0, 96($sp)
+		lw $t1, 12($t0)
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8776066315638
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8776066315638
+		j object_get_attribute_8776066315638
+		int_get_attribute_8776066315638:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 44($sp)
+		j end_get_attribute_8776066315638
+		bool_get_attribute_8776066315638:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 44($sp)
+		j end_get_attribute_8776066315638
+		object_get_attribute_8776066315638:
+		sw $t1, 44($sp)
+		end_get_attribute_8776066315638:
+		
+		# ALLOCATING INT -> 5
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 5
+		sw $t0, 8($v0)
+		sw $v0, 36($sp)
+		
+		# GET METHOD out_int OF Edge
+		lw $t0, 96($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 36($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 32($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 108($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_12]
+		lw $t0, 56($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_15
+		lw $t0, 44($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 52($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 10
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0)
+		
+		addi $t0, $zero, 10
+		sw $t0, 4($v0)
+		
+		addi $t0, $zero, 41
+		sb $t0, 8($v0)
+		
+		sb $zero, 9($v0)
+		
+		sw $v0, 28($sp)
+		
+		# ALLOCATING INT -> 4
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 4
+		sw $t0, 8($v0)
+		sw $v0, 20($sp)
+		
+		# GET METHOD out_string OF Edge
+		lw $t0, 96($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 20($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 16($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 108($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_16]
+		lw $t0, 40($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_19
+		lw $t0, 28($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 36($sp)
+		addi $sp, $sp, 12
+		
+		# GET ATTRIBUTE weight OF self
+		lw $t0, 96($sp)
+		lw $t1, 16($t0)
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8776066314132
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8776066314132
+		j object_get_attribute_8776066314132
+		int_get_attribute_8776066314132:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($sp)
+		j end_get_attribute_8776066314132
+		bool_get_attribute_8776066314132:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($sp)
+		j end_get_attribute_8776066314132
+		object_get_attribute_8776066314132:
+		sw $t1, 12($sp)
+		end_get_attribute_8776066314132:
+		
+		# ALLOCATING INT -> 5
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 5
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# GET METHOD out_int OF Edge
+		lw $t0, 96($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 108($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_20]
+		lw $t0, 24($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_23
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 20($sp)
+		addi $sp, $sp, 12
+		
+		lw $v1, 8($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 96
+		
+		jr $ra
+		
+	function___init___at_EList:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -4
+		
+		# ALLOCATING NUll INTO -> internal_0
+		sw $zero, 0($sp)
+		
+		# SET ATTRIBUTE car OF self
+		lw $t0, 4($sp)
+		lw $t1, 0($sp)
+		beq $t1, $zero, object_set_attribute_8776066314060
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066314060
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066314060
+		j object_set_attribute_8776066314060
+		int_set_attribute_8776066314060:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0)
+		j end_set_attribute_8776066314060
+		bool_set_attribute_8776066314060:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0)
+		j end_set_attribute_8776066314060
+		object_set_attribute_8776066314060:
+		sw $t1, 8($t0)
+		end_set_attribute_8776066314060:
+		
+		lw $v1, 4($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_isNil_at_EList:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -4
+		
+		# ALLOCATING BOOL -> 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 1
+		sw $t0, 8($v0)
+		sw $v0, 0($sp)
+		
+		lw $v1, 0($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_head_at_EList:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -16
+		
+		# ALLOCATING INT -> 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 1
+		sw $t0, 8($v0)
+		sw $v0, 8($sp)
+		
+		# GET METHOD abort OF EList
+		lw $t0, 16($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 8($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 4($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 24($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_2
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 20($sp)
+		addi $sp, $sp, 8
+		
+		# GET ATTRIBUTE car OF self
+		lw $t0, 16($sp)
+		lw $t1, 8($t0)
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8776066313322
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8776066313322
+		j object_get_attribute_8776066313322
+		int_get_attribute_8776066313322:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 0($sp)
+		j end_get_attribute_8776066313322
+		bool_get_attribute_8776066313322:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 0($sp)
+		j end_get_attribute_8776066313322
+		object_get_attribute_8776066313322:
+		sw $t1, 0($sp)
+		end_get_attribute_8776066313322:
+		
+		lw $v1, 0($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 16
+		
+		jr $ra
+		
+	function_tail_at_EList:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -12
+		
+		# ALLOCATING INT -> 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 1
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# GET METHOD abort OF EList
+		lw $t0, 12($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 20($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_2
+		lw $t0, 8($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 16($sp)
+		addi $sp, $sp, 8
+		
+		lw $v1, 12($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 12
+		
+		jr $ra
+		
+	function_cons_at_EList:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -16
+		
+		# ALLOCATING -> ECons
+		li $v0, 9
+		lw $a0, type_ECons
+		syscall
+		la $t0, type_ECons
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		sw $v0, 12($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [internal_0]
+		lw $t0, 20($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function___init___at_ECons
+		jal function___init___at_ECons
+		lw $ra, 4($sp)
+		sw $v1, 20($sp)
+		addi $sp, $sp, 8
+		
+		# ALLOCATING INT -> 14
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 14
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# GET METHOD init OF ECons
+		lw $t0, 12($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -16
+		sw $ra, 12($sp)
+		
+		# ARGUMENT [internal_0]
+		lw $t0, 28($sp)
+		sw $t0, 8($sp)
+		
+		# ARGUMENT [e]
+		lw $t0, 32($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 36($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_3
+		lw $t0, 16($sp)
+		jalr $t0
+		lw $ra, 12($sp)
+		sw $v1, 24($sp)
+		addi $sp, $sp, 16
+		
+		lw $v1, 8($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 16
+		
+		jr $ra
+		
+	function_append_at_EList:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -68
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 60($sp)
+		
+		# ALLOCATING INT -> 8
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 8
+		sw $t0, 8($v0)
+		sw $v0, 52($sp)
+		
+		# GET METHOD isNil OF EList
+		lw $t0, 72($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 52($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 48($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 80($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_4
+		lw $t0, 56($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 64($sp)
+		addi $sp, $sp, 8
+		
+		# internal_1 <- internal_2
+		lw $t0, 56($sp)
+		sw $t0, 60($sp)
+		
+		# IF internal_1 THEN GOTO then_8776066348605
+		lw $t0, 60($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, then_8776066348605
+		
+		# JUMP TO else_8776066348605
+		j else_8776066348605
+		
+		then_8776066348605:
+		
+		# internal_0 <- l
+		lw $t0, 68($sp)
+		sw $t0, 64($sp)
+		
+		# JUMP TO endif_8776066348605
+		j endif_8776066348605
+		
+		else_8776066348605:
+		
+		# ALLOCATING INT -> 10
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 10
+		sw $t0, 8($v0)
+		sw $v0, 40($sp)
+		
+		# GET METHOD tail OF EList
+		lw $t0, 72($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 40($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 36($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 80($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_7
+		lw $t0, 44($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 52($sp)
+		addi $sp, $sp, 8
+		
+		# ALLOCATING INT -> 12
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 12
+		sw $t0, 8($v0)
+		sw $v0, 28($sp)
+		
+		# GET METHOD append OF EList
+		lw $t0, 44($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 28($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 24($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [internal_5]
+		lw $t0, 56($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [l]
+		lw $t0, 80($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_10
+		lw $t0, 36($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 44($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING INT -> 9
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 9
+		sw $t0, 8($v0)
+		sw $v0, 16($sp)
+		
+		# GET METHOD head OF EList
+		lw $t0, 72($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 16($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 12($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 80($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_13
+		lw $t0, 20($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 28($sp)
+		addi $sp, $sp, 8
+		
+		# ALLOCATING INT -> 11
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 11
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# GET METHOD cons OF EList
+		lw $t0, 32($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [internal_8]
+		lw $t0, 44($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_11]
+		lw $t0, 32($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_16
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 20($sp)
+		addi $sp, $sp, 12
+		
+		# internal_0 <- internal_14
+		lw $t0, 8($sp)
+		sw $t0, 64($sp)
+		
+		# JUMP TO endif_8776066348605
+		j endif_8776066348605
+		
+		endif_8776066348605:
+		
+		lw $v1, 64($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 68
+		
+		jr $ra
+		
+	function_print_at_EList:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -16
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 10
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0)
+		
+		addi $t0, $zero, 10
+		sw $t0, 4($v0)
+		
+		addi $t0, $zero, 10
+		sb $t0, 8($v0)
+		
+		sb $zero, 9($v0)
+		
+		sw $v0, 12($sp)
+		
+		# ALLOCATING INT -> 4
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 4
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# GET METHOD out_string OF EList
+		lw $t0, 16($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 28($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_0]
+		lw $t0, 24($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_3
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 20($sp)
+		addi $sp, $sp, 12
+		
+		lw $v1, 8($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 16
+		
+		jr $ra
+		
+	function___init___at_ECons:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -8
+		
+		# ALLOCATING NUll INTO -> internal_0
+		sw $zero, 4($sp)
+		
+		# SET ATTRIBUTE car OF self
+		lw $t0, 8($sp)
+		lw $t1, 4($sp)
+		beq $t1, $zero, object_set_attribute_8776066316614
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066316614
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066316614
+		j object_set_attribute_8776066316614
+		int_set_attribute_8776066316614:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0)
+		j end_set_attribute_8776066316614
+		bool_set_attribute_8776066316614:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0)
+		j end_set_attribute_8776066316614
+		object_set_attribute_8776066316614:
+		sw $t1, 8($t0)
+		end_set_attribute_8776066316614:
+		
+		# ALLOCATING NUll INTO -> internal_1
+		sw $zero, 0($sp)
+		
+		# SET ATTRIBUTE cdr OF self
+		lw $t0, 8($sp)
+		lw $t1, 0($sp)
+		beq $t1, $zero, object_set_attribute_8776066316560
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066316560
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066316560
+		j object_set_attribute_8776066316560
+		int_set_attribute_8776066316560:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066316560
+		bool_set_attribute_8776066316560:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066316560
+		object_set_attribute_8776066316560:
+		sw $t1, 12($t0)
+		end_set_attribute_8776066316560:
+		
+		lw $v1, 8($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 8
+		
+		jr $ra
+		
+	function_isNil_at_ECons:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -4
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 0($sp)
+		
+		lw $v1, 0($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_head_at_ECons:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -4
+		
+		# GET ATTRIBUTE car OF self
+		lw $t0, 4($sp)
+		lw $t1, 8($t0)
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8776066316737
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8776066316737
+		j object_get_attribute_8776066316737
+		int_get_attribute_8776066316737:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 0($sp)
+		j end_get_attribute_8776066316737
+		bool_get_attribute_8776066316737:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 0($sp)
+		j end_get_attribute_8776066316737
+		object_get_attribute_8776066316737:
+		sw $t1, 0($sp)
+		end_get_attribute_8776066316737:
+		
+		lw $v1, 0($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_tail_at_ECons:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -4
+		
+		# GET ATTRIBUTE cdr OF self
+		lw $t0, 4($sp)
+		lw $t1, 12($t0)
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8776066316623
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8776066316623
+		j object_get_attribute_8776066316623
+		int_get_attribute_8776066316623:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 0($sp)
+		j end_get_attribute_8776066316623
+		bool_get_attribute_8776066316623:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 0($sp)
+		j end_get_attribute_8776066316623
+		object_get_attribute_8776066316623:
+		sw $t1, 0($sp)
+		end_get_attribute_8776066316623:
+		
+		lw $v1, 0($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_init_at_ECons:
+		# SET ATTRIBUTE car OF self
+		lw $t0, 8($sp)
+		lw $t1, 4($sp)
+		beq $t1, $zero, object_set_attribute_8776066318002
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066318002
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066318002
+		j object_set_attribute_8776066318002
+		int_set_attribute_8776066318002:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0)
+		j end_set_attribute_8776066318002
+		bool_set_attribute_8776066318002:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0)
+		j end_set_attribute_8776066318002
+		object_set_attribute_8776066318002:
+		sw $t1, 8($t0)
+		end_set_attribute_8776066318002:
+		
+		# SET ATTRIBUTE cdr OF self
+		lw $t0, 8($sp)
+		lw $t1, 0($sp)
+		beq $t1, $zero, object_set_attribute_8776066317990
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066317990
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066317990
+		j object_set_attribute_8776066317990
+		int_set_attribute_8776066317990:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066317990
+		bool_set_attribute_8776066317990:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066317990
+		object_set_attribute_8776066317990:
+		sw $t1, 12($t0)
+		end_set_attribute_8776066317990:
+		
+		lw $v1, 8($sp)
+		
+		jr $ra
+		
+	function_print_at_ECons:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -32
+		
+		# GET ATTRIBUTE car OF self
+		lw $t0, 32($sp)
+		lw $t1, 8($t0)
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8776066317855
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8776066317855
+		j object_get_attribute_8776066317855
+		int_get_attribute_8776066317855:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 28($sp)
+		j end_get_attribute_8776066317855
+		bool_get_attribute_8776066317855:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 28($sp)
+		j end_get_attribute_8776066317855
+		object_get_attribute_8776066317855:
+		sw $t1, 28($sp)
+		end_get_attribute_8776066317855:
+		
+		# ALLOCATING INT -> 9
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 9
+		sw $t0, 8($v0)
+		sw $v0, 20($sp)
+		
+		# GET METHOD print OF Edge
+		lw $t0, 28($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 20($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 16($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [internal_0]
+		lw $t0, 36($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_3
+		lw $t0, 24($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 32($sp)
+		addi $sp, $sp, 8
+		
+		# GET ATTRIBUTE cdr OF self
+		lw $t0, 32($sp)
+		lw $t1, 12($t0)
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8776066309030
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8776066309030
+		j object_get_attribute_8776066309030
+		int_get_attribute_8776066309030:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($sp)
+		j end_get_attribute_8776066309030
+		bool_get_attribute_8776066309030:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($sp)
+		j end_get_attribute_8776066309030
+		object_get_attribute_8776066309030:
+		sw $t1, 12($sp)
+		end_get_attribute_8776066309030:
+		
+		# ALLOCATING INT -> 13
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 13
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# GET METHOD print OF EList
+		lw $t0, 12($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [internal_4]
+		lw $t0, 20($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_7
+		lw $t0, 8($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 16($sp)
+		addi $sp, $sp, 8
+		
+		lw $v1, 8($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 32
+		
+		jr $ra
+		
+	function___init___at_VList:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -4
+		
+		# ALLOCATING NUll INTO -> internal_0
+		sw $zero, 0($sp)
+		
+		# SET ATTRIBUTE car OF self
+		lw $t0, 4($sp)
+		lw $t1, 0($sp)
+		beq $t1, $zero, object_set_attribute_8776066308880
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066308880
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066308880
+		j object_set_attribute_8776066308880
+		int_set_attribute_8776066308880:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0)
+		j end_set_attribute_8776066308880
+		bool_set_attribute_8776066308880:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0)
+		j end_set_attribute_8776066308880
+		object_set_attribute_8776066308880:
+		sw $t1, 8($t0)
+		end_set_attribute_8776066308880:
+		
+		lw $v1, 4($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_isNil_at_VList:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -4
+		
+		# ALLOCATING BOOL -> 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 1
+		sw $t0, 8($v0)
+		sw $v0, 0($sp)
+		
+		lw $v1, 0($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_head_at_VList:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -16
+		
+		# ALLOCATING INT -> 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 1
+		sw $t0, 8($v0)
+		sw $v0, 8($sp)
+		
+		# GET METHOD abort OF VList
+		lw $t0, 16($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 8($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 4($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 24($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_2
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 20($sp)
+		addi $sp, $sp, 8
+		
+		# GET ATTRIBUTE car OF self
+		lw $t0, 16($sp)
+		lw $t1, 8($t0)
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8776066337732
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8776066337732
+		j object_get_attribute_8776066337732
+		int_get_attribute_8776066337732:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 0($sp)
+		j end_get_attribute_8776066337732
+		bool_get_attribute_8776066337732:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 0($sp)
+		j end_get_attribute_8776066337732
+		object_get_attribute_8776066337732:
+		sw $t1, 0($sp)
+		end_get_attribute_8776066337732:
+		
+		lw $v1, 0($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 16
+		
+		jr $ra
+		
+	function_tail_at_VList:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -12
+		
+		# ALLOCATING INT -> 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 1
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# GET METHOD abort OF VList
+		lw $t0, 12($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 20($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_2
+		lw $t0, 8($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 16($sp)
+		addi $sp, $sp, 8
+		
+		lw $v1, 12($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 12
+		
+		jr $ra
+		
+	function_cons_at_VList:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -16
+		
+		# ALLOCATING -> VCons
+		li $v0, 9
+		lw $a0, type_VCons
+		syscall
+		la $t0, type_VCons
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		sw $v0, 12($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [internal_0]
+		lw $t0, 20($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function___init___at_VCons
+		jal function___init___at_VCons
+		lw $ra, 4($sp)
+		sw $v1, 20($sp)
+		addi $sp, $sp, 8
+		
+		# ALLOCATING INT -> 13
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 13
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# GET METHOD init OF VCons
+		lw $t0, 12($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -16
+		sw $ra, 12($sp)
+		
+		# ARGUMENT [internal_0]
+		lw $t0, 28($sp)
+		sw $t0, 8($sp)
+		
+		# ARGUMENT [v]
+		lw $t0, 32($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 36($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_3
+		lw $t0, 16($sp)
+		jalr $t0
+		lw $ra, 12($sp)
+		sw $v1, 24($sp)
+		addi $sp, $sp, 16
+		
+		lw $v1, 8($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 16
+		
+		jr $ra
+		
+	function_print_at_VList:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -16
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 10
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0)
+		
+		addi $t0, $zero, 10
+		sw $t0, 4($v0)
+		
+		addi $t0, $zero, 10
+		sb $t0, 8($v0)
+		
+		sb $zero, 9($v0)
+		
+		sw $v0, 12($sp)
+		
+		# ALLOCATING INT -> 4
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 4
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# GET METHOD out_string OF VList
+		lw $t0, 16($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 28($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_0]
+		lw $t0, 24($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_3
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 20($sp)
+		addi $sp, $sp, 12
+		
+		lw $v1, 8($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 16
+		
+		jr $ra
+		
+	function___init___at_VCons:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -8
+		
+		# ALLOCATING NUll INTO -> internal_0
+		sw $zero, 4($sp)
+		
+		# SET ATTRIBUTE car OF self
+		lw $t0, 8($sp)
+		lw $t1, 4($sp)
+		beq $t1, $zero, object_set_attribute_8776066332844
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066332844
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066332844
+		j object_set_attribute_8776066332844
+		int_set_attribute_8776066332844:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0)
+		j end_set_attribute_8776066332844
+		bool_set_attribute_8776066332844:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0)
+		j end_set_attribute_8776066332844
+		object_set_attribute_8776066332844:
+		sw $t1, 8($t0)
+		end_set_attribute_8776066332844:
+		
+		# ALLOCATING NUll INTO -> internal_1
+		sw $zero, 0($sp)
+		
+		# SET ATTRIBUTE cdr OF self
+		lw $t0, 8($sp)
+		lw $t1, 0($sp)
+		beq $t1, $zero, object_set_attribute_8776066332676
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066332676
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066332676
+		j object_set_attribute_8776066332676
+		int_set_attribute_8776066332676:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066332676
+		bool_set_attribute_8776066332676:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066332676
+		object_set_attribute_8776066332676:
+		sw $t1, 12($t0)
+		end_set_attribute_8776066332676:
+		
+		lw $v1, 8($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 8
+		
+		jr $ra
+		
+	function_isNil_at_VCons:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -4
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 0($sp)
+		
+		lw $v1, 0($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_head_at_VCons:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -4
+		
+		# GET ATTRIBUTE car OF self
+		lw $t0, 4($sp)
+		lw $t1, 8($t0)
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8776066332630
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8776066332630
+		j object_get_attribute_8776066332630
+		int_get_attribute_8776066332630:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 0($sp)
+		j end_get_attribute_8776066332630
+		bool_get_attribute_8776066332630:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 0($sp)
+		j end_get_attribute_8776066332630
+		object_get_attribute_8776066332630:
+		sw $t1, 0($sp)
+		end_get_attribute_8776066332630:
+		
+		lw $v1, 0($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_tail_at_VCons:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -4
+		
+		# GET ATTRIBUTE cdr OF self
+		lw $t0, 4($sp)
+		lw $t1, 12($t0)
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8776066332660
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8776066332660
+		j object_get_attribute_8776066332660
+		int_get_attribute_8776066332660:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 0($sp)
+		j end_get_attribute_8776066332660
+		bool_get_attribute_8776066332660:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 0($sp)
+		j end_get_attribute_8776066332660
+		object_get_attribute_8776066332660:
+		sw $t1, 0($sp)
+		end_get_attribute_8776066332660:
+		
+		lw $v1, 0($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 4
+		
+		jr $ra
+		
+	function_init_at_VCons:
+		# SET ATTRIBUTE car OF self
+		lw $t0, 8($sp)
+		lw $t1, 4($sp)
+		beq $t1, $zero, object_set_attribute_8776066332549
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066332549
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066332549
+		j object_set_attribute_8776066332549
+		int_set_attribute_8776066332549:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0)
+		j end_set_attribute_8776066332549
+		bool_set_attribute_8776066332549:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0)
+		j end_set_attribute_8776066332549
+		object_set_attribute_8776066332549:
+		sw $t1, 8($t0)
+		end_set_attribute_8776066332549:
+		
+		# SET ATTRIBUTE cdr OF self
+		lw $t0, 8($sp)
+		lw $t1, 0($sp)
+		beq $t1, $zero, object_set_attribute_8776066332450
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066332450
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066332450
+		j object_set_attribute_8776066332450
+		int_set_attribute_8776066332450:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066332450
+		bool_set_attribute_8776066332450:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066332450
+		object_set_attribute_8776066332450:
+		sw $t1, 12($t0)
+		end_set_attribute_8776066332450:
+		
+		lw $v1, 8($sp)
+		
+		jr $ra
+		
+	function_print_at_VCons:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -32
+		
+		# GET ATTRIBUTE car OF self
+		lw $t0, 32($sp)
+		lw $t1, 8($t0)
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8776066329676
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8776066329676
+		j object_get_attribute_8776066329676
+		int_get_attribute_8776066329676:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 28($sp)
+		j end_get_attribute_8776066329676
+		bool_get_attribute_8776066329676:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 28($sp)
+		j end_get_attribute_8776066329676
+		object_get_attribute_8776066329676:
+		sw $t1, 28($sp)
+		end_get_attribute_8776066329676:
+		
+		# ALLOCATING INT -> 12
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 12
+		sw $t0, 8($v0)
+		sw $v0, 20($sp)
+		
+		# GET METHOD print OF Vertice
+		lw $t0, 28($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 20($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 16($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [internal_0]
+		lw $t0, 36($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_3
+		lw $t0, 24($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 32($sp)
+		addi $sp, $sp, 8
+		
+		# GET ATTRIBUTE cdr OF self
+		lw $t0, 32($sp)
+		lw $t1, 12($t0)
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8776066329664
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8776066329664
+		j object_get_attribute_8776066329664
+		int_get_attribute_8776066329664:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($sp)
+		j end_get_attribute_8776066329664
+		bool_get_attribute_8776066329664:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($sp)
+		j end_get_attribute_8776066329664
+		object_get_attribute_8776066329664:
+		sw $t1, 12($sp)
+		end_get_attribute_8776066329664:
+		
+		# ALLOCATING INT -> 12
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 12
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# GET METHOD print OF VList
+		lw $t0, 12($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [internal_4]
+		lw $t0, 20($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_7
+		lw $t0, 8($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 16($sp)
+		addi $sp, $sp, 8
+		
+		lw $v1, 8($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 32
+		
+		jr $ra
+		
+	function___init___at_Parse:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -8
+		
+		# ALLOCATING -> BoolOp
+		li $v0, 9
+		lw $a0, type_BoolOp
+		syscall
+		la $t0, type_BoolOp
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		sw $v0, 4($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [internal_0]
+		lw $t0, 12($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function___init___at_BoolOp
+		jal function___init___at_BoolOp
+		lw $ra, 4($sp)
+		sw $v1, 12($sp)
+		addi $sp, $sp, 8
+		
+		# SET ATTRIBUTE boolop OF self
+		lw $t0, 8($sp)
+		lw $t1, 4($sp)
+		beq $t1, $zero, object_set_attribute_8776066329661
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066329661
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066329661
+		j object_set_attribute_8776066329661
+		int_set_attribute_8776066329661:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0)
+		j end_set_attribute_8776066329661
+		bool_set_attribute_8776066329661:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0)
+		j end_set_attribute_8776066329661
+		object_set_attribute_8776066329661:
+		sw $t1, 8($t0)
+		end_set_attribute_8776066329661:
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 9
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0)
+		
+		addi $t0, $zero, 9
+		sw $t0, 4($v0)
+		
+		sb $zero, 8($v0)
+		
+		sw $v0, 0($sp)
+		
+		# SET ATTRIBUTE rest OF self
+		lw $t0, 8($sp)
+		lw $t1, 0($sp)
+		beq $t1, $zero, object_set_attribute_8776066330929
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066330929
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066330929
+		j object_set_attribute_8776066330929
+		int_set_attribute_8776066330929:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066330929
+		bool_set_attribute_8776066330929:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066330929
+		object_set_attribute_8776066330929:
+		sw $t1, 12($t0)
+		end_set_attribute_8776066330929:
+		
+		lw $v1, 8($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 8
+		
+		jr $ra
+		
+	function_read_input_at_Parse:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -112
+		
+		# ALLOCATING -> Graph
+		li $v0, 9
+		lw $a0, type_Graph
+		syscall
+		la $t0, type_Graph
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		sw $v0, 104($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [internal_1]
+		lw $t0, 112($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function___init___at_Graph
+		jal function___init___at_Graph
+		lw $ra, 4($sp)
+		sw $v1, 112($sp)
+		addi $sp, $sp, 8
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [g]
+		lw $t0, 120($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_1]
+		lw $t0, 116($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_assign
+		jal function_assign
+		lw $ra, 8($sp)
+		sw $v1, 120($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING INT -> 6
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 6
+		sw $t0, 8($v0)
+		sw $v0, 92($sp)
+		
+		# GET METHOD in_string OF Parse
+		lw $t0, 112($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 92($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 88($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 120($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_5
+		lw $t0, 96($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 104($sp)
+		addi $sp, $sp, 8
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [line]
+		lw $t0, 112($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_3]
+		lw $t0, 108($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_assign
+		jal function_assign
+		lw $ra, 8($sp)
+		sw $v1, 112($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING NUll INTO -> internal_6
+		sw $zero, 84($sp)
+		
+		while_start_8776066350324:
+		
+		# GET ATTRIBUTE boolop OF self
+		lw $t0, 112($sp)
+		lw $t1, 8($t0)
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8776066330685
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8776066330685
+		j object_get_attribute_8776066330685
+		int_get_attribute_8776066330685:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 80($sp)
+		j end_get_attribute_8776066330685
+		bool_get_attribute_8776066330685:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 80($sp)
+		j end_get_attribute_8776066330685
+		object_get_attribute_8776066330685:
+		sw $t1, 80($sp)
+		end_get_attribute_8776066330685:
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 10
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0)
+		
+		addi $t0, $zero, 10
+		sw $t0, 4($v0)
+		
+		addi $t0, $zero, 10
+		sb $t0, 8($v0)
+		
+		sb $zero, 9($v0)
+		
+		sw $v0, 76($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [line]
+		lw $t0, 112($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_8]
+		lw $t0, 88($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_equal
+		jal function_equal
+		lw $ra, 8($sp)
+		sw $v1, 84($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING INT -> 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 1
+		sw $t0, 8($v0)
+		sw $v0, 68($sp)
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 64($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [internal_9]
+		lw $t0, 84($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_10]
+		lw $t0, 80($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_xor
+		jal function_xor
+		lw $ra, 8($sp)
+		sw $v1, 76($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 9
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0)
+		
+		addi $t0, $zero, 9
+		sw $t0, 4($v0)
+		
+		sb $zero, 8($v0)
+		
+		sw $v0, 60($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [line]
+		lw $t0, 112($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_12]
+		lw $t0, 72($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_equal
+		jal function_equal
+		lw $ra, 8($sp)
+		sw $v1, 68($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING INT -> 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 1
+		sw $t0, 8($v0)
+		sw $v0, 52($sp)
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 48($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [internal_13]
+		lw $t0, 68($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_14]
+		lw $t0, 64($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_xor
+		jal function_xor
+		lw $ra, 8($sp)
+		sw $v1, 60($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING INT -> 4
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 4
+		sw $t0, 8($v0)
+		sw $v0, 40($sp)
+		
+		# GET METHOD and OF BoolOp
+		lw $t0, 80($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 40($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 36($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -16
+		sw $ra, 12($sp)
+		
+		# ARGUMENT [internal_7]
+		lw $t0, 96($sp)
+		sw $t0, 8($sp)
+		
+		# ARGUMENT [internal_11]
+		lw $t0, 80($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_15]
+		lw $t0, 64($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_18
+		lw $t0, 52($sp)
+		jalr $t0
+		lw $ra, 12($sp)
+		sw $v1, 60($sp)
+		addi $sp, $sp, 16
+		
+		# IF internal_16 THEN GOTO while_body_8776066350324
+		lw $t0, 44($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, while_body_8776066350324
+		
+		# JUMP TO while_end_8776066350324
+		j while_end_8776066350324
+		
+		while_body_8776066350324:
+		
+		# ALLOCATING INT -> 9
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 9
+		sw $t0, 8($v0)
+		sw $v0, 28($sp)
+		
+		# GET METHOD parse_line OF Parse
+		lw $t0, 112($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 28($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 24($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 124($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [line]
+		lw $t0, 112($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_21
+		lw $t0, 36($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 44($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING INT -> 4
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 4
+		sw $t0, 8($v0)
+		sw $v0, 16($sp)
+		
+		# GET METHOD add_vertice OF Graph
+		lw $t0, 108($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 16($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 12($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [g]
+		lw $t0, 120($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_19]
+		lw $t0, 44($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_24
+		lw $t0, 24($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 32($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING INT -> 6
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 6
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# GET METHOD in_string OF Parse
+		lw $t0, 112($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 120($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_27
+		lw $t0, 8($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 16($sp)
+		addi $sp, $sp, 8
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [line]
+		lw $t0, 112($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_25]
+		lw $t0, 20($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_assign
+		jal function_assign
+		lw $ra, 8($sp)
+		sw $v1, 112($sp)
+		addi $sp, $sp, 12
+		
+		# JUMP TO while_start_8776066350324
+		j while_start_8776066350324
+		
+		while_end_8776066350324:
+		
+		lw $v1, 108($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 112
+		
+		jr $ra
+		
+	function_parse_line_at_Parse:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -148
+		
+		# ALLOCATING -> Vertice
+		li $v0, 9
+		lw $a0, type_Vertice
+		syscall
+		la $t0, type_Vertice
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		sw $v0, 140($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [internal_1]
+		lw $t0, 148($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function___init___at_Vertice
+		jal function___init___at_Vertice
+		lw $ra, 4($sp)
+		sw $v1, 148($sp)
+		addi $sp, $sp, 8
+		
+		# ALLOCATING INT -> 11
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 11
+		sw $t0, 8($v0)
+		sw $v0, 132($sp)
+		
+		# GET METHOD a2i OF Parse
+		lw $t0, 152($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 132($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 128($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 164($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [s]
+		lw $t0, 160($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_4
+		lw $t0, 140($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 148($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING INT -> 10
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 10
+		sw $t0, 8($v0)
+		sw $v0, 120($sp)
+		
+		# GET METHOD init OF Vertice
+		lw $t0, 140($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 120($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 116($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [internal_1]
+		lw $t0, 152($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_2]
+		lw $t0, 148($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_7
+		lw $t0, 128($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 136($sp)
+		addi $sp, $sp, 12
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [v]
+		lw $t0, 156($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_5]
+		lw $t0, 136($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_assign
+		jal function_assign
+		lw $ra, 8($sp)
+		sw $v1, 156($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING NUll INTO -> internal_8
+		sw $zero, 112($sp)
+		
+		while_start_8776066350617:
+		
+		# GET ATTRIBUTE rest OF self
+		lw $t0, 152($sp)
+		lw $t1, 12($t0)
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8776066286764
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8776066286764
+		j object_get_attribute_8776066286764
+		int_get_attribute_8776066286764:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 108($sp)
+		j end_get_attribute_8776066286764
+		bool_get_attribute_8776066286764:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 108($sp)
+		j end_get_attribute_8776066286764
+		object_get_attribute_8776066286764:
+		sw $t1, 108($sp)
+		end_get_attribute_8776066286764:
+		
+		# ALLOCATING INT -> 4
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 4
+		sw $t0, 8($v0)
+		sw $v0, 100($sp)
+		
+		# GET METHOD length OF String
+		lw $t0, 108($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 100($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 96($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [internal_9]
+		lw $t0, 116($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_12
+		lw $t0, 104($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 112($sp)
+		addi $sp, $sp, 8
+		
+		# ALLOCATING INT -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 92($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [internal_10]
+		lw $t0, 116($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_13]
+		lw $t0, 104($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_equal
+		jal function_equal
+		lw $ra, 8($sp)
+		sw $v1, 100($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING INT -> 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 1
+		sw $t0, 8($v0)
+		sw $v0, 84($sp)
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 80($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [internal_14]
+		lw $t0, 100($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_15]
+		lw $t0, 96($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_xor
+		jal function_xor
+		lw $ra, 8($sp)
+		sw $v1, 92($sp)
+		addi $sp, $sp, 12
+		
+		# IF internal_16 THEN GOTO while_body_8776066350617
+		lw $t0, 80($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, while_body_8776066350617
+		
+		# JUMP TO while_end_8776066350617
+		j while_end_8776066350617
+		
+		while_body_8776066350617:
+		
+		# GET ATTRIBUTE rest OF self
+		lw $t0, 152($sp)
+		lw $t1, 12($t0)
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8776066286957
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8776066286957
+		j object_get_attribute_8776066286957
+		int_get_attribute_8776066286957:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 72($sp)
+		j end_get_attribute_8776066286957
+		bool_get_attribute_8776066286957:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 72($sp)
+		j end_get_attribute_8776066286957
+		object_get_attribute_8776066286957:
+		sw $t1, 72($sp)
+		end_get_attribute_8776066286957:
+		
+		# ALLOCATING INT -> 11
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 11
+		sw $t0, 8($v0)
+		sw $v0, 64($sp)
+		
+		# GET METHOD a2i OF Parse
+		lw $t0, 152($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 64($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 60($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 164($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_18]
+		lw $t0, 84($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_21
+		lw $t0, 72($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 80($sp)
+		addi $sp, $sp, 12
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [succ]
+		lw $t0, 88($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_19]
+		lw $t0, 80($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_assign
+		jal function_assign
+		lw $ra, 8($sp)
+		sw $v1, 88($sp)
+		addi $sp, $sp, 12
+		
+		# GET ATTRIBUTE rest OF self
+		lw $t0, 152($sp)
+		lw $t1, 12($t0)
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8776066287068
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8776066287068
+		j object_get_attribute_8776066287068
+		int_get_attribute_8776066287068:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 52($sp)
+		j end_get_attribute_8776066287068
+		bool_get_attribute_8776066287068:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 52($sp)
+		j end_get_attribute_8776066287068
+		object_get_attribute_8776066287068:
+		sw $t1, 52($sp)
+		end_get_attribute_8776066287068:
+		
+		# ALLOCATING INT -> 11
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 11
+		sw $t0, 8($v0)
+		sw $v0, 44($sp)
+		
+		# GET METHOD a2i OF Parse
+		lw $t0, 152($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 44($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 40($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 164($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_23]
+		lw $t0, 64($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_26
+		lw $t0, 52($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 60($sp)
+		addi $sp, $sp, 12
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [weight]
+		lw $t0, 68($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_24]
+		lw $t0, 60($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_assign
+		jal function_assign
+		lw $ra, 8($sp)
+		sw $v1, 68($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING -> Edge
+		li $v0, 9
+		lw $a0, type_Edge
+		syscall
+		la $t0, type_Edge
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		sw $v0, 36($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [internal_27]
+		lw $t0, 44($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function___init___at_Edge
+		jal function___init___at_Edge
+		lw $ra, 4($sp)
+		sw $v1, 44($sp)
+		addi $sp, $sp, 8
+		
+		# ALLOCATING INT -> 9
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 9
+		sw $t0, 8($v0)
+		sw $v0, 28($sp)
+		
+		# GET METHOD number OF Vertice
+		lw $t0, 144($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 28($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 24($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [v]
+		lw $t0, 152($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_30
+		lw $t0, 32($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 40($sp)
+		addi $sp, $sp, 8
+		
+		# ALLOCATING INT -> 8
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 8
+		sw $t0, 8($v0)
+		sw $v0, 16($sp)
+		
+		# GET METHOD init OF Edge
+		lw $t0, 36($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 16($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 12($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -20
+		sw $ra, 16($sp)
+		
+		# ARGUMENT [internal_27]
+		lw $t0, 56($sp)
+		sw $t0, 12($sp)
+		
+		# ARGUMENT [internal_28]
+		lw $t0, 52($sp)
+		sw $t0, 8($sp)
+		
+		# ARGUMENT [succ]
+		lw $t0, 96($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [weight]
+		lw $t0, 76($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_33
+		lw $t0, 32($sp)
+		jalr $t0
+		lw $ra, 16($sp)
+		sw $v1, 40($sp)
+		addi $sp, $sp, 20
+		
+		# ALLOCATING INT -> 11
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 11
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# GET METHOD add_out OF Vertice
+		lw $t0, 144($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [v]
+		lw $t0, 156($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_31]
+		lw $t0, 32($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_36
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 20($sp)
+		addi $sp, $sp, 12
+		
+		# JUMP TO while_start_8776066350617
+		j while_start_8776066350617
+		
+		while_end_8776066350617:
+		
+		lw $v1, 144($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 148
+		
+		jr $ra
+		
+	function_c2i_at_Parse:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -216
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 208($sp)
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 10
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0)
+		
+		addi $t0, $zero, 10
+		sw $t0, 4($v0)
+		
+		addi $t0, $zero, 48
+		sb $t0, 8($v0)
+		
+		sb $zero, 9($v0)
+		
+		sw $v0, 204($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [char]
+		lw $t0, 228($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_2]
+		lw $t0, 216($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_equal
+		jal function_equal
+		lw $ra, 8($sp)
+		sw $v1, 212($sp)
+		addi $sp, $sp, 12
+		
+		# internal_1 <- internal_3
+		lw $t0, 200($sp)
+		sw $t0, 208($sp)
+		
+		# IF internal_1 THEN GOTO then_8776066350791
+		lw $t0, 208($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, then_8776066350791
+		
+		# JUMP TO else_8776066350791
+		j else_8776066350791
+		
+		then_8776066350791:
+		
+		# ALLOCATING INT -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 196($sp)
+		
+		# internal_0 <- internal_4
+		lw $t0, 196($sp)
+		sw $t0, 212($sp)
+		
+		# JUMP TO endif_8776066350791
+		j endif_8776066350791
+		
+		else_8776066350791:
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 188($sp)
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 10
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0)
+		
+		addi $t0, $zero, 10
+		sw $t0, 4($v0)
+		
+		addi $t0, $zero, 49
+		sb $t0, 8($v0)
+		
+		sb $zero, 9($v0)
+		
+		sw $v0, 184($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [char]
+		lw $t0, 228($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_7]
+		lw $t0, 196($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_equal
+		jal function_equal
+		lw $ra, 8($sp)
+		sw $v1, 192($sp)
+		addi $sp, $sp, 12
+		
+		# internal_6 <- internal_8
+		lw $t0, 180($sp)
+		sw $t0, 188($sp)
+		
+		# IF internal_6 THEN GOTO then_8776066351888
+		lw $t0, 188($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, then_8776066351888
+		
+		# JUMP TO else_8776066351888
+		j else_8776066351888
+		
+		then_8776066351888:
+		
+		# ALLOCATING INT -> 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 1
+		sw $t0, 8($v0)
+		sw $v0, 176($sp)
+		
+		# internal_5 <- internal_9
+		lw $t0, 176($sp)
+		sw $t0, 192($sp)
+		
+		# JUMP TO endif_8776066351888
+		j endif_8776066351888
+		
+		else_8776066351888:
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 168($sp)
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 10
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0)
+		
+		addi $t0, $zero, 10
+		sw $t0, 4($v0)
+		
+		addi $t0, $zero, 50
+		sb $t0, 8($v0)
+		
+		sb $zero, 9($v0)
+		
+		sw $v0, 164($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [char]
+		lw $t0, 228($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_12]
+		lw $t0, 176($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_equal
+		jal function_equal
+		lw $ra, 8($sp)
+		sw $v1, 172($sp)
+		addi $sp, $sp, 12
+		
+		# internal_11 <- internal_13
+		lw $t0, 160($sp)
+		sw $t0, 168($sp)
+		
+		# IF internal_11 THEN GOTO then_8776066351951
+		lw $t0, 168($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, then_8776066351951
+		
+		# JUMP TO else_8776066351951
+		j else_8776066351951
+		
+		then_8776066351951:
+		
+		# ALLOCATING INT -> 2
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 2
+		sw $t0, 8($v0)
+		sw $v0, 156($sp)
+		
+		# internal_10 <- internal_14
+		lw $t0, 156($sp)
+		sw $t0, 172($sp)
+		
+		# JUMP TO endif_8776066351951
+		j endif_8776066351951
+		
+		else_8776066351951:
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 148($sp)
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 10
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0)
+		
+		addi $t0, $zero, 10
+		sw $t0, 4($v0)
+		
+		addi $t0, $zero, 51
+		sb $t0, 8($v0)
+		
+		sb $zero, 9($v0)
+		
+		sw $v0, 144($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [char]
+		lw $t0, 228($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_17]
+		lw $t0, 156($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_equal
+		jal function_equal
+		lw $ra, 8($sp)
+		sw $v1, 152($sp)
+		addi $sp, $sp, 12
+		
+		# internal_16 <- internal_18
+		lw $t0, 140($sp)
+		sw $t0, 148($sp)
+		
+		# IF internal_16 THEN GOTO then_8776066352005
+		lw $t0, 148($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, then_8776066352005
+		
+		# JUMP TO else_8776066352005
+		j else_8776066352005
+		
+		then_8776066352005:
+		
+		# ALLOCATING INT -> 3
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 3
+		sw $t0, 8($v0)
+		sw $v0, 136($sp)
+		
+		# internal_15 <- internal_19
+		lw $t0, 136($sp)
+		sw $t0, 152($sp)
+		
+		# JUMP TO endif_8776066352005
+		j endif_8776066352005
+		
+		else_8776066352005:
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 128($sp)
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 10
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0)
+		
+		addi $t0, $zero, 10
+		sw $t0, 4($v0)
+		
+		addi $t0, $zero, 52
+		sb $t0, 8($v0)
+		
+		sb $zero, 9($v0)
+		
+		sw $v0, 124($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [char]
+		lw $t0, 228($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_22]
+		lw $t0, 136($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_equal
+		jal function_equal
+		lw $ra, 8($sp)
+		sw $v1, 132($sp)
+		addi $sp, $sp, 12
+		
+		# internal_21 <- internal_23
+		lw $t0, 120($sp)
+		sw $t0, 128($sp)
+		
+		# IF internal_21 THEN GOTO then_8776066352059
+		lw $t0, 128($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, then_8776066352059
+		
+		# JUMP TO else_8776066352059
+		j else_8776066352059
+		
+		then_8776066352059:
+		
+		# ALLOCATING INT -> 4
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 4
+		sw $t0, 8($v0)
+		sw $v0, 116($sp)
+		
+		# internal_20 <- internal_24
+		lw $t0, 116($sp)
+		sw $t0, 132($sp)
+		
+		# JUMP TO endif_8776066352059
+		j endif_8776066352059
+		
+		else_8776066352059:
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 108($sp)
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 10
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0)
+		
+		addi $t0, $zero, 10
+		sw $t0, 4($v0)
+		
+		addi $t0, $zero, 53
+		sb $t0, 8($v0)
+		
+		sb $zero, 9($v0)
+		
+		sw $v0, 104($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [char]
+		lw $t0, 228($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_27]
+		lw $t0, 116($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_equal
+		jal function_equal
+		lw $ra, 8($sp)
+		sw $v1, 112($sp)
+		addi $sp, $sp, 12
+		
+		# internal_26 <- internal_28
+		lw $t0, 100($sp)
+		sw $t0, 108($sp)
+		
+		# IF internal_26 THEN GOTO then_8776066352113
+		lw $t0, 108($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, then_8776066352113
+		
+		# JUMP TO else_8776066352113
+		j else_8776066352113
+		
+		then_8776066352113:
+		
+		# ALLOCATING INT -> 5
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 5
+		sw $t0, 8($v0)
+		sw $v0, 96($sp)
+		
+		# internal_25 <- internal_29
+		lw $t0, 96($sp)
+		sw $t0, 112($sp)
+		
+		# JUMP TO endif_8776066352113
+		j endif_8776066352113
+		
+		else_8776066352113:
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 88($sp)
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 10
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0)
+		
+		addi $t0, $zero, 10
+		sw $t0, 4($v0)
+		
+		addi $t0, $zero, 54
+		sb $t0, 8($v0)
+		
+		sb $zero, 9($v0)
+		
+		sw $v0, 84($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [char]
+		lw $t0, 228($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_32]
+		lw $t0, 96($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_equal
+		jal function_equal
+		lw $ra, 8($sp)
+		sw $v1, 92($sp)
+		addi $sp, $sp, 12
+		
+		# internal_31 <- internal_33
+		lw $t0, 80($sp)
+		sw $t0, 88($sp)
+		
+		# IF internal_31 THEN GOTO then_8776066352427
+		lw $t0, 88($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, then_8776066352427
+		
+		# JUMP TO else_8776066352427
+		j else_8776066352427
+		
+		then_8776066352427:
+		
+		# ALLOCATING INT -> 6
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 6
+		sw $t0, 8($v0)
+		sw $v0, 76($sp)
+		
+		# internal_30 <- internal_34
+		lw $t0, 76($sp)
+		sw $t0, 92($sp)
+		
+		# JUMP TO endif_8776066352427
+		j endif_8776066352427
+		
+		else_8776066352427:
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 68($sp)
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 10
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0)
+		
+		addi $t0, $zero, 10
+		sw $t0, 4($v0)
+		
+		addi $t0, $zero, 55
+		sb $t0, 8($v0)
+		
+		sb $zero, 9($v0)
+		
+		sw $v0, 64($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [char]
+		lw $t0, 228($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_37]
+		lw $t0, 76($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_equal
+		jal function_equal
+		lw $ra, 8($sp)
+		sw $v1, 72($sp)
+		addi $sp, $sp, 12
+		
+		# internal_36 <- internal_38
+		lw $t0, 60($sp)
+		sw $t0, 68($sp)
+		
+		# IF internal_36 THEN GOTO then_8776066352481
+		lw $t0, 68($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, then_8776066352481
+		
+		# JUMP TO else_8776066352481
+		j else_8776066352481
+		
+		then_8776066352481:
+		
+		# ALLOCATING INT -> 7
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 7
+		sw $t0, 8($v0)
+		sw $v0, 56($sp)
+		
+		# internal_35 <- internal_39
+		lw $t0, 56($sp)
+		sw $t0, 72($sp)
+		
+		# JUMP TO endif_8776066352481
+		j endif_8776066352481
+		
+		else_8776066352481:
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 48($sp)
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 10
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0)
+		
+		addi $t0, $zero, 10
+		sw $t0, 4($v0)
+		
+		addi $t0, $zero, 56
+		sb $t0, 8($v0)
+		
+		sb $zero, 9($v0)
+		
+		sw $v0, 44($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [char]
+		lw $t0, 228($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_42]
+		lw $t0, 56($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_equal
+		jal function_equal
+		lw $ra, 8($sp)
+		sw $v1, 52($sp)
+		addi $sp, $sp, 12
+		
+		# internal_41 <- internal_43
+		lw $t0, 40($sp)
+		sw $t0, 48($sp)
+		
+		# IF internal_41 THEN GOTO then_8776066352535
+		lw $t0, 48($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, then_8776066352535
+		
+		# JUMP TO else_8776066352535
+		j else_8776066352535
+		
+		then_8776066352535:
+		
+		# ALLOCATING INT -> 8
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 8
+		sw $t0, 8($v0)
+		sw $v0, 36($sp)
+		
+		# internal_40 <- internal_44
+		lw $t0, 36($sp)
+		sw $t0, 52($sp)
+		
+		# JUMP TO endif_8776066352535
+		j endif_8776066352535
+		
+		else_8776066352535:
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 28($sp)
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 10
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0)
+		
+		addi $t0, $zero, 10
+		sw $t0, 4($v0)
+		
+		addi $t0, $zero, 57
+		sb $t0, 8($v0)
+		
+		sb $zero, 9($v0)
+		
+		sw $v0, 24($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [char]
+		lw $t0, 228($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_47]
+		lw $t0, 36($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_equal
+		jal function_equal
+		lw $ra, 8($sp)
+		sw $v1, 32($sp)
+		addi $sp, $sp, 12
+		
+		# internal_46 <- internal_48
+		lw $t0, 20($sp)
+		sw $t0, 28($sp)
+		
+		# IF internal_46 THEN GOTO then_8776066352589
+		lw $t0, 28($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, then_8776066352589
+		
+		# JUMP TO else_8776066352589
+		j else_8776066352589
+		
+		then_8776066352589:
+		
+		# ALLOCATING INT -> 9
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 9
+		sw $t0, 8($v0)
+		sw $v0, 16($sp)
+		
+		# internal_45 <- internal_49
+		lw $t0, 16($sp)
+		sw $t0, 32($sp)
+		
+		# JUMP TO endif_8776066352589
+		j endif_8776066352589
+		
+		else_8776066352589:
+		
+		# ALLOCATING INT -> 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 1
+		sw $t0, 8($v0)
+		sw $v0, 8($sp)
+		
+		# GET METHOD abort OF Parse
+		lw $t0, 220($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 8($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 4($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 228($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_52
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 20($sp)
+		addi $sp, $sp, 8
+		
+		# ALLOCATING INT -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 0($sp)
+		
+		# internal_45 <- internal_53
+		lw $t0, 0($sp)
+		sw $t0, 32($sp)
+		
+		# JUMP TO endif_8776066352589
+		j endif_8776066352589
+		
+		endif_8776066352589:
+		
+		# internal_40 <- internal_45
+		lw $t0, 32($sp)
+		sw $t0, 52($sp)
+		
+		# JUMP TO endif_8776066352535
+		j endif_8776066352535
+		
+		endif_8776066352535:
+		
+		# internal_35 <- internal_40
+		lw $t0, 52($sp)
+		sw $t0, 72($sp)
+		
+		# JUMP TO endif_8776066352481
+		j endif_8776066352481
+		
+		endif_8776066352481:
+		
+		# internal_30 <- internal_35
+		lw $t0, 72($sp)
+		sw $t0, 92($sp)
+		
+		# JUMP TO endif_8776066352427
+		j endif_8776066352427
+		
+		endif_8776066352427:
+		
+		# internal_25 <- internal_30
+		lw $t0, 92($sp)
+		sw $t0, 112($sp)
+		
+		# JUMP TO endif_8776066352113
+		j endif_8776066352113
+		
+		endif_8776066352113:
+		
+		# internal_20 <- internal_25
+		lw $t0, 112($sp)
+		sw $t0, 132($sp)
+		
+		# JUMP TO endif_8776066352059
+		j endif_8776066352059
+		
+		endif_8776066352059:
+		
+		# internal_15 <- internal_20
+		lw $t0, 132($sp)
+		sw $t0, 152($sp)
+		
+		# JUMP TO endif_8776066352005
+		j endif_8776066352005
+		
+		endif_8776066352005:
+		
+		# internal_10 <- internal_15
+		lw $t0, 152($sp)
+		sw $t0, 172($sp)
+		
+		# JUMP TO endif_8776066351951
+		j endif_8776066351951
+		
+		endif_8776066351951:
+		
+		# internal_5 <- internal_10
+		lw $t0, 172($sp)
+		sw $t0, 192($sp)
+		
+		# JUMP TO endif_8776066351888
+		j endif_8776066351888
+		
+		endif_8776066351888:
+		
+		# internal_0 <- internal_5
+		lw $t0, 192($sp)
+		sw $t0, 212($sp)
+		
+		# JUMP TO endif_8776066350791
+		j endif_8776066350791
+		
+		endif_8776066350791:
+		
+		lw $v1, 212($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 216
+		
+		jr $ra
+		
+	function_a2i_at_Parse:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -224
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 216($sp)
+		
+		# ALLOCATING INT -> 4
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 4
+		sw $t0, 8($v0)
+		sw $v0, 208($sp)
+		
+		# GET METHOD length OF String
+		lw $t0, 224($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 208($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 204($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [s]
+		lw $t0, 232($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_4
+		lw $t0, 212($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 220($sp)
+		addi $sp, $sp, 8
+		
+		# ALLOCATING INT -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 200($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [internal_2]
+		lw $t0, 224($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_5]
+		lw $t0, 212($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_equal
+		jal function_equal
+		lw $ra, 8($sp)
+		sw $v1, 208($sp)
+		addi $sp, $sp, 12
+		
+		# internal_1 <- internal_6
+		lw $t0, 196($sp)
+		sw $t0, 216($sp)
+		
+		# IF internal_1 THEN GOTO then_8776066352020
+		lw $t0, 216($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, then_8776066352020
+		
+		# JUMP TO else_8776066352020
+		j else_8776066352020
+		
+		then_8776066352020:
+		
+		# ALLOCATING INT -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 192($sp)
+		
+		# internal_0 <- internal_7
+		lw $t0, 192($sp)
+		sw $t0, 220($sp)
+		
+		# JUMP TO endif_8776066352020
+		j endif_8776066352020
+		
+		else_8776066352020:
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 184($sp)
+		
+		# ALLOCATING INT -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 180($sp)
+		
+		# ALLOCATING INT -> 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 1
+		sw $t0, 8($v0)
+		sw $v0, 176($sp)
+		
+		# ALLOCATING INT -> 6
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 6
+		sw $t0, 8($v0)
+		sw $v0, 168($sp)
+		
+		# GET METHOD substr OF String
+		lw $t0, 224($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 168($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 164($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -16
+		sw $ra, 12($sp)
+		
+		# ARGUMENT [s]
+		lw $t0, 240($sp)
+		sw $t0, 8($sp)
+		
+		# ARGUMENT [internal_10]
+		lw $t0, 196($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_11]
+		lw $t0, 192($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_14
+		lw $t0, 180($sp)
+		jalr $t0
+		lw $ra, 12($sp)
+		sw $v1, 188($sp)
+		addi $sp, $sp, 16
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 10
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0)
+		
+		addi $t0, $zero, 10
+		sw $t0, 4($v0)
+		
+		addi $t0, $zero, 45
+		sb $t0, 8($v0)
+		
+		sb $zero, 9($v0)
+		
+		sw $v0, 160($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [internal_12]
+		lw $t0, 184($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_15]
+		lw $t0, 172($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_equal
+		jal function_equal
+		lw $ra, 8($sp)
+		sw $v1, 168($sp)
+		addi $sp, $sp, 12
+		
+		# internal_9 <- internal_16
+		lw $t0, 156($sp)
+		sw $t0, 184($sp)
+		
+		# IF internal_9 THEN GOTO then_8776066352038
+		lw $t0, 184($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, then_8776066352038
+		
+		# JUMP TO else_8776066352038
+		j else_8776066352038
+		
+		then_8776066352038:
+		
+		# ALLOCATING INT -> 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 1
+		sw $t0, 8($v0)
+		sw $v0, 152($sp)
+		
+		# ALLOCATING INT -> 4
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 4
+		sw $t0, 8($v0)
+		sw $v0, 144($sp)
+		
+		# GET METHOD length OF String
+		lw $t0, 224($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 144($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 140($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [s]
+		lw $t0, 232($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_20
+		lw $t0, 148($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 156($sp)
+		addi $sp, $sp, 8
+		
+		# ALLOCATING INT -> 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 1
+		sw $t0, 8($v0)
+		sw $v0, 136($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [internal_18]
+		lw $t0, 160($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_21]
+		lw $t0, 148($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_sub
+		jal function_sub
+		lw $ra, 8($sp)
+		sw $v1, 144($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING INT -> 6
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 6
+		sw $t0, 8($v0)
+		sw $v0, 124($sp)
+		
+		# GET METHOD substr OF String
+		lw $t0, 224($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 124($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 120($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -16
+		sw $ra, 12($sp)
+		
+		# ARGUMENT [s]
+		lw $t0, 240($sp)
+		sw $t0, 8($sp)
+		
+		# ARGUMENT [internal_17]
+		lw $t0, 168($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_22]
+		lw $t0, 148($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_25
+		lw $t0, 136($sp)
+		jalr $t0
+		lw $ra, 12($sp)
+		sw $v1, 144($sp)
+		addi $sp, $sp, 16
+		
+		# ALLOCATING INT -> 12
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 12
+		sw $t0, 8($v0)
+		sw $v0, 112($sp)
+		
+		# GET METHOD a2i_aux OF Parse
+		lw $t0, 228($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 112($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 108($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 240($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_23]
+		lw $t0, 140($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_28
+		lw $t0, 120($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 128($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING INT -> 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 1
+		sw $t0, 8($v0)
+		sw $v0, 104($sp)
+		
+		# ALLOCATING INT -> 4294967295
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 4294967295
+		sw $t0, 8($v0)
+		sw $v0, 100($sp)
+		
+		# ALLOCATING INT -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 96($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [internal_26]
+		lw $t0, 128($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_30]
+		lw $t0, 112($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_xor
+		jal function_xor
+		lw $ra, 8($sp)
+		sw $v1, 108($sp)
+		addi $sp, $sp, 12
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [internal_31]
+		lw $t0, 108($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_29]
+		lw $t0, 116($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 108($sp)
+		addi $sp, $sp, 12
+		
+		# internal_8 <- internal_31
+		lw $t0, 96($sp)
+		sw $t0, 188($sp)
+		
+		# JUMP TO endif_8776066352038
+		j endif_8776066352038
+		
+		else_8776066352038:
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 88($sp)
+		
+		# ALLOCATING INT -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 84($sp)
+		
+		# ALLOCATING INT -> 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 1
+		sw $t0, 8($v0)
+		sw $v0, 80($sp)
+		
+		# ALLOCATING INT -> 6
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 6
+		sw $t0, 8($v0)
+		sw $v0, 72($sp)
+		
+		# GET METHOD substr OF String
+		lw $t0, 224($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 72($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 68($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -16
+		sw $ra, 12($sp)
+		
+		# ARGUMENT [s]
+		lw $t0, 240($sp)
+		sw $t0, 8($sp)
+		
+		# ARGUMENT [internal_34]
+		lw $t0, 100($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_35]
+		lw $t0, 96($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_38
+		lw $t0, 84($sp)
+		jalr $t0
+		lw $ra, 12($sp)
+		sw $v1, 92($sp)
+		addi $sp, $sp, 16
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 10
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0)
+		
+		addi $t0, $zero, 10
+		sw $t0, 4($v0)
+		
+		addi $t0, $zero, 32
+		sb $t0, 8($v0)
+		
+		sb $zero, 9($v0)
+		
+		sw $v0, 64($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [internal_36]
+		lw $t0, 88($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_39]
+		lw $t0, 76($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_equal
+		jal function_equal
+		lw $ra, 8($sp)
+		sw $v1, 72($sp)
+		addi $sp, $sp, 12
+		
+		# internal_33 <- internal_40
+		lw $t0, 60($sp)
+		sw $t0, 88($sp)
+		
+		# IF internal_33 THEN GOTO then_8776066352409
+		lw $t0, 88($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, then_8776066352409
+		
+		# JUMP TO else_8776066352409
+		j else_8776066352409
+		
+		then_8776066352409:
+		
+		# ALLOCATING INT -> 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 1
+		sw $t0, 8($v0)
+		sw $v0, 56($sp)
+		
+		# ALLOCATING INT -> 4
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 4
+		sw $t0, 8($v0)
+		sw $v0, 48($sp)
+		
+		# GET METHOD length OF String
+		lw $t0, 224($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 48($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 44($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [s]
+		lw $t0, 232($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_44
+		lw $t0, 52($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 60($sp)
+		addi $sp, $sp, 8
+		
+		# ALLOCATING INT -> 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 1
+		sw $t0, 8($v0)
+		sw $v0, 40($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [internal_42]
+		lw $t0, 64($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_45]
+		lw $t0, 52($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_sub
+		jal function_sub
+		lw $ra, 8($sp)
+		sw $v1, 48($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING INT -> 6
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 6
+		sw $t0, 8($v0)
+		sw $v0, 28($sp)
+		
+		# GET METHOD substr OF String
+		lw $t0, 224($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 28($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 24($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -16
+		sw $ra, 12($sp)
+		
+		# ARGUMENT [s]
+		lw $t0, 240($sp)
+		sw $t0, 8($sp)
+		
+		# ARGUMENT [internal_41]
+		lw $t0, 72($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_46]
+		lw $t0, 52($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_49
+		lw $t0, 40($sp)
+		jalr $t0
+		lw $ra, 12($sp)
+		sw $v1, 48($sp)
+		addi $sp, $sp, 16
+		
+		# ALLOCATING INT -> 11
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 11
+		sw $t0, 8($v0)
+		sw $v0, 16($sp)
+		
+		# GET METHOD a2i OF Parse
+		lw $t0, 228($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 16($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 12($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 240($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_47]
+		lw $t0, 44($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_52
+		lw $t0, 24($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 32($sp)
+		addi $sp, $sp, 12
+		
+		# internal_32 <- internal_50
+		lw $t0, 20($sp)
+		sw $t0, 92($sp)
+		
+		# JUMP TO endif_8776066352409
+		j endif_8776066352409
+		
+		else_8776066352409:
+		
+		# ALLOCATING INT -> 12
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 12
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# GET METHOD a2i_aux OF Parse
+		lw $t0, 228($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 240($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [s]
+		lw $t0, 236($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_55
+		lw $t0, 12($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 20($sp)
+		addi $sp, $sp, 12
+		
+		# internal_32 <- internal_53
+		lw $t0, 8($sp)
+		sw $t0, 92($sp)
+		
+		# JUMP TO endif_8776066352409
+		j endif_8776066352409
+		
+		endif_8776066352409:
+		
+		# internal_8 <- internal_32
+		lw $t0, 92($sp)
+		sw $t0, 188($sp)
+		
+		# JUMP TO endif_8776066352038
+		j endif_8776066352038
+		
+		endif_8776066352038:
+		
+		# internal_0 <- internal_8
+		lw $t0, 188($sp)
+		sw $t0, 220($sp)
+		
+		# JUMP TO endif_8776066352020
+		j endif_8776066352020
+		
+		endif_8776066352020:
+		
+		lw $v1, 220($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 224
+		
+		jr $ra
+		
+	function_a2i_aux_at_Parse:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -248
+		
+		# ALLOCATING INT -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 240($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [int]
+		lw $t0, 256($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_1]
+		lw $t0, 252($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_assign
+		jal function_assign
+		lw $ra, 8($sp)
+		sw $v1, 256($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING INT -> 4
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 4
+		sw $t0, 8($v0)
+		sw $v0, 228($sp)
+		
+		# GET METHOD length OF String
+		lw $t0, 248($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 228($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 224($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [s]
+		lw $t0, 256($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_5
+		lw $t0, 232($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 240($sp)
+		addi $sp, $sp, 8
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [j]
+		lw $t0, 248($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_3]
+		lw $t0, 244($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_assign
+		jal function_assign
+		lw $ra, 8($sp)
+		sw $v1, 248($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING INT -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 216($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [i]
+		lw $t0, 232($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_7]
+		lw $t0, 228($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_assign
+		jal function_assign
+		lw $ra, 8($sp)
+		sw $v1, 232($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING NUll INTO -> internal_8
+		sw $zero, 212($sp)
+		
+		while_start_8776066352201:
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [i]
+		lw $t0, 232($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [j]
+		lw $t0, 248($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_less_than
+		jal function_less_than
+		lw $ra, 8($sp)
+		sw $v1, 220($sp)
+		addi $sp, $sp, 12
+		
+		# IF internal_9 THEN GOTO while_body_8776066352201
+		lw $t0, 208($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, while_body_8776066352201
+		
+		# JUMP TO while_end_8776066352201
+		j while_end_8776066352201
+		
+		while_body_8776066352201:
+		
+		# ALLOCATING INT -> 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 1
+		sw $t0, 8($v0)
+		sw $v0, 200($sp)
+		
+		# ALLOCATING INT -> 6
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 6
+		sw $t0, 8($v0)
+		sw $v0, 192($sp)
+		
+		# GET METHOD substr OF String
+		lw $t0, 248($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 192($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 188($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -16
+		sw $ra, 12($sp)
+		
+		# ARGUMENT [s]
+		lw $t0, 264($sp)
+		sw $t0, 8($sp)
+		
+		# ARGUMENT [i]
+		lw $t0, 236($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_11]
+		lw $t0, 216($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_14
+		lw $t0, 204($sp)
+		jalr $t0
+		lw $ra, 12($sp)
+		sw $v1, 212($sp)
+		addi $sp, $sp, 16
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [c]
+		lw $t0, 216($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_12]
+		lw $t0, 208($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_assign
+		jal function_assign
+		lw $ra, 8($sp)
+		sw $v1, 216($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 180($sp)
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 10
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0)
+		
+		addi $t0, $zero, 10
+		sw $t0, 4($v0)
+		
+		addi $t0, $zero, 32
+		sb $t0, 8($v0)
+		
+		sb $zero, 9($v0)
+		
+		sw $v0, 176($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [c]
+		lw $t0, 216($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_17]
+		lw $t0, 188($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_equal
+		jal function_equal
+		lw $ra, 8($sp)
+		sw $v1, 184($sp)
+		addi $sp, $sp, 12
+		
+		# internal_16 <- internal_18
+		lw $t0, 172($sp)
+		sw $t0, 180($sp)
+		
+		# IF internal_16 THEN GOTO then_8776066353674
+		lw $t0, 180($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, then_8776066353674
+		
+		# JUMP TO else_8776066353674
+		j else_8776066353674
+		
+		then_8776066353674:
+		
+		# ALLOCATING INT -> 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 1
+		sw $t0, 8($v0)
+		sw $v0, 168($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [i]
+		lw $t0, 232($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_19]
+		lw $t0, 180($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 176($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING INT -> 4
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 4
+		sw $t0, 8($v0)
+		sw $v0, 156($sp)
+		
+		# GET METHOD length OF String
+		lw $t0, 248($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 156($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 152($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [s]
+		lw $t0, 256($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_23
+		lw $t0, 160($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 168($sp)
+		addi $sp, $sp, 8
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [internal_21]
+		lw $t0, 172($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [i]
+		lw $t0, 232($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_sub
+		jal function_sub
+		lw $ra, 8($sp)
+		sw $v1, 160($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING INT -> 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 1
+		sw $t0, 8($v0)
+		sw $v0, 144($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [internal_24]
+		lw $t0, 160($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_25]
+		lw $t0, 156($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_sub
+		jal function_sub
+		lw $ra, 8($sp)
+		sw $v1, 152($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING INT -> 6
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 6
+		sw $t0, 8($v0)
+		sw $v0, 132($sp)
+		
+		# GET METHOD substr OF String
+		lw $t0, 248($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 132($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 128($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -16
+		sw $ra, 12($sp)
+		
+		# ARGUMENT [s]
+		lw $t0, 264($sp)
+		sw $t0, 8($sp)
+		
+		# ARGUMENT [internal_20]
+		lw $t0, 180($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_26]
+		lw $t0, 156($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_29
+		lw $t0, 144($sp)
+		jalr $t0
+		lw $ra, 12($sp)
+		sw $v1, 152($sp)
+		addi $sp, $sp, 16
+		
+		# SET ATTRIBUTE rest OF self
+		lw $t0, 252($sp)
+		lw $t1, 136($sp)
+		beq $t1, $zero, object_set_attribute_8776066261523
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066261523
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066261523
+		j object_set_attribute_8776066261523
+		int_set_attribute_8776066261523:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066261523
+		bool_set_attribute_8776066261523:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066261523
+		object_set_attribute_8776066261523:
+		sw $t1, 12($t0)
+		end_set_attribute_8776066261523:
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [i]
+		lw $t0, 232($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [j]
+		lw $t0, 248($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_assign
+		jal function_assign
+		lw $ra, 8($sp)
+		sw $v1, 232($sp)
+		addi $sp, $sp, 12
+		
+		# internal_15 <- i
+		lw $t0, 220($sp)
+		sw $t0, 184($sp)
+		
+		# JUMP TO endif_8776066353674
+		j endif_8776066353674
+		
+		else_8776066353674:
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 120($sp)
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 10
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0)
+		
+		addi $t0, $zero, 10
+		sw $t0, 4($v0)
+		
+		addi $t0, $zero, 44
+		sb $t0, 8($v0)
+		
+		sb $zero, 9($v0)
+		
+		sw $v0, 116($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [c]
+		lw $t0, 216($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_32]
+		lw $t0, 128($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_equal
+		jal function_equal
+		lw $ra, 8($sp)
+		sw $v1, 124($sp)
+		addi $sp, $sp, 12
+		
+		# internal_31 <- internal_33
+		lw $t0, 112($sp)
+		sw $t0, 120($sp)
+		
+		# IF internal_31 THEN GOTO then_8776066353791
+		lw $t0, 120($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, then_8776066353791
+		
+		# JUMP TO else_8776066353791
+		j else_8776066353791
+		
+		then_8776066353791:
+		
+		# ALLOCATING INT -> 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 1
+		sw $t0, 8($v0)
+		sw $v0, 108($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [i]
+		lw $t0, 232($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_34]
+		lw $t0, 120($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 116($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING INT -> 4
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 4
+		sw $t0, 8($v0)
+		sw $v0, 96($sp)
+		
+		# GET METHOD length OF String
+		lw $t0, 248($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 96($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 92($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [s]
+		lw $t0, 256($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_38
+		lw $t0, 100($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 108($sp)
+		addi $sp, $sp, 8
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [internal_36]
+		lw $t0, 112($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [i]
+		lw $t0, 232($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_sub
+		jal function_sub
+		lw $ra, 8($sp)
+		sw $v1, 100($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING INT -> 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 1
+		sw $t0, 8($v0)
+		sw $v0, 84($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [internal_39]
+		lw $t0, 100($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_40]
+		lw $t0, 96($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_sub
+		jal function_sub
+		lw $ra, 8($sp)
+		sw $v1, 92($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING INT -> 6
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 6
+		sw $t0, 8($v0)
+		sw $v0, 72($sp)
+		
+		# GET METHOD substr OF String
+		lw $t0, 248($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 72($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 68($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -16
+		sw $ra, 12($sp)
+		
+		# ARGUMENT [s]
+		lw $t0, 264($sp)
+		sw $t0, 8($sp)
+		
+		# ARGUMENT [internal_35]
+		lw $t0, 120($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_41]
+		lw $t0, 96($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_44
+		lw $t0, 84($sp)
+		jalr $t0
+		lw $ra, 12($sp)
+		sw $v1, 92($sp)
+		addi $sp, $sp, 16
+		
+		# SET ATTRIBUTE rest OF self
+		lw $t0, 252($sp)
+		lw $t1, 76($sp)
+		beq $t1, $zero, object_set_attribute_8776066262420
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066262420
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066262420
+		j object_set_attribute_8776066262420
+		int_set_attribute_8776066262420:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066262420
+		bool_set_attribute_8776066262420:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066262420
+		object_set_attribute_8776066262420:
+		sw $t1, 12($t0)
+		end_set_attribute_8776066262420:
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [i]
+		lw $t0, 232($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [j]
+		lw $t0, 248($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_assign
+		jal function_assign
+		lw $ra, 8($sp)
+		sw $v1, 232($sp)
+		addi $sp, $sp, 12
+		
+		# internal_30 <- i
+		lw $t0, 220($sp)
+		sw $t0, 124($sp)
+		
+		# JUMP TO endif_8776066353791
+		j endif_8776066353791
+		
+		else_8776066353791:
+		
+		# ALLOCATING INT -> 10
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 10
+		sw $t0, 8($v0)
+		sw $v0, 64($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [int]
+		lw $t0, 256($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_45]
+		lw $t0, 76($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_mult
+		jal function_mult
+		lw $ra, 8($sp)
+		sw $v1, 72($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING INT -> 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 1
+		sw $t0, 8($v0)
+		sw $v0, 56($sp)
+		
+		# ALLOCATING INT -> 6
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 6
+		sw $t0, 8($v0)
+		sw $v0, 48($sp)
+		
+		# GET METHOD substr OF String
+		lw $t0, 248($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 48($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 44($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -16
+		sw $ra, 12($sp)
+		
+		# ARGUMENT [s]
+		lw $t0, 264($sp)
+		sw $t0, 8($sp)
+		
+		# ARGUMENT [i]
+		lw $t0, 236($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_47]
+		lw $t0, 72($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_50
+		lw $t0, 60($sp)
+		jalr $t0
+		lw $ra, 12($sp)
+		sw $v1, 68($sp)
+		addi $sp, $sp, 16
+		
+		# ALLOCATING INT -> 10
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 10
+		sw $t0, 8($v0)
+		sw $v0, 36($sp)
+		
+		# GET METHOD c2i OF Parse
+		lw $t0, 252($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 36($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 32($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 264($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_48]
+		lw $t0, 64($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_53
+		lw $t0, 44($sp)
+		jalr $t0
+		lw $ra, 8($sp)
+		sw $v1, 52($sp)
+		addi $sp, $sp, 12
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [internal_46]
+		lw $t0, 72($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_51]
+		lw $t0, 52($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 40($sp)
+		addi $sp, $sp, 12
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [int]
+		lw $t0, 256($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_54]
+		lw $t0, 40($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_assign
+		jal function_assign
+		lw $ra, 8($sp)
+		sw $v1, 256($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING INT -> 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 1
+		sw $t0, 8($v0)
+		sw $v0, 24($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [i]
+		lw $t0, 232($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_55]
+		lw $t0, 36($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_add
+		jal function_add
+		lw $ra, 8($sp)
+		sw $v1, 32($sp)
+		addi $sp, $sp, 12
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [i]
+		lw $t0, 232($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [internal_56]
+		lw $t0, 32($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_assign
+		jal function_assign
+		lw $ra, 8($sp)
+		sw $v1, 232($sp)
+		addi $sp, $sp, 12
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 12($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -12
+		sw $ra, 8($sp)
+		
+		# ARGUMENT [i]
+		lw $t0, 232($sp)
+		sw $t0, 4($sp)
+		
+		# ARGUMENT [j]
+		lw $t0, 248($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function_equal
+		jal function_equal
+		lw $ra, 8($sp)
+		sw $v1, 20($sp)
+		addi $sp, $sp, 12
+		
+		# internal_58 <- internal_59
+		lw $t0, 8($sp)
+		sw $t0, 12($sp)
+		
+		# IF internal_58 THEN GOTO then_8776066354270
+		lw $t0, 12($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, then_8776066354270
+		
+		# JUMP TO else_8776066354270
+		j else_8776066354270
+		
+		then_8776066354270:
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 9
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0)
+		
+		addi $t0, $zero, 9
+		sw $t0, 4($v0)
+		
+		sb $zero, 8($v0)
+		
+		sw $v0, 4($sp)
+		
+		# SET ATTRIBUTE rest OF self
+		lw $t0, 252($sp)
+		lw $t1, 4($sp)
+		beq $t1, $zero, object_set_attribute_8776066264101
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066264101
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066264101
+		j object_set_attribute_8776066264101
+		int_set_attribute_8776066264101:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066264101
+		bool_set_attribute_8776066264101:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066264101
+		object_set_attribute_8776066264101:
+		sw $t1, 12($t0)
+		end_set_attribute_8776066264101:
+		
+		# internal_57 <- internal_60
+		lw $t0, 4($sp)
+		sw $t0, 16($sp)
+		
+		# JUMP TO endif_8776066354270
+		j endif_8776066354270
+		
+		else_8776066354270:
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 9
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0)
+		
+		addi $t0, $zero, 9
+		sw $t0, 4($v0)
+		
+		sb $zero, 8($v0)
+		
+		sw $v0, 0($sp)
+		
+		# internal_57 <- internal_61
+		lw $t0, 0($sp)
+		sw $t0, 16($sp)
+		
+		# JUMP TO endif_8776066354270
+		j endif_8776066354270
+		
+		endif_8776066354270:
+		
+		# internal_30 <- internal_57
+		lw $t0, 16($sp)
+		sw $t0, 124($sp)
+		
+		# JUMP TO endif_8776066353791
+		j endif_8776066353791
+		
+		endif_8776066353791:
+		
+		# internal_15 <- internal_30
+		lw $t0, 124($sp)
+		sw $t0, 184($sp)
+		
+		# JUMP TO endif_8776066353674
+		j endif_8776066353674
+		
+		endif_8776066353674:
+		
+		# JUMP TO while_start_8776066352201
+		j while_start_8776066352201
+		
+		while_end_8776066352201:
+		
+		lw $v1, 244($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 248
+		
+		jr $ra
+		
+	function___init___at_Main:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -20
+		
+		# ALLOCATING -> BoolOp
+		li $v0, 9
+		lw $a0, type_BoolOp
+		syscall
+		la $t0, type_BoolOp
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		sw $v0, 16($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [internal_0]
+		lw $t0, 24($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function___init___at_BoolOp
+		jal function___init___at_BoolOp
+		lw $ra, 4($sp)
+		sw $v1, 24($sp)
+		addi $sp, $sp, 8
+		
+		# SET ATTRIBUTE boolop OF self
+		lw $t0, 20($sp)
+		lw $t1, 16($sp)
+		beq $t1, $zero, object_set_attribute_8776066260905
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066260905
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066260905
+		j object_set_attribute_8776066260905
+		int_set_attribute_8776066260905:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0)
+		j end_set_attribute_8776066260905
+		bool_set_attribute_8776066260905:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 8($t0)
+		j end_set_attribute_8776066260905
+		object_set_attribute_8776066260905:
+		sw $t1, 8($t0)
+		end_set_attribute_8776066260905:
+		
+		# ALLOCATING STRING
+		li $v0, 9
+		addi $a0, $zero, 9
+		syscall
+		
+		la $t0, type_String
+		sw $t0, 0($v0)
+		
+		addi $t0, $zero, 9
+		sw $t0, 4($v0)
+		
+		sb $zero, 8($v0)
+		
+		sw $v0, 12($sp)
+		
+		# SET ATTRIBUTE rest OF self
+		lw $t0, 20($sp)
+		lw $t1, 12($sp)
+		beq $t1, $zero, object_set_attribute_8776066264176
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066264176
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066264176
+		j object_set_attribute_8776066264176
+		int_set_attribute_8776066264176:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066264176
+		bool_set_attribute_8776066264176:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($t0)
+		j end_set_attribute_8776066264176
+		object_set_attribute_8776066264176:
+		sw $t1, 12($t0)
+		end_set_attribute_8776066264176:
+		
+		# ALLOCATING INT -> 8
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 8
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# GET METHOD read_input OF Main
+		lw $t0, 20($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [self]
+		lw $t0, 28($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_4
+		lw $t0, 8($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 16($sp)
+		addi $sp, $sp, 8
+		
+		# SET ATTRIBUTE g OF self
+		lw $t0, 20($sp)
+		lw $t1, 8($sp)
+		beq $t1, $zero, object_set_attribute_8776066264197
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_set_attribute_8776066264197
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_set_attribute_8776066264197
+		j object_set_attribute_8776066264197
+		int_set_attribute_8776066264197:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 16($t0)
+		j end_set_attribute_8776066264197
+		bool_set_attribute_8776066264197:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 16($t0)
+		j end_set_attribute_8776066264197
+		object_set_attribute_8776066264197:
+		sw $t1, 16($t0)
+		end_set_attribute_8776066264197:
+		
+		lw $v1, 20($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 20
+		
+		jr $ra
+		
+	function_main_at_Main:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -32
+		
+		# GET ATTRIBUTE g OF self
+		lw $t0, 32($sp)
+		lw $t1, 16($t0)
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8776066264284
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8776066264284
+		j object_get_attribute_8776066264284
+		int_get_attribute_8776066264284:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 28($sp)
+		j end_get_attribute_8776066264284
+		bool_get_attribute_8776066264284:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 28($sp)
+		j end_get_attribute_8776066264284
+		object_get_attribute_8776066264284:
+		sw $t1, 28($sp)
+		end_get_attribute_8776066264284:
+		
+		# ALLOCATING INT -> 6
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 6
+		sw $t0, 8($v0)
+		sw $v0, 20($sp)
+		
+		# GET METHOD print_V OF Graph
+		lw $t0, 28($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 20($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 16($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [internal_0]
+		lw $t0, 36($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_3
+		lw $t0, 24($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 32($sp)
+		addi $sp, $sp, 8
+		
+		# GET ATTRIBUTE g OF self
+		lw $t0, 32($sp)
+		lw $t1, 16($t0)
+		lw $t2, 0($t1)
+		la $t3, type_Int
+		la $t4, type_Bool
+		addi $t5, $zero, 1
+		seq $t6, $t2, $t3
+		beq $t6, $t5, int_get_attribute_8776066264598
+		seq $t6, $t2, $t4
+		beq $t6, $t5, bool_get_attribute_8776066264598
+		j object_get_attribute_8776066264598
+		int_get_attribute_8776066264598:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t3, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($sp)
+		j end_get_attribute_8776066264598
+		bool_get_attribute_8776066264598:
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		sw $t4, 0($v0)
+		sw $a0, 4($v0)
+		lw $t5, 8($t1)
+		sw $t5, 8($v0)
+		sw $v0, 12($sp)
+		j end_get_attribute_8776066264598
+		object_get_attribute_8776066264598:
+		sw $t1, 12($sp)
+		end_get_attribute_8776066264598:
+		
+		# ALLOCATING INT -> 5
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 5
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# GET METHOD print_E OF Graph
+		lw $t0, 12($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [internal_4]
+		lw $t0, 20($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_7
+		lw $t0, 8($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 16($sp)
+		addi $sp, $sp, 8
+		
+		lw $v1, 8($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 32
+		
+		jr $ra
+		
+	function___init___at_BoolOp:
+		lw $v1, 0($sp)
+		
+		jr $ra
+		
+	function_and_at_BoolOp:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -12
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# internal_1 <- b1
+		lw $t0, 16($sp)
+		sw $t0, 4($sp)
+		
+		# IF internal_1 THEN GOTO then_8776066352132
+		lw $t0, 4($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, then_8776066352132
+		
+		# JUMP TO else_8776066352132
+		j else_8776066352132
+		
+		then_8776066352132:
+		
+		# internal_0 <- b2
+		lw $t0, 12($sp)
+		sw $t0, 8($sp)
+		
+		# JUMP TO endif_8776066352132
+		j endif_8776066352132
+		
+		else_8776066352132:
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 0($sp)
+		
+		# internal_0 <- internal_2
+		lw $t0, 0($sp)
+		sw $t0, 8($sp)
+		
+		# JUMP TO endif_8776066352132
+		j endif_8776066352132
+		
+		endif_8776066352132:
+		
+		lw $v1, 8($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 12
+		
+		jr $ra
+		
+	function_or_at_BoolOp:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -12
+		
+		# ALLOCATING BOOL -> 0
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 0
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# internal_1 <- b1
+		lw $t0, 16($sp)
+		sw $t0, 4($sp)
+		
+		# IF internal_1 THEN GOTO then_8776066352222
+		lw $t0, 4($sp)
+		lw $t0, 8($t0)
+		addi $t1, $zero, 1
+		beq $t0, $t1, then_8776066352222
+		
+		# JUMP TO else_8776066352222
+		j else_8776066352222
+		
+		then_8776066352222:
+		
+		# ALLOCATING BOOL -> 1
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Bool
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 1
+		sw $t0, 8($v0)
+		sw $v0, 0($sp)
+		
+		# internal_0 <- internal_2
+		lw $t0, 0($sp)
+		sw $t0, 8($sp)
+		
+		# JUMP TO endif_8776066352222
+		j endif_8776066352222
+		
+		else_8776066352222:
+		
+		# internal_0 <- b2
+		lw $t0, 12($sp)
+		sw $t0, 8($sp)
+		
+		# JUMP TO endif_8776066352222
+		j endif_8776066352222
+		
+		endif_8776066352222:
+		
+		lw $v1, 8($sp)
+		
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, 12
+		
+		jr $ra
+		
+	main:
+		# SPACE FOR LOCAL VARIABLES
+		addi $sp, $sp, -16
+		
+		# ALLOCATING -> Main
+		li $v0, 9
+		lw $a0, type_Main
+		syscall
+		la $t0, type_Main
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		sw $v0, 12($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [internal_0]
+		lw $t0, 20($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING STATIC FUNCTION function___init___at_Main
+		jal function___init___at_Main
+		lw $ra, 4($sp)
+		sw $v1, 20($sp)
+		addi $sp, $sp, 8
+		
+		# ALLOCATING INT -> 13
+		li $v0, 9
+		addi $a0, $zero, 12
+		syscall
+		
+		la $t0, type_Int
+		sw $t0, 0($v0)
+		sw $a0, 4($v0)
+		addi $t0, $zero, 13
+		sw $t0, 8($v0)
+		sw $v0, 4($sp)
+		
+		# GET METHOD main OF Main
+		lw $t0, 12($sp)
+		lw $t0, 0($t0)
+		addi $t0, $t0, 12
+		lw $t1, 4($sp)
+		lw $t1, 8($t1)
+		sll $t1, $t1, 2
+		add $t0, $t0, $t1
+		lw $t0, 0($t0)
+		sw $t0, 0($sp)
+		
+		# FUNCTION ARG
+		addi $sp, $sp, -8
+		sw $ra, 4($sp)
+		
+		# ARGUMENT [internal_0]
+		lw $t0, 20($sp)
+		sw $t0, 0($sp)
+		
+		# CALLING DYNAMIC FUNCTION -> internal_3
+		lw $t0, 8($sp)
+		jalr $t0
+		lw $ra, 4($sp)
+		sw $v1, 16($sp)
+		addi $sp, $sp, 8
+		
+		# EXIT!
+		li $v0, 10
+		syscall
+		
+		
