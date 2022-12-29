@@ -1,10 +1,10 @@
 members:
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
-  - name: Nombre Apellido1 Apellido2
-    github: github_id
-    group: CXXX
+  - name: Marcos Adrian Valdivie Rodriguez
+    github: mavaldivie
+    group: C412
+  - name: Claudia Olavarrieta Martinez
+    github: ClaudiOM
+    group: C411
+  - name: Adrian Hernandez Perez
+    github: AdrianHP
+    group: C411

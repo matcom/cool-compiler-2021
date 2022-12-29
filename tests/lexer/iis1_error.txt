@@ -1,1 +1,1 @@
-(4, 2) - LexicographicError: ERROR "!"  
+(4, 2) - LexicographicError: ERROR "!"
