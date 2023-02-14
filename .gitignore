@@ -292,6 +292,10 @@ TSWLatexianTemp*
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+# Created by .ignore support plugin (hsz.mobi)
+### Python template
+# Byte-compiled / optimized / DLL files
+__pycache__/
 *$py.class
 
 # C extensions
@@ -357,16 +361,6 @@ target/
 # pyenv
 .python-version
 
-# pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   having no cross-platform support, pipenv may install dependencies that don't work, or not
-#   install all needed dependencies.
-#Pipfile.lock
-
-# celery beat schedule file
-celerybeat-schedule
-
 # SageMath parsed files
 *.sage.py
 
@@ -394,16 +388,17 @@ dmypy.json
 .pyre/
 
 ### VisualStudioCode ###
+.vscode
 .vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+# !.vscode/settings.json
+# !.vscode/tasks.json
+# !.vscode/launch.json
+# !.vscode/extensions.json
 
 ### VisualStudioCode Patch ###
 # Ignore all local history of files
 .history
-
+.idea
 # End of https://www.gitignore.io/api/visualstudiocode,linux,latex,python
 
 # Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
