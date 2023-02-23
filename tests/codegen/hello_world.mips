@@ -1,0 +1,703 @@
+.data
+			Int_name:     .asciiz      "Int"
+			Int_size:     .word     16
+__virtual_table__Int:
+			 .word function_abort_at_Object
+			 .word function_type_name_at_Object
+			 .word function_copy_at_Object
+			String_name:     .asciiz      "String"
+			String_size:     .word     16
+__virtual_table__String:
+			 .word function_abort_at_Object
+			 .word function_type_name_at_Object
+			 .word function_copy_at_Object
+			 .word function_length_at_String
+			 .word function_concat_at_String
+			 .word function_substr_at_String
+			Bool_name:     .asciiz      "Bool"
+			Bool_size:     .word     16
+__virtual_table__Bool:
+			 .word function_abort_at_Object
+			 .word function_type_name_at_Object
+			 .word function_copy_at_Object
+			Object_name:     .asciiz      "Object"
+			Object_size:     .word     12
+__virtual_table__Object:
+			 .word function_abort_at_Object
+			 .word function_type_name_at_Object
+			 .word function_copy_at_Object
+			IO_name:     .asciiz      "IO"
+			IO_size:     .word     12
+__virtual_table__IO:
+			 .word function_abort_at_Object
+			 .word function_type_name_at_Object
+			 .word function_copy_at_Object
+			 .word function_out_string_at_IO
+			 .word function_out_int_at_IO
+			 .word function_in_int_at_IO
+			 .word function_in_string_at_IO
+			Main_name:     .asciiz      "Main"
+			Main_size:     .word     12
+__virtual_table__Main:
+			 .word function_abort_at_Object
+			 .word function_type_name_at_Object
+			 .word function_copy_at_Object
+			 .word function_out_string_at_IO
+			 .word function_out_int_at_IO
+			 .word function_in_int_at_IO
+			 .word function_in_string_at_IO
+			 .word function_main_at_Main
+			_empty:     .asciiz      ""
+			data_1:     .asciiz      "n"
+            _error1:    .asciiz     "Abort called from class "
+            _salto_para_abort: .asciiz "
+"
+            _buffer:    .space      2048
+            _void:      .asciiz       ""
+             
+
+.text
+main:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -12
+
+ #init allocate
+
+			li $v0, 9
+			lw $a0, Main_size
+			syscall
+			sw $v0, -4($fp)
+
+ #end allocate
+
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada al constructor
+
+			jal function_Ctr_at_Main
+			sw $a0, -8($fp)
+
+ #fin llamada dinamica
+
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -8($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada dinamica
+
+			la $a0, __virtual_table__Main
+			lw $a0, 28($a0)
+			jalr $a0
+			sw $a0, -12($fp)
+
+ #fin llamada dinamica
+
+
+ #retornando el valor
+
+			li $a0, 0
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 20
+			lw $fp, 0($sp)
+			jr $ra
+function_main_at_Main:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -8
+			la $t1, data_1
+			sw $t1, -8($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -8($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -4($fp)
+
+ #retornando el valor
+
+			lw $a0, -4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 20
+			lw $fp, 0($sp)
+			jr $ra
+function_Ctr_at_Main:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -4
+
+ #LOAD inicia
+
+			la $t1, Main_name
+			lw $t2, 4($fp)
+			sw $t1, 0($t2)
+
+ #LOAD inicia
+
+			lw $t1, Main_size
+			lw $t2, 4($fp)
+			sw $t1, 4($t2)
+
+ #LOAD inicia
+
+			la $t1, __virtual_table__Main
+			lw $t2, 4($fp)
+			sw $t1, 8($t2)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada al constructor
+
+			jal function_Init_at_Main
+			sw $a0, -4($fp)
+
+ #fin llamada dinamica
+
+
+ #retornando el valor
+
+			lw $a0, 4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 16
+			lw $fp, 0($sp)
+			jr $ra
+function_Init_at_Main:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -4
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada al constructor
+
+			jal function_Init_at_IO
+			sw $a0, -4($fp)
+
+ #fin llamada dinamica
+
+
+ #retornando el valor
+
+			lw $a0, 4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 16
+			lw $fp, 0($sp)
+			jr $ra
+
+
+function_Ctr_at_Object:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+
+            la $t1, Object_name
+			lw $t2, 4($fp)
+			sw $t1, 0($t2)
+
+			lw $t1, Object_size
+			lw $t2, 4($fp)
+			sw $t1, 4($t2)
+
+			la $t1, __virtual_table__Object
+			lw $t2, 4($fp)
+			sw $t1, 8($t2)
+
+
+            lw $a0, 4($fp)
+
+            lw $ra, 0($fp)
+            addiu $sp, $sp, 12
+            lw $fp, 0($sp)
+            jr $ra 
+
+function_Init_at_Object:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+
+            lw $a0, 4($fp)
+
+            lw $ra, 0($fp)
+            addiu $sp, $sp, 12
+            lw $fp, 0($sp)
+            jr $ra 
+
+function_Ctr_at_IO:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+
+            la $t1, IO_name
+			lw $t2, 4($fp)
+			sw $t1, 0($t2)
+
+			lw $t1, IO_size
+			lw $t2, 4($fp)
+			sw $t1, 4($t2)
+
+			la $t1, __virtual_table__IO
+			lw $t2, 4($fp)
+			sw $t1, 8($t2)
+
+
+            lw $a0, 4($fp)
+
+            lw $ra, 0($fp)
+            addiu $sp, $sp, 12
+            lw $fp, 0($sp)
+            jr $ra 
+
+function_Init_at_IO:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+
+            lw $a0, 4($fp)
+
+            lw $ra, 0($fp)
+            addiu $sp, $sp, 12
+            lw $fp, 0($sp)
+            jr $ra 
+
+function_type_name_at_Object:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+            lw $a0, 4($fp)   
+            lw  $a0 0($a0)      
+            lw $ra, 0($fp)
+            addiu $sp, $sp, 12
+            lw $fp, 0($sp)
+            jr $ra
+
+function_abort_at_Object:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+            la $a0, _error1
+            li $v0, 4
+            syscall
+            lw $a0 4($fp)
+            lw $a0 ($a0)
+            li $v0, 4
+            syscall
+            la $a0, _salto_para_abort
+            li $v0, 4
+            syscall
+            li $v0, 10
+            syscall
+
+function_copy_at_Object:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+
+            lw $a0, 4($fp)
+            lw $a0, 0($a0)
+            la $t0, Int_name
+
+            bne $a0, $t0, not_int
+            lw $a0, 4($fp)
+            lw $a0, 8($a0)
+            j end
+
+        not_int:
+            lw $a0, 4($fp)
+            lw $a0, 0($a0)
+            la $t0, Bool_name
+
+            bne $a0, $t0, not_bool
+            lw $a0, 4($fp)
+            lw $a0, 8($a0)
+            j end
+
+        not_bool:
+            lw $a0, 4($fp)
+            lw $a0, 0($a0)
+            la $t0, String_name
+
+            bne $a0, $t0, not_string
+            lw $a0, 4($fp)
+            lw $a0, 8($a0)
+            j end
+
+        not_string:
+            lw $a0, 4($fp)
+            move $t2, $a0 
+            lw $a0, 4($a0)
+            move $t1, $a0
+
+            li $v0, 9
+            syscall
+
+            move $a0, $v0
+
+        copy:
+            lw $t0, 0($t2)
+            sw $t0, 0($a0)
+            addiu $a0, $a0, 4
+            addiu $t2, $t2, 4
+            addiu $t1, $t1, -4
+            bne $t1, $zero, copy
+
+            move $a0, $v0
+
+        end:
+            lw $ra, 0($fp)
+            addiu $sp, $sp, 12
+            lw $fp, 0($sp)
+            jr $ra 
+
+function_length_at_String:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+
+            lw $s0, 4($fp)
+            li $a0, -1
+
+        length:
+            lb $t0, ($s0)
+            addiu $a0, $a0, 1
+            addiu $s0, $s0, 1
+            bne $t0, $zero, length
+
+            lw $ra, 0($fp)
+            addiu $sp, $sp, 12
+            lw $fp, 0($sp)
+            jr $ra 
+
+function_concat_at_String:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+
+            lw $s1, 4($fp)
+            sw $fp, 0($sp)
+            addiu $sp, $sp, -4
+            sw $s1, 0($sp)
+            addiu $sp, $sp, -4
+            jal function_length_at_String
+
+            sw $a0, 0($sp)
+            addiu $sp, $sp, -4
+
+            lw $s1, 8($fp)
+            sw $fp, 0($sp)
+            addiu $sp, $sp, -4
+            sw $s1, 0($sp)
+            addiu $sp, $sp, -4
+            jal function_length_at_String
+
+            lw $t7, 4($sp)
+            addiu $sp, $sp, 4
+
+            move $t6, $a0
+            add $a0, $t7, $t6
+            addiu $a0, $a0, 1
+
+            li $v0, 9
+            syscall
+
+            move $t0, $v0
+
+            lw $s1, 4($fp)
+        copy_self:
+            lb $t5, ($s1)
+            beq $t5, $zero, end_copy_self
+            sb $t5, ($t0)
+            addiu $s1, $s1, 1
+            addiu $t0, $t0, 1
+            j copy_self
+
+        end_copy_self:
+            lw $s1, 8($fp)
+
+        copy_given:
+            lb $t5, ($s1)
+            sb $t5, ($t0)
+            addiu $s1, $s1, 1
+            addiu $t0, $t0, 1
+            bne $t5, $zero, copy_given
+
+
+            move $a0, $v0
+
+            lw $ra, 0($fp)
+            addiu $sp, $sp, 16
+            lw $fp, 0($sp)
+            jr $ra 
+
+
+function_substr_at_String:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+
+            lw $a0, 12($fp)
+            addiu $a0, $a0, 1
+            li $v0, 9
+            syscall
+
+            move $t0, $v0
+
+            lw $s1, 4($fp)
+            lw $t1, 8($fp)
+            add $s1, $s1, $t1
+
+            lw $t1, 12($fp)
+
+        substr:
+            lb $t5, ($s1)
+            sb $t5, ($t0)
+            addiu $s1, $s1, 1
+            addiu $t0, $t0, 1
+            addiu $t1, $t1, -1
+            bne $t1, $zero, substr
+
+            sb $zero, ($t0)
+            move $a0, $v0
+
+            lw $ra, 0($fp)
+            addiu $sp, $sp, 20
+            lw $fp, 0($sp)
+            jr $ra 
+
+
+function_comparer_string:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+
+            lw $s1, 4($fp)
+            sw $fp, 0($sp)
+            addiu $sp, $sp, -4
+            sw $s1, 0($sp)
+            addiu $sp, $sp, -4
+            jal function_length_at_String
+
+            sw $a0, 0($sp)
+            addiu $sp, $sp, -4
+
+            lw $s1, 8($fp)
+            sw $fp, 0($sp)
+            addiu $sp, $sp, -4
+            sw $s1, 0($sp)
+            addiu $sp, $sp, -4
+            jal function_length_at_String
+
+            lw $t7, 4($sp)
+            addiu $sp, $sp, 4
+
+            bne $t7, $a0, not_equals_strings
+
+            lw $t7, 4($fp)
+            lw $a0, 8($fp)
+
+        equal_chart:
+            lb $t1, ($t7)
+            lb $t2, ($a0)
+            addiu $t7, $t7, 1
+            addiu $a0, $a0, 1
+            bne $t1, $t2, not_equals_strings
+            beq $t1, $zero, equals_strings
+            j equal_chart
+
+        not_equals_strings:
+            li $a0, 0
+            j end_equal_string
+
+        equals_strings:
+            li $a0, 1
+
+        end_equal_string:
+            lw $ra, 0($fp)
+            addiu $sp, $sp, 16
+            lw $fp, 0($sp)
+            jr $ra 
+
+
+
+function_out_string_at_IO:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+
+            lw $a0, 8($fp)
+            li $v0, 4
+            syscall
+
+            lw $a0, 4($fp)
+
+            lw $ra, 0($fp)
+            addiu $sp, $sp, 16
+            lw $fp, 0($sp)
+            jr $ra 
+
+function_out_int_at_IO:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+
+            lw $a0, 8($fp)
+            li $v0, 1
+            syscall
+
+            lw $a0, 4($fp)
+
+            lw $ra, 0($fp)
+            addiu $sp, $sp, 16
+            lw $fp, 0($sp)
+            jr $ra 
+
+function_in_int_at_IO:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+
+            lw $a0, 4($fp)
+            li $v0, 5
+            syscall
+
+            move $a0, $v0
+
+            lw $ra, 0($fp)
+            addiu $sp, $sp, 12
+            lw $fp, 0($sp)
+            jr $ra 
+
+function_in_string_at_IO:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+
+            la $a0, _buffer
+            li $a1, 1024
+
+            li $v0, 8
+            syscall
+
+            sw $fp, 0($sp)
+            addiu $sp, $sp, -4
+            sw $a0, 0($sp)
+            addiu $sp, $sp, -4
+            jal function_length_at_String
+
+            addiu $a0, $a0, 1
+            li $v0, 9
+            syscall
+
+            move $t0, $v0
+            la $a0, _buffer
+
+        IO_copy:
+            lb $t1, ($a0)
+            sb $t1, ($t0)
+            addiu $a0, $a0, 1
+            addiu $t0, $t0, 1
+            bne $t1, $zero, IO_copy
+
+            addiu $t0, $t0, -2
+            li $t1 10
+            lb $t2, ($t0)
+            bne $t1 , $t2 not_slash
+            sb $zero, ($t0)
+
+            not_slash:
+            move $a0, $v0
+
+            lw $ra, 0($fp)
+            addiu $sp, $sp, 12
+            lw $fp, 0($sp)
+            jr $ra 
+
+            

@@ -1,0 +1,4673 @@
+.data
+			Int_name:     .asciiz      "Int"
+			Int_size:     .word     16
+__virtual_table__Int:
+			 .word function_abort_at_Object
+			 .word function_type_name_at_Object
+			 .word function_copy_at_Object
+			String_name:     .asciiz      "String"
+			String_size:     .word     16
+__virtual_table__String:
+			 .word function_abort_at_Object
+			 .word function_type_name_at_Object
+			 .word function_copy_at_Object
+			 .word function_length_at_String
+			 .word function_concat_at_String
+			 .word function_substr_at_String
+			Bool_name:     .asciiz      "Bool"
+			Bool_size:     .word     16
+__virtual_table__Bool:
+			 .word function_abort_at_Object
+			 .word function_type_name_at_Object
+			 .word function_copy_at_Object
+			Object_name:     .asciiz      "Object"
+			Object_size:     .word     12
+__virtual_table__Object:
+			 .word function_abort_at_Object
+			 .word function_type_name_at_Object
+			 .word function_copy_at_Object
+			IO_name:     .asciiz      "IO"
+			IO_size:     .word     12
+__virtual_table__IO:
+			 .word function_abort_at_Object
+			 .word function_type_name_at_Object
+			 .word function_copy_at_Object
+			 .word function_out_string_at_IO
+			 .word function_out_int_at_IO
+			 .word function_in_int_at_IO
+			 .word function_in_string_at_IO
+			Board_name:     .asciiz      "Board"
+			Board_size:     .word     24
+__virtual_table__Board:
+			 .word function_abort_at_Object
+			 .word function_type_name_at_Object
+			 .word function_copy_at_Object
+			 .word function_out_string_at_IO
+			 .word function_out_int_at_IO
+			 .word function_in_int_at_IO
+			 .word function_in_string_at_IO
+			 .word function_size_of_board_at_Board
+			 .word function_board_init_at_Board
+			CellularAutomaton_name:     .asciiz      "CellularAutomaton"
+			CellularAutomaton_size:     .word     28
+__virtual_table__CellularAutomaton:
+			 .word function_abort_at_Object
+			 .word function_type_name_at_Object
+			 .word function_copy_at_Object
+			 .word function_out_string_at_IO
+			 .word function_out_int_at_IO
+			 .word function_in_int_at_IO
+			 .word function_in_string_at_IO
+			 .word function_size_of_board_at_Board
+			 .word function_board_init_at_Board
+			 .word function_init_at_CellularAutomaton
+			 .word function_print_at_CellularAutomaton
+			 .word function_num_cells_at_CellularAutomaton
+			 .word function_cell_at_CellularAutomaton
+			 .word function_north_at_CellularAutomaton
+			 .word function_south_at_CellularAutomaton
+			 .word function_east_at_CellularAutomaton
+			 .word function_west_at_CellularAutomaton
+			 .word function_northwest_at_CellularAutomaton
+			 .word function_northeast_at_CellularAutomaton
+			 .word function_southeast_at_CellularAutomaton
+			 .word function_southwest_at_CellularAutomaton
+			 .word function_neighbors_at_CellularAutomaton
+			 .word function_cell_at_next_evolution_at_CellularAutomaton
+			 .word function_evolve_at_CellularAutomaton
+			 .word function_option_at_CellularAutomaton
+			 .word function_prompt_at_CellularAutomaton
+			 .word function_prompt2_at_CellularAutomaton
+			Main_name:     .asciiz      "Main"
+			Main_size:     .word     32
+__virtual_table__Main:
+			 .word function_abort_at_Object
+			 .word function_type_name_at_Object
+			 .word function_copy_at_Object
+			 .word function_out_string_at_IO
+			 .word function_out_int_at_IO
+			 .word function_in_int_at_IO
+			 .word function_in_string_at_IO
+			 .word function_size_of_board_at_Board
+			 .word function_board_init_at_Board
+			 .word function_init_at_CellularAutomaton
+			 .word function_print_at_CellularAutomaton
+			 .word function_num_cells_at_CellularAutomaton
+			 .word function_cell_at_CellularAutomaton
+			 .word function_north_at_CellularAutomaton
+			 .word function_south_at_CellularAutomaton
+			 .word function_east_at_CellularAutomaton
+			 .word function_west_at_CellularAutomaton
+			 .word function_northwest_at_CellularAutomaton
+			 .word function_northeast_at_CellularAutomaton
+			 .word function_southeast_at_CellularAutomaton
+			 .word function_southwest_at_CellularAutomaton
+			 .word function_neighbors_at_CellularAutomaton
+			 .word function_cell_at_next_evolution_at_CellularAutomaton
+			 .word function_evolve_at_CellularAutomaton
+			 .word function_option_at_CellularAutomaton
+			 .word function_prompt_at_CellularAutomaton
+			 .word function_prompt2_at_CellularAutomaton
+			 .word function_main_at_Main
+			_empty:     .asciiz      ""
+			data_1:     .asciiz      "n"
+			data_2:     .asciiz      "nn"
+			data_3:     .asciiz      "	n"
+            _error1:    .asciiz     "Abort called from class "
+            _salto_para_abort: .asciiz "
+"
+            _buffer:    .space      2048
+            _void:      .asciiz       ""
+             
+
+.text
+main:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -12
+
+ #init allocate
+
+			li $v0, 9
+			lw $a0, Main_size
+			syscall
+			sw $v0, -4($fp)
+
+ #end allocate
+
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada al constructor
+
+			jal function_Ctr_at_Main
+			sw $a0, -8($fp)
+
+ #fin llamada dinamica
+
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -8($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada dinamica
+
+			la $a0, __virtual_table__Main
+			lw $a0, 108($a0)
+			jalr $a0
+			sw $a0, -12($fp)
+
+ #fin llamada dinamica
+
+
+ #retornando el valor
+
+			li $a0, 0
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 20
+			lw $fp, 0($sp)
+			jr $ra
+function_size_of_board_at_Board:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -4
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 8($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada al constructor
+
+			jal function_length_at_String
+			sw $a0, -4($fp)
+
+ #fin llamada dinamica
+
+
+ #retornando el valor
+
+			lw $a0, -4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 20
+			lw $fp, 0($sp)
+			jr $ra
+function_board_init_at_Board:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -80
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 8($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 28($a0)
+			jalr $a0
+			sw $a0, -4($fp)
+			lw $t1, -4($fp)
+			sw $t1, -8($fp)
+			li $t1, size
+			li $a0, 15
+			sub $a0, $t1, $a0
+			sw $a0, -16($fp)
+			lw $a0, -16($fp)
+			bne $a0, $zero, label_board_init_at_Board_0
+			li $t1, 1
+			sw $t1, -12($fp)
+			j label_board_init_at_Board_1
+label_board_init_at_Board_0:
+			li $t1, 0
+			sw $t1, -12($fp)
+label_board_init_at_Board_1:
+			lw $a0, -12($fp)
+			bne $a0, $zero, label_board_init_at_Board_2
+			li $t1, size
+			li $a0, 16
+			sub $a0, $t1, $a0
+			sw $a0, -28($fp)
+			lw $a0, -28($fp)
+			bne $a0, $zero, label_board_init_at_Board_4
+			li $t1, 1
+			sw $t1, -24($fp)
+			j label_board_init_at_Board_5
+label_board_init_at_Board_4:
+			li $t1, 0
+			sw $t1, -24($fp)
+label_board_init_at_Board_5:
+			lw $a0, -24($fp)
+			bne $a0, $zero, label_board_init_at_Board_6
+			li $t1, size
+			li $a0, 20
+			sub $a0, $t1, $a0
+			sw $a0, -40($fp)
+			lw $a0, -40($fp)
+			bne $a0, $zero, label_board_init_at_Board_8
+			li $t1, 1
+			sw $t1, -36($fp)
+			j label_board_init_at_Board_9
+label_board_init_at_Board_8:
+			li $t1, 0
+			sw $t1, -36($fp)
+label_board_init_at_Board_9:
+			lw $a0, -36($fp)
+			bne $a0, $zero, label_board_init_at_Board_10
+			li $t1, size
+			li $a0, 21
+			sub $a0, $t1, $a0
+			sw $a0, -52($fp)
+			lw $a0, -52($fp)
+			bne $a0, $zero, label_board_init_at_Board_12
+			li $t1, 1
+			sw $t1, -48($fp)
+			j label_board_init_at_Board_13
+label_board_init_at_Board_12:
+			li $t1, 0
+			sw $t1, -48($fp)
+label_board_init_at_Board_13:
+			lw $a0, -48($fp)
+			bne $a0, $zero, label_board_init_at_Board_14
+			li $t1, size
+			li $a0, 25
+			sub $a0, $t1, $a0
+			sw $a0, -64($fp)
+			lw $a0, -64($fp)
+			bne $a0, $zero, label_board_init_at_Board_16
+			li $t1, 1
+			sw $t1, -60($fp)
+			j label_board_init_at_Board_17
+label_board_init_at_Board_16:
+			li $t1, 0
+			sw $t1, -60($fp)
+label_board_init_at_Board_17:
+			lw $a0, -60($fp)
+			bne $a0, $zero, label_board_init_at_Board_18
+			li $t1, size
+			li $a0, 28
+			sub $a0, $t1, $a0
+			sw $a0, -76($fp)
+			lw $a0, -76($fp)
+			bne $a0, $zero, label_board_init_at_Board_20
+			li $t1, 1
+			sw $t1, -72($fp)
+			j label_board_init_at_Board_21
+label_board_init_at_Board_20:
+			li $t1, 0
+			sw $t1, -72($fp)
+label_board_init_at_Board_21:
+			lw $a0, -72($fp)
+			bne $a0, $zero, label_board_init_at_Board_22
+
+ #init set attribute
+
+			lw $a0, 4($fp)
+			li $t1, 5
+			sw $t1, 12($a0)
+
+ #end set attribute
+
+
+ #init set attribute
+
+			lw $a0, 4($fp)
+			li $t1, 5
+			sw $t1, 16($a0)
+
+ #end set attribute
+
+
+ #init set attribute
+
+			lw $a0, 4($fp)
+			li $t1, size
+			sw $t1, 20($a0)
+
+ #end set attribute
+
+			li $t1, size
+			sw $t1, -80($fp)
+			j label_board_init_at_Board_23
+label_board_init_at_Board_22:
+
+ #init set attribute
+
+			lw $a0, 4($fp)
+			li $t1, 7
+			sw $t1, 12($a0)
+
+ #end set attribute
+
+
+ #init set attribute
+
+			lw $a0, 4($fp)
+			li $t1, 4
+			sw $t1, 16($a0)
+
+ #end set attribute
+
+
+ #init set attribute
+
+			lw $a0, 4($fp)
+			li $t1, size
+			sw $t1, 20($a0)
+
+ #end set attribute
+
+			li $t1, size
+			sw $t1, -80($fp)
+label_board_init_at_Board_23:
+			lw $t1, -80($fp)
+			sw $t1, -68($fp)
+			j label_board_init_at_Board_19
+label_board_init_at_Board_18:
+
+ #init set attribute
+
+			lw $a0, 4($fp)
+			li $t1, 5
+			sw $t1, 12($a0)
+
+ #end set attribute
+
+
+ #init set attribute
+
+			lw $a0, 4($fp)
+			li $t1, 5
+			sw $t1, 16($a0)
+
+ #end set attribute
+
+
+ #init set attribute
+
+			lw $a0, 4($fp)
+			li $t1, size
+			sw $t1, 20($a0)
+
+ #end set attribute
+
+			li $t1, size
+			sw $t1, -68($fp)
+label_board_init_at_Board_19:
+			lw $t1, -68($fp)
+			sw $t1, -56($fp)
+			j label_board_init_at_Board_15
+label_board_init_at_Board_14:
+
+ #init set attribute
+
+			lw $a0, 4($fp)
+			li $t1, 3
+			sw $t1, 12($a0)
+
+ #end set attribute
+
+
+ #init set attribute
+
+			lw $a0, 4($fp)
+			li $t1, 7
+			sw $t1, 16($a0)
+
+ #end set attribute
+
+
+ #init set attribute
+
+			lw $a0, 4($fp)
+			li $t1, size
+			sw $t1, 20($a0)
+
+ #end set attribute
+
+			li $t1, size
+			sw $t1, -56($fp)
+label_board_init_at_Board_15:
+			lw $t1, -56($fp)
+			sw $t1, -44($fp)
+			j label_board_init_at_Board_11
+label_board_init_at_Board_10:
+
+ #init set attribute
+
+			lw $a0, 4($fp)
+			li $t1, 4
+			sw $t1, 12($a0)
+
+ #end set attribute
+
+
+ #init set attribute
+
+			lw $a0, 4($fp)
+			li $t1, 5
+			sw $t1, 16($a0)
+
+ #end set attribute
+
+
+ #init set attribute
+
+			lw $a0, 4($fp)
+			li $t1, size
+			sw $t1, 20($a0)
+
+ #end set attribute
+
+			li $t1, size
+			sw $t1, -44($fp)
+label_board_init_at_Board_11:
+			lw $t1, -44($fp)
+			sw $t1, -32($fp)
+			j label_board_init_at_Board_7
+label_board_init_at_Board_6:
+
+ #init set attribute
+
+			lw $a0, 4($fp)
+			li $t1, 4
+			sw $t1, 12($a0)
+
+ #end set attribute
+
+
+ #init set attribute
+
+			lw $a0, 4($fp)
+			li $t1, 4
+			sw $t1, 16($a0)
+
+ #end set attribute
+
+
+ #init set attribute
+
+			lw $a0, 4($fp)
+			li $t1, size
+			sw $t1, 20($a0)
+
+ #end set attribute
+
+			li $t1, size
+			sw $t1, -32($fp)
+label_board_init_at_Board_7:
+			lw $t1, -32($fp)
+			sw $t1, -20($fp)
+			j label_board_init_at_Board_3
+label_board_init_at_Board_2:
+
+ #init set attribute
+
+			lw $a0, 4($fp)
+			li $t1, 3
+			sw $t1, 12($a0)
+
+ #end set attribute
+
+
+ #init set attribute
+
+			lw $a0, 4($fp)
+			li $t1, 5
+			sw $t1, 16($a0)
+
+ #end set attribute
+
+
+ #init set attribute
+
+			lw $a0, 4($fp)
+			li $t1, size
+			sw $t1, 20($a0)
+
+ #end set attribute
+
+			li $t1, size
+			sw $t1, -20($fp)
+label_board_init_at_Board_3:
+
+ #retornando el valor
+
+			lw $a0, 4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 96
+			lw $fp, 0($sp)
+			jr $ra
+function_Ctr_at_Board:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -4
+
+ #LOAD inicia
+
+			la $t1, Board_name
+			lw $t2, 4($fp)
+			sw $t1, 0($t2)
+
+ #LOAD inicia
+
+			lw $t1, Board_size
+			lw $t2, 4($fp)
+			sw $t1, 4($t2)
+
+ #LOAD inicia
+
+			la $t1, __virtual_table__Board
+			lw $t2, 4($fp)
+			sw $t1, 8($t2)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada al constructor
+
+			jal function_Init_at_Board
+			sw $a0, -4($fp)
+
+ #fin llamada dinamica
+
+
+ #retornando el valor
+
+			lw $a0, 4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 16
+			lw $fp, 0($sp)
+			jr $ra
+function_Init_at_Board:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -4
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada al constructor
+
+			jal function_Init_at_IO
+			sw $a0, -4($fp)
+
+ #fin llamada dinamica
+
+
+ #retornando el valor
+
+			lw $a0, 4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 16
+			lw $fp, 0($sp)
+			jr $ra
+function_init_at_CellularAutomaton:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -4
+
+ #init set attribute
+
+			lw $a0, 4($fp)
+			lw $t1, 8($fp)
+			sw $t1, 24($a0)
+
+ #end set attribute
+
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 8($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 32($a0)
+			jalr $a0
+			sw $a0, -4($fp)
+
+ #retornando el valor
+
+			lw $a0, 4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 20
+			lw $fp, 0($sp)
+			jr $ra
+function_print_at_CellularAutomaton:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -64
+			li $t1, 0
+			sw $t1, -4($fp)
+
+ #init get attribute
+
+			lw $a0, 4($fp)
+			lw $a0, 20($a0)
+			sw $a0, -8($fp)
+			lw $t1, -8($fp)
+			sw $t1, -12($fp)
+			la $t1, data_1
+			sw $t1, -20($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -20($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -16($fp)
+label_print_at_CellularAutomaton_0:
+			li $a0, []
+			bne $a0, $zero, label_print_at_CellularAutomaton_1
+			j label_print_at_CellularAutomaton_2
+label_print_at_CellularAutomaton_1:
+
+ #init get attribute
+
+			lw $a0, 4($fp)
+			lw $a0, 24($a0)
+			sw $a0, -32($fp)
+
+ #init get attribute
+
+			lw $a0, 4($fp)
+			lw $a0, 16($a0)
+			sw $a0, -36($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -36($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			li $a0, i
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -32($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada al constructor
+
+			jal function_substr_at_String
+			sw $a0, -28($fp)
+
+ #fin llamada dinamica
+
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -28($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -24($fp)
+			la $t1, data_1
+			sw $t1, -44($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -44($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -40($fp)
+
+ #init get attribute
+
+			lw $a0, 4($fp)
+			lw $a0, 16($a0)
+			sw $a0, -52($fp)
+			li $t1, i
+			lw $a0, -52($fp)
+			add $a0, $a0, $t1
+			sw $a0, -48($fp)
+			lw $t1, -48($fp)
+			sw $t1, -4($fp)
+			j label_print_at_CellularAutomaton_0
+label_print_at_CellularAutomaton_2:
+			la $t1, _void
+			sw $t1, -56($fp)
+			la $t1, data_1
+			sw $t1, -64($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -64($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -60($fp)
+
+ #retornando el valor
+
+			lw $a0, 4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 76
+			lw $fp, 0($sp)
+			jr $ra
+function_num_cells_at_CellularAutomaton:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -8
+
+ #init get attribute
+
+			lw $a0, 4($fp)
+			lw $a0, 24($a0)
+			sw $a0, -8($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -8($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada al constructor
+
+			jal function_length_at_String
+			sw $a0, -4($fp)
+
+ #fin llamada dinamica
+
+
+ #retornando el valor
+
+			lw $a0, -4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 20
+			lw $fp, 0($sp)
+			jr $ra
+function_cell_at_CellularAutomaton:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -16
+			li $a0, []
+			bne $a0, $zero, label_cell_at_CellularAutomaton_0
+
+ #init get attribute
+
+			lw $a0, 4($fp)
+			lw $a0, 24($a0)
+			sw $a0, -12($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			li $a0, 1
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 8($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -12($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada al constructor
+
+			jal function_substr_at_String
+			sw $a0, -8($fp)
+
+ #fin llamada dinamica
+
+			lw $t1, -8($fp)
+			sw $t1, -4($fp)
+			j label_cell_at_CellularAutomaton_1
+label_cell_at_CellularAutomaton_0:
+			la $t1, _empty
+			sw $t1, -16($fp)
+			lw $t1, -16($fp)
+			sw $t1, -4($fp)
+label_cell_at_CellularAutomaton_1:
+
+ #retornando el valor
+
+			lw $a0, -4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 32
+			lw $fp, 0($sp)
+			jr $ra
+function_north_at_CellularAutomaton:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -20
+			li $a0, []
+			bne $a0, $zero, label_north_at_CellularAutomaton_0
+
+ #init get attribute
+
+			lw $a0, 4($fp)
+			lw $a0, 16($a0)
+			sw $a0, -16($fp)
+			lw $t1, 8($fp)
+			lw $a0, -16($fp)
+			blt $t1, $a0, label_north_at_CellularAutomaton_2
+			li $a0, 0
+			j label_north_at_CellularAutomaton_3
+label_north_at_CellularAutomaton_2:
+			li $a0, 1
+label_north_at_CellularAutomaton_3:
+			sw $a0, -12($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -12($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 48($a0)
+			jalr $a0
+			sw $a0, -8($fp)
+			lw $t1, -8($fp)
+			sw $t1, -4($fp)
+			j label_north_at_CellularAutomaton_1
+label_north_at_CellularAutomaton_0:
+			la $t1, _empty
+			sw $t1, -20($fp)
+			lw $t1, -20($fp)
+			sw $t1, -4($fp)
+label_north_at_CellularAutomaton_1:
+
+ #retornando el valor
+
+			lw $a0, -4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 36
+			lw $fp, 0($sp)
+			jr $ra
+function_south_at_CellularAutomaton:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -20
+			li $a0, []
+			bne $a0, $zero, label_south_at_CellularAutomaton_0
+
+ #init get attribute
+
+			lw $a0, 4($fp)
+			lw $a0, 16($a0)
+			sw $a0, -16($fp)
+			lw $t1, 8($fp)
+			lw $a0, -16($fp)
+			add $a0, $a0, $t1
+			sw $a0, -12($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -12($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 48($a0)
+			jalr $a0
+			sw $a0, -8($fp)
+			lw $t1, -8($fp)
+			sw $t1, -4($fp)
+			j label_south_at_CellularAutomaton_1
+label_south_at_CellularAutomaton_0:
+			la $t1, _empty
+			sw $t1, -20($fp)
+			lw $t1, -20($fp)
+			sw $t1, -4($fp)
+label_south_at_CellularAutomaton_1:
+
+ #retornando el valor
+
+			lw $a0, -4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 36
+			lw $fp, 0($sp)
+			jr $ra
+function_east_at_CellularAutomaton:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -48
+			lw $t1, 8($fp)
+			li $a0, 1
+			add $a0, $a0, $t1
+			sw $a0, -16($fp)
+
+ #init get attribute
+
+			lw $a0, 4($fp)
+			lw $a0, 16($a0)
+			sw $a0, -20($fp)
+			lw $t1, -16($fp)
+			lw $a0, -20($fp)
+			div $a0, $t1, $a0
+			sw $a0, -12($fp)
+
+ #init get attribute
+
+			lw $a0, 4($fp)
+			lw $a0, 16($a0)
+			sw $a0, -24($fp)
+			lw $t1, -12($fp)
+			lw $a0, -24($fp)
+			mul $a0 $t1 $a0
+			sw $a0, -8($fp)
+			lw $t1, 8($fp)
+			li $a0, 1
+			add $a0, $a0, $t1
+			sw $a0, -28($fp)
+			lw $t1, -8($fp)
+			lw $a0, -28($fp)
+			sub $a0, $t1, $a0
+			sw $a0, -32($fp)
+			lw $a0, -32($fp)
+			bne $a0, $zero, label_east_at_CellularAutomaton_0
+			li $t1, 1
+			sw $t1, -4($fp)
+			j label_east_at_CellularAutomaton_1
+label_east_at_CellularAutomaton_0:
+			li $t1, 0
+			sw $t1, -4($fp)
+label_east_at_CellularAutomaton_1:
+			lw $a0, -4($fp)
+			bne $a0, $zero, label_east_at_CellularAutomaton_2
+			lw $t1, 8($fp)
+			li $a0, 1
+			add $a0, $a0, $t1
+			sw $a0, -44($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -44($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 48($a0)
+			jalr $a0
+			sw $a0, -40($fp)
+			lw $t1, -40($fp)
+			sw $t1, -36($fp)
+			j label_east_at_CellularAutomaton_3
+label_east_at_CellularAutomaton_2:
+			la $t1, _empty
+			sw $t1, -48($fp)
+			lw $t1, -48($fp)
+			sw $t1, -36($fp)
+label_east_at_CellularAutomaton_3:
+
+ #retornando el valor
+
+			lw $a0, -36($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 64
+			lw $fp, 0($sp)
+			jr $ra
+function_west_at_CellularAutomaton:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -56
+			lw $t1, 8($fp)
+			li $a0, 0
+			sub $a0, $t1, $a0
+			sw $a0, -8($fp)
+			lw $a0, -8($fp)
+			bne $a0, $zero, label_west_at_CellularAutomaton_0
+			li $t1, 1
+			sw $t1, -4($fp)
+			j label_west_at_CellularAutomaton_1
+label_west_at_CellularAutomaton_0:
+			li $t1, 0
+			sw $t1, -4($fp)
+label_west_at_CellularAutomaton_1:
+			lw $a0, -4($fp)
+			bne $a0, $zero, label_west_at_CellularAutomaton_2
+
+ #init get attribute
+
+			lw $a0, 4($fp)
+			lw $a0, 16($a0)
+			sw $a0, -28($fp)
+			lw $t1, 8($fp)
+			lw $a0, -28($fp)
+			div $a0, $t1, $a0
+			sw $a0, -24($fp)
+
+ #init get attribute
+
+			lw $a0, 4($fp)
+			lw $a0, 16($a0)
+			sw $a0, -32($fp)
+			lw $t1, -24($fp)
+			lw $a0, -32($fp)
+			mul $a0 $t1 $a0
+			sw $a0, -20($fp)
+			lw $t1, -20($fp)
+			lw $a0, 8($fp)
+			sub $a0, $t1, $a0
+			sw $a0, -36($fp)
+			lw $a0, -36($fp)
+			bne $a0, $zero, label_west_at_CellularAutomaton_4
+			li $t1, 1
+			sw $t1, -16($fp)
+			j label_west_at_CellularAutomaton_5
+label_west_at_CellularAutomaton_4:
+			li $t1, 0
+			sw $t1, -16($fp)
+label_west_at_CellularAutomaton_5:
+			lw $a0, -16($fp)
+			bne $a0, $zero, label_west_at_CellularAutomaton_6
+			lw $t1, 8($fp)
+			li $a0, 1
+			blt $t1, $a0, label_west_at_CellularAutomaton_8
+			li $a0, 0
+			j label_west_at_CellularAutomaton_9
+label_west_at_CellularAutomaton_8:
+			li $a0, 1
+label_west_at_CellularAutomaton_9:
+			sw $a0, -48($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -48($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 48($a0)
+			jalr $a0
+			sw $a0, -44($fp)
+			lw $t1, -44($fp)
+			sw $t1, -40($fp)
+			j label_west_at_CellularAutomaton_7
+label_west_at_CellularAutomaton_6:
+			la $t1, _empty
+			sw $t1, -52($fp)
+			lw $t1, -52($fp)
+			sw $t1, -40($fp)
+label_west_at_CellularAutomaton_7:
+			lw $t1, -40($fp)
+			sw $t1, -12($fp)
+			j label_west_at_CellularAutomaton_3
+label_west_at_CellularAutomaton_2:
+			la $t1, _empty
+			sw $t1, -56($fp)
+			lw $t1, -56($fp)
+			sw $t1, -12($fp)
+label_west_at_CellularAutomaton_3:
+
+ #retornando el valor
+
+			lw $a0, -12($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 72
+			lw $fp, 0($sp)
+			jr $ra
+function_northwest_at_CellularAutomaton:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -48
+			li $a0, []
+			bne $a0, $zero, label_northwest_at_CellularAutomaton_0
+
+ #init get attribute
+
+			lw $a0, 4($fp)
+			lw $a0, 16($a0)
+			sw $a0, -20($fp)
+			lw $t1, 8($fp)
+			lw $a0, -20($fp)
+			div $a0, $t1, $a0
+			sw $a0, -16($fp)
+
+ #init get attribute
+
+			lw $a0, 4($fp)
+			lw $a0, 16($a0)
+			sw $a0, -24($fp)
+			lw $t1, -16($fp)
+			lw $a0, -24($fp)
+			mul $a0 $t1 $a0
+			sw $a0, -12($fp)
+			lw $t1, -12($fp)
+			lw $a0, 8($fp)
+			sub $a0, $t1, $a0
+			sw $a0, -28($fp)
+			lw $a0, -28($fp)
+			bne $a0, $zero, label_northwest_at_CellularAutomaton_2
+			li $t1, 1
+			sw $t1, -8($fp)
+			j label_northwest_at_CellularAutomaton_3
+label_northwest_at_CellularAutomaton_2:
+			li $t1, 0
+			sw $t1, -8($fp)
+label_northwest_at_CellularAutomaton_3:
+			lw $a0, -8($fp)
+			bne $a0, $zero, label_northwest_at_CellularAutomaton_4
+			lw $t1, 8($fp)
+			li $a0, 1
+			blt $t1, $a0, label_northwest_at_CellularAutomaton_6
+			li $a0, 0
+			j label_northwest_at_CellularAutomaton_7
+label_northwest_at_CellularAutomaton_6:
+			li $a0, 1
+label_northwest_at_CellularAutomaton_7:
+			sw $a0, -40($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -40($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 52($a0)
+			jalr $a0
+			sw $a0, -36($fp)
+			lw $t1, -36($fp)
+			sw $t1, -32($fp)
+			j label_northwest_at_CellularAutomaton_5
+label_northwest_at_CellularAutomaton_4:
+			la $t1, _empty
+			sw $t1, -44($fp)
+			lw $t1, -44($fp)
+			sw $t1, -32($fp)
+label_northwest_at_CellularAutomaton_5:
+			lw $t1, -32($fp)
+			sw $t1, -4($fp)
+			j label_northwest_at_CellularAutomaton_1
+label_northwest_at_CellularAutomaton_0:
+			la $t1, _empty
+			sw $t1, -48($fp)
+			lw $t1, -48($fp)
+			sw $t1, -4($fp)
+label_northwest_at_CellularAutomaton_1:
+
+ #retornando el valor
+
+			lw $a0, -4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 64
+			lw $fp, 0($sp)
+			jr $ra
+function_northeast_at_CellularAutomaton:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -56
+			li $a0, []
+			bne $a0, $zero, label_northeast_at_CellularAutomaton_0
+			lw $t1, 8($fp)
+			li $a0, 1
+			add $a0, $a0, $t1
+			sw $a0, -20($fp)
+
+ #init get attribute
+
+			lw $a0, 4($fp)
+			lw $a0, 16($a0)
+			sw $a0, -24($fp)
+			lw $t1, -20($fp)
+			lw $a0, -24($fp)
+			div $a0, $t1, $a0
+			sw $a0, -16($fp)
+
+ #init get attribute
+
+			lw $a0, 4($fp)
+			lw $a0, 16($a0)
+			sw $a0, -28($fp)
+			lw $t1, -16($fp)
+			lw $a0, -28($fp)
+			mul $a0 $t1 $a0
+			sw $a0, -12($fp)
+			lw $t1, 8($fp)
+			li $a0, 1
+			add $a0, $a0, $t1
+			sw $a0, -32($fp)
+			lw $t1, -12($fp)
+			lw $a0, -32($fp)
+			sub $a0, $t1, $a0
+			sw $a0, -36($fp)
+			lw $a0, -36($fp)
+			bne $a0, $zero, label_northeast_at_CellularAutomaton_2
+			li $t1, 1
+			sw $t1, -8($fp)
+			j label_northeast_at_CellularAutomaton_3
+label_northeast_at_CellularAutomaton_2:
+			li $t1, 0
+			sw $t1, -8($fp)
+label_northeast_at_CellularAutomaton_3:
+			lw $a0, -8($fp)
+			bne $a0, $zero, label_northeast_at_CellularAutomaton_4
+			lw $t1, 8($fp)
+			li $a0, 1
+			add $a0, $a0, $t1
+			sw $a0, -48($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -48($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 52($a0)
+			jalr $a0
+			sw $a0, -44($fp)
+			lw $t1, -44($fp)
+			sw $t1, -40($fp)
+			j label_northeast_at_CellularAutomaton_5
+label_northeast_at_CellularAutomaton_4:
+			la $t1, _empty
+			sw $t1, -52($fp)
+			lw $t1, -52($fp)
+			sw $t1, -40($fp)
+label_northeast_at_CellularAutomaton_5:
+			lw $t1, -40($fp)
+			sw $t1, -4($fp)
+			j label_northeast_at_CellularAutomaton_1
+label_northeast_at_CellularAutomaton_0:
+			la $t1, _empty
+			sw $t1, -56($fp)
+			lw $t1, -56($fp)
+			sw $t1, -4($fp)
+label_northeast_at_CellularAutomaton_1:
+
+ #retornando el valor
+
+			lw $a0, -4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 72
+			lw $fp, 0($sp)
+			jr $ra
+function_southeast_at_CellularAutomaton:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -56
+			li $a0, []
+			bne $a0, $zero, label_southeast_at_CellularAutomaton_0
+			lw $t1, 8($fp)
+			li $a0, 1
+			add $a0, $a0, $t1
+			sw $a0, -20($fp)
+
+ #init get attribute
+
+			lw $a0, 4($fp)
+			lw $a0, 16($a0)
+			sw $a0, -24($fp)
+			lw $t1, -20($fp)
+			lw $a0, -24($fp)
+			div $a0, $t1, $a0
+			sw $a0, -16($fp)
+
+ #init get attribute
+
+			lw $a0, 4($fp)
+			lw $a0, 16($a0)
+			sw $a0, -28($fp)
+			lw $t1, -16($fp)
+			lw $a0, -28($fp)
+			mul $a0 $t1 $a0
+			sw $a0, -12($fp)
+			lw $t1, 8($fp)
+			li $a0, 1
+			add $a0, $a0, $t1
+			sw $a0, -32($fp)
+			lw $t1, -12($fp)
+			lw $a0, -32($fp)
+			sub $a0, $t1, $a0
+			sw $a0, -36($fp)
+			lw $a0, -36($fp)
+			bne $a0, $zero, label_southeast_at_CellularAutomaton_2
+			li $t1, 1
+			sw $t1, -8($fp)
+			j label_southeast_at_CellularAutomaton_3
+label_southeast_at_CellularAutomaton_2:
+			li $t1, 0
+			sw $t1, -8($fp)
+label_southeast_at_CellularAutomaton_3:
+			lw $a0, -8($fp)
+			bne $a0, $zero, label_southeast_at_CellularAutomaton_4
+			lw $t1, 8($fp)
+			li $a0, 1
+			add $a0, $a0, $t1
+			sw $a0, -48($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -48($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 56($a0)
+			jalr $a0
+			sw $a0, -44($fp)
+			lw $t1, -44($fp)
+			sw $t1, -40($fp)
+			j label_southeast_at_CellularAutomaton_5
+label_southeast_at_CellularAutomaton_4:
+			la $t1, _empty
+			sw $t1, -52($fp)
+			lw $t1, -52($fp)
+			sw $t1, -40($fp)
+label_southeast_at_CellularAutomaton_5:
+			lw $t1, -40($fp)
+			sw $t1, -4($fp)
+			j label_southeast_at_CellularAutomaton_1
+label_southeast_at_CellularAutomaton_0:
+			la $t1, _empty
+			sw $t1, -56($fp)
+			lw $t1, -56($fp)
+			sw $t1, -4($fp)
+label_southeast_at_CellularAutomaton_1:
+
+ #retornando el valor
+
+			lw $a0, -4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 72
+			lw $fp, 0($sp)
+			jr $ra
+function_southwest_at_CellularAutomaton:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -48
+			li $a0, []
+			bne $a0, $zero, label_southwest_at_CellularAutomaton_0
+
+ #init get attribute
+
+			lw $a0, 4($fp)
+			lw $a0, 16($a0)
+			sw $a0, -20($fp)
+			lw $t1, 8($fp)
+			lw $a0, -20($fp)
+			div $a0, $t1, $a0
+			sw $a0, -16($fp)
+
+ #init get attribute
+
+			lw $a0, 4($fp)
+			lw $a0, 16($a0)
+			sw $a0, -24($fp)
+			lw $t1, -16($fp)
+			lw $a0, -24($fp)
+			mul $a0 $t1 $a0
+			sw $a0, -12($fp)
+			lw $t1, -12($fp)
+			lw $a0, 8($fp)
+			sub $a0, $t1, $a0
+			sw $a0, -28($fp)
+			lw $a0, -28($fp)
+			bne $a0, $zero, label_southwest_at_CellularAutomaton_2
+			li $t1, 1
+			sw $t1, -8($fp)
+			j label_southwest_at_CellularAutomaton_3
+label_southwest_at_CellularAutomaton_2:
+			li $t1, 0
+			sw $t1, -8($fp)
+label_southwest_at_CellularAutomaton_3:
+			lw $a0, -8($fp)
+			bne $a0, $zero, label_southwest_at_CellularAutomaton_4
+			lw $t1, 8($fp)
+			li $a0, 1
+			blt $t1, $a0, label_southwest_at_CellularAutomaton_6
+			li $a0, 0
+			j label_southwest_at_CellularAutomaton_7
+label_southwest_at_CellularAutomaton_6:
+			li $a0, 1
+label_southwest_at_CellularAutomaton_7:
+			sw $a0, -40($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -40($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 56($a0)
+			jalr $a0
+			sw $a0, -36($fp)
+			lw $t1, -36($fp)
+			sw $t1, -32($fp)
+			j label_southwest_at_CellularAutomaton_5
+label_southwest_at_CellularAutomaton_4:
+			la $t1, _empty
+			sw $t1, -44($fp)
+			lw $t1, -44($fp)
+			sw $t1, -32($fp)
+label_southwest_at_CellularAutomaton_5:
+			lw $t1, -32($fp)
+			sw $t1, -4($fp)
+			j label_southwest_at_CellularAutomaton_1
+label_southwest_at_CellularAutomaton_0:
+			la $t1, _empty
+			sw $t1, -48($fp)
+			lw $t1, -48($fp)
+			sw $t1, -4($fp)
+label_southwest_at_CellularAutomaton_1:
+
+ #retornando el valor
+
+			lw $a0, -4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 64
+			lw $fp, 0($sp)
+			jr $ra
+function_neighbors_at_CellularAutomaton:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -156
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 8($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 52($a0)
+			jalr $a0
+			sw $a0, -36($fp)
+			la $t1, _empty
+			sw $t1, -40($fp)
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -36($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -40($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			jal function_comparer_string
+			sw $a0, -32($fp)
+			lw $a0, -32($fp)
+			bne $a0, $zero, label_neighbors_at_CellularAutomaton_0
+			li $t1, 0
+			sw $t1, -44($fp)
+			j label_neighbors_at_CellularAutomaton_1
+label_neighbors_at_CellularAutomaton_0:
+			li $t1, 1
+			sw $t1, -44($fp)
+label_neighbors_at_CellularAutomaton_1:
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 8($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 56($a0)
+			jalr $a0
+			sw $a0, -52($fp)
+			la $t1, _empty
+			sw $t1, -56($fp)
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -52($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -56($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			jal function_comparer_string
+			sw $a0, -48($fp)
+			lw $a0, -48($fp)
+			bne $a0, $zero, label_neighbors_at_CellularAutomaton_2
+			li $t1, 0
+			sw $t1, -60($fp)
+			j label_neighbors_at_CellularAutomaton_3
+label_neighbors_at_CellularAutomaton_2:
+			li $t1, 1
+			sw $t1, -60($fp)
+label_neighbors_at_CellularAutomaton_3:
+			lw $t1, -44($fp)
+			lw $a0, -60($fp)
+			add $a0, $a0, $t1
+			sw $a0, -28($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 8($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 60($a0)
+			jalr $a0
+			sw $a0, -68($fp)
+			la $t1, _empty
+			sw $t1, -72($fp)
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -68($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -72($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			jal function_comparer_string
+			sw $a0, -64($fp)
+			lw $a0, -64($fp)
+			bne $a0, $zero, label_neighbors_at_CellularAutomaton_4
+			li $t1, 0
+			sw $t1, -76($fp)
+			j label_neighbors_at_CellularAutomaton_5
+label_neighbors_at_CellularAutomaton_4:
+			li $t1, 1
+			sw $t1, -76($fp)
+label_neighbors_at_CellularAutomaton_5:
+			lw $t1, -28($fp)
+			lw $a0, -76($fp)
+			add $a0, $a0, $t1
+			sw $a0, -24($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 8($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 64($a0)
+			jalr $a0
+			sw $a0, -84($fp)
+			la $t1, _empty
+			sw $t1, -88($fp)
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -84($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -88($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			jal function_comparer_string
+			sw $a0, -80($fp)
+			lw $a0, -80($fp)
+			bne $a0, $zero, label_neighbors_at_CellularAutomaton_6
+			li $t1, 0
+			sw $t1, -92($fp)
+			j label_neighbors_at_CellularAutomaton_7
+label_neighbors_at_CellularAutomaton_6:
+			li $t1, 1
+			sw $t1, -92($fp)
+label_neighbors_at_CellularAutomaton_7:
+			lw $t1, -24($fp)
+			lw $a0, -92($fp)
+			add $a0, $a0, $t1
+			sw $a0, -20($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 8($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 72($a0)
+			jalr $a0
+			sw $a0, -100($fp)
+			la $t1, _empty
+			sw $t1, -104($fp)
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -100($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -104($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			jal function_comparer_string
+			sw $a0, -96($fp)
+			lw $a0, -96($fp)
+			bne $a0, $zero, label_neighbors_at_CellularAutomaton_8
+			li $t1, 0
+			sw $t1, -108($fp)
+			j label_neighbors_at_CellularAutomaton_9
+label_neighbors_at_CellularAutomaton_8:
+			li $t1, 1
+			sw $t1, -108($fp)
+label_neighbors_at_CellularAutomaton_9:
+			lw $t1, -20($fp)
+			lw $a0, -108($fp)
+			add $a0, $a0, $t1
+			sw $a0, -16($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 8($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 68($a0)
+			jalr $a0
+			sw $a0, -116($fp)
+			la $t1, _empty
+			sw $t1, -120($fp)
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -116($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -120($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			jal function_comparer_string
+			sw $a0, -112($fp)
+			lw $a0, -112($fp)
+			bne $a0, $zero, label_neighbors_at_CellularAutomaton_10
+			li $t1, 0
+			sw $t1, -124($fp)
+			j label_neighbors_at_CellularAutomaton_11
+label_neighbors_at_CellularAutomaton_10:
+			li $t1, 1
+			sw $t1, -124($fp)
+label_neighbors_at_CellularAutomaton_11:
+			lw $t1, -16($fp)
+			lw $a0, -124($fp)
+			add $a0, $a0, $t1
+			sw $a0, -12($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 8($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 76($a0)
+			jalr $a0
+			sw $a0, -132($fp)
+			la $t1, _empty
+			sw $t1, -136($fp)
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -132($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -136($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			jal function_comparer_string
+			sw $a0, -128($fp)
+			lw $a0, -128($fp)
+			bne $a0, $zero, label_neighbors_at_CellularAutomaton_12
+			li $t1, 0
+			sw $t1, -140($fp)
+			j label_neighbors_at_CellularAutomaton_13
+label_neighbors_at_CellularAutomaton_12:
+			li $t1, 1
+			sw $t1, -140($fp)
+label_neighbors_at_CellularAutomaton_13:
+			lw $t1, -12($fp)
+			lw $a0, -140($fp)
+			add $a0, $a0, $t1
+			sw $a0, -8($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 8($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 80($a0)
+			jalr $a0
+			sw $a0, -148($fp)
+			la $t1, _empty
+			sw $t1, -152($fp)
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -148($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -152($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			jal function_comparer_string
+			sw $a0, -144($fp)
+			lw $a0, -144($fp)
+			bne $a0, $zero, label_neighbors_at_CellularAutomaton_14
+			li $t1, 0
+			sw $t1, -156($fp)
+			j label_neighbors_at_CellularAutomaton_15
+label_neighbors_at_CellularAutomaton_14:
+			li $t1, 1
+			sw $t1, -156($fp)
+label_neighbors_at_CellularAutomaton_15:
+			lw $t1, -8($fp)
+			lw $a0, -156($fp)
+			add $a0, $a0, $t1
+			sw $a0, -4($fp)
+
+ #retornando el valor
+
+			lw $a0, -4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 172
+			lw $fp, 0($sp)
+			jr $ra
+function_cell_at_next_evolution_at_CellularAutomaton:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -64
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 8($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 84($a0)
+			jalr $a0
+			sw $a0, -8($fp)
+			lw $t1, -8($fp)
+			li $a0, 3
+			sub $a0, $t1, $a0
+			sw $a0, -12($fp)
+			lw $a0, -12($fp)
+			bne $a0, $zero, label_cell_at_next_evolution_at_CellularAutomaton_0
+			li $t1, 1
+			sw $t1, -4($fp)
+			j label_cell_at_next_evolution_at_CellularAutomaton_1
+label_cell_at_next_evolution_at_CellularAutomaton_0:
+			li $t1, 0
+			sw $t1, -4($fp)
+label_cell_at_next_evolution_at_CellularAutomaton_1:
+			lw $a0, -4($fp)
+			bne $a0, $zero, label_cell_at_next_evolution_at_CellularAutomaton_2
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 8($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 84($a0)
+			jalr $a0
+			sw $a0, -24($fp)
+			lw $t1, -24($fp)
+			li $a0, 2
+			sub $a0, $t1, $a0
+			sw $a0, -28($fp)
+			lw $a0, -28($fp)
+			bne $a0, $zero, label_cell_at_next_evolution_at_CellularAutomaton_4
+			li $t1, 1
+			sw $t1, -20($fp)
+			j label_cell_at_next_evolution_at_CellularAutomaton_5
+label_cell_at_next_evolution_at_CellularAutomaton_4:
+			li $t1, 0
+			sw $t1, -20($fp)
+label_cell_at_next_evolution_at_CellularAutomaton_5:
+			lw $a0, -20($fp)
+			bne $a0, $zero, label_cell_at_next_evolution_at_CellularAutomaton_6
+			la $t1, _empty
+			sw $t1, -36($fp)
+			lw $t1, -36($fp)
+			sw $t1, -32($fp)
+			j label_cell_at_next_evolution_at_CellularAutomaton_7
+label_cell_at_next_evolution_at_CellularAutomaton_6:
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 8($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 48($a0)
+			jalr $a0
+			sw $a0, -44($fp)
+			la $t1, _empty
+			sw $t1, -48($fp)
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -44($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -48($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			jal function_comparer_string
+			sw $a0, -40($fp)
+			lw $a0, -40($fp)
+			bne $a0, $zero, label_cell_at_next_evolution_at_CellularAutomaton_8
+			la $t1, _empty
+			sw $t1, -56($fp)
+			lw $t1, -56($fp)
+			sw $t1, -52($fp)
+			j label_cell_at_next_evolution_at_CellularAutomaton_9
+label_cell_at_next_evolution_at_CellularAutomaton_8:
+			la $t1, _empty
+			sw $t1, -60($fp)
+			lw $t1, -60($fp)
+			sw $t1, -52($fp)
+label_cell_at_next_evolution_at_CellularAutomaton_9:
+			lw $t1, -52($fp)
+			sw $t1, -32($fp)
+label_cell_at_next_evolution_at_CellularAutomaton_7:
+			lw $t1, -32($fp)
+			sw $t1, -16($fp)
+			j label_cell_at_next_evolution_at_CellularAutomaton_3
+label_cell_at_next_evolution_at_CellularAutomaton_2:
+			la $t1, _empty
+			sw $t1, -64($fp)
+			lw $t1, -64($fp)
+			sw $t1, -16($fp)
+label_cell_at_next_evolution_at_CellularAutomaton_3:
+
+ #retornando el valor
+
+			lw $a0, -16($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 80
+			lw $fp, 0($sp)
+			jr $ra
+function_evolve_at_CellularAutomaton:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -36
+			li $t1, 0
+			sw $t1, -4($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 44($a0)
+			jalr $a0
+			sw $a0, -8($fp)
+			lw $t1, -8($fp)
+			sw $t1, -12($fp)
+			la $t1, _empty
+			sw $t1, -16($fp)
+			lw $t1, -16($fp)
+			sw $t1, -20($fp)
+label_evolve_at_CellularAutomaton_0:
+			li $a0, []
+			bne $a0, $zero, label_evolve_at_CellularAutomaton_1
+			j label_evolve_at_CellularAutomaton_2
+label_evolve_at_CellularAutomaton_1:
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			li $a0, position
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 88($a0)
+			jalr $a0
+			sw $a0, -28($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -28($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			li $a0, temp
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada al constructor
+
+			jal function_concat_at_String
+			sw $a0, -24($fp)
+
+ #fin llamada dinamica
+
+			lw $t1, -24($fp)
+			sw $t1, -20($fp)
+			li $t1, position
+			li $a0, 1
+			add $a0, $a0, $t1
+			sw $a0, -32($fp)
+			lw $t1, -32($fp)
+			sw $t1, -4($fp)
+			j label_evolve_at_CellularAutomaton_0
+label_evolve_at_CellularAutomaton_2:
+			la $t1, _void
+			sw $t1, -36($fp)
+
+ #init set attribute
+
+			lw $a0, 4($fp)
+			li $t1, temp
+			sw $t1, 24($a0)
+
+ #end set attribute
+
+
+ #retornando el valor
+
+			lw $a0, 4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 48
+			lw $fp, 0($sp)
+			jr $ra
+function_option_at_CellularAutomaton:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -540
+			li $t1, 0
+			sw $t1, -4($fp)
+			la $t1, data_2
+			sw $t1, -12($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -12($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -8($fp)
+			la $t1, data_3
+			sw $t1, -20($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -20($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -16($fp)
+			la $t1, data_3
+			sw $t1, -28($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -28($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -24($fp)
+			la $t1, data_3
+			sw $t1, -36($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -36($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -32($fp)
+			la $t1, data_3
+			sw $t1, -44($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -44($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -40($fp)
+			la $t1, data_3
+			sw $t1, -52($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -52($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -48($fp)
+			la $t1, data_3
+			sw $t1, -60($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -60($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -56($fp)
+			la $t1, data_3
+			sw $t1, -68($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -68($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -64($fp)
+			la $t1, data_3
+			sw $t1, -76($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -76($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -72($fp)
+			la $t1, data_3
+			sw $t1, -84($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -84($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -80($fp)
+			la $t1, data_3
+			sw $t1, -92($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -92($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -88($fp)
+			la $t1, data_3
+			sw $t1, -100($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -100($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -96($fp)
+			la $t1, data_3
+			sw $t1, -108($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -108($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -104($fp)
+			la $t1, data_3
+			sw $t1, -116($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -116($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -112($fp)
+			la $t1, data_3
+			sw $t1, -124($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -124($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -120($fp)
+			la $t1, data_3
+			sw $t1, -132($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -132($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -128($fp)
+			la $t1, data_3
+			sw $t1, -140($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -140($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -136($fp)
+			la $t1, data_3
+			sw $t1, -148($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -148($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -144($fp)
+			la $t1, data_3
+			sw $t1, -156($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -156($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -152($fp)
+			la $t1, data_3
+			sw $t1, -164($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -164($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -160($fp)
+			la $t1, data_3
+			sw $t1, -172($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -172($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -168($fp)
+			la $t1, data_3
+			sw $t1, -180($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -180($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -176($fp)
+			la $t1, _empty
+			sw $t1, -188($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -188($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -184($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 20($a0)
+			jalr $a0
+			sw $a0, -192($fp)
+			lw $t1, -192($fp)
+			sw $t1, -4($fp)
+			la $t1, data_1
+			sw $t1, -200($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -200($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -196($fp)
+			li $t1, num
+			li $a0, 1
+			sub $a0, $t1, $a0
+			sw $a0, -208($fp)
+			lw $a0, -208($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_0
+			li $t1, 1
+			sw $t1, -204($fp)
+			j label_option_at_CellularAutomaton_1
+label_option_at_CellularAutomaton_0:
+			li $t1, 0
+			sw $t1, -204($fp)
+label_option_at_CellularAutomaton_1:
+			lw $a0, -204($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_2
+			li $t1, num
+			li $a0, 2
+			sub $a0, $t1, $a0
+			sw $a0, -220($fp)
+			lw $a0, -220($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_4
+			li $t1, 1
+			sw $t1, -216($fp)
+			j label_option_at_CellularAutomaton_5
+label_option_at_CellularAutomaton_4:
+			li $t1, 0
+			sw $t1, -216($fp)
+label_option_at_CellularAutomaton_5:
+			lw $a0, -216($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_6
+			li $t1, num
+			li $a0, 3
+			sub $a0, $t1, $a0
+			sw $a0, -232($fp)
+			lw $a0, -232($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_8
+			li $t1, 1
+			sw $t1, -228($fp)
+			j label_option_at_CellularAutomaton_9
+label_option_at_CellularAutomaton_8:
+			li $t1, 0
+			sw $t1, -228($fp)
+label_option_at_CellularAutomaton_9:
+			lw $a0, -228($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_10
+			li $t1, num
+			li $a0, 4
+			sub $a0, $t1, $a0
+			sw $a0, -244($fp)
+			lw $a0, -244($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_12
+			li $t1, 1
+			sw $t1, -240($fp)
+			j label_option_at_CellularAutomaton_13
+label_option_at_CellularAutomaton_12:
+			li $t1, 0
+			sw $t1, -240($fp)
+label_option_at_CellularAutomaton_13:
+			lw $a0, -240($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_14
+			li $t1, num
+			li $a0, 5
+			sub $a0, $t1, $a0
+			sw $a0, -256($fp)
+			lw $a0, -256($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_16
+			li $t1, 1
+			sw $t1, -252($fp)
+			j label_option_at_CellularAutomaton_17
+label_option_at_CellularAutomaton_16:
+			li $t1, 0
+			sw $t1, -252($fp)
+label_option_at_CellularAutomaton_17:
+			lw $a0, -252($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_18
+			li $t1, num
+			li $a0, 6
+			sub $a0, $t1, $a0
+			sw $a0, -268($fp)
+			lw $a0, -268($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_20
+			li $t1, 1
+			sw $t1, -264($fp)
+			j label_option_at_CellularAutomaton_21
+label_option_at_CellularAutomaton_20:
+			li $t1, 0
+			sw $t1, -264($fp)
+label_option_at_CellularAutomaton_21:
+			lw $a0, -264($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_22
+			li $t1, num
+			li $a0, 7
+			sub $a0, $t1, $a0
+			sw $a0, -280($fp)
+			lw $a0, -280($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_24
+			li $t1, 1
+			sw $t1, -276($fp)
+			j label_option_at_CellularAutomaton_25
+label_option_at_CellularAutomaton_24:
+			li $t1, 0
+			sw $t1, -276($fp)
+label_option_at_CellularAutomaton_25:
+			lw $a0, -276($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_26
+			li $t1, num
+			li $a0, 8
+			sub $a0, $t1, $a0
+			sw $a0, -292($fp)
+			lw $a0, -292($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_28
+			li $t1, 1
+			sw $t1, -288($fp)
+			j label_option_at_CellularAutomaton_29
+label_option_at_CellularAutomaton_28:
+			li $t1, 0
+			sw $t1, -288($fp)
+label_option_at_CellularAutomaton_29:
+			lw $a0, -288($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_30
+			li $t1, num
+			li $a0, 9
+			sub $a0, $t1, $a0
+			sw $a0, -304($fp)
+			lw $a0, -304($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_32
+			li $t1, 1
+			sw $t1, -300($fp)
+			j label_option_at_CellularAutomaton_33
+label_option_at_CellularAutomaton_32:
+			li $t1, 0
+			sw $t1, -300($fp)
+label_option_at_CellularAutomaton_33:
+			lw $a0, -300($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_34
+			li $t1, num
+			li $a0, 10
+			sub $a0, $t1, $a0
+			sw $a0, -316($fp)
+			lw $a0, -316($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_36
+			li $t1, 1
+			sw $t1, -312($fp)
+			j label_option_at_CellularAutomaton_37
+label_option_at_CellularAutomaton_36:
+			li $t1, 0
+			sw $t1, -312($fp)
+label_option_at_CellularAutomaton_37:
+			lw $a0, -312($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_38
+			li $t1, num
+			li $a0, 11
+			sub $a0, $t1, $a0
+			sw $a0, -328($fp)
+			lw $a0, -328($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_40
+			li $t1, 1
+			sw $t1, -324($fp)
+			j label_option_at_CellularAutomaton_41
+label_option_at_CellularAutomaton_40:
+			li $t1, 0
+			sw $t1, -324($fp)
+label_option_at_CellularAutomaton_41:
+			lw $a0, -324($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_42
+			li $t1, num
+			li $a0, 12
+			sub $a0, $t1, $a0
+			sw $a0, -340($fp)
+			lw $a0, -340($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_44
+			li $t1, 1
+			sw $t1, -336($fp)
+			j label_option_at_CellularAutomaton_45
+label_option_at_CellularAutomaton_44:
+			li $t1, 0
+			sw $t1, -336($fp)
+label_option_at_CellularAutomaton_45:
+			lw $a0, -336($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_46
+			li $t1, num
+			li $a0, 13
+			sub $a0, $t1, $a0
+			sw $a0, -352($fp)
+			lw $a0, -352($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_48
+			li $t1, 1
+			sw $t1, -348($fp)
+			j label_option_at_CellularAutomaton_49
+label_option_at_CellularAutomaton_48:
+			li $t1, 0
+			sw $t1, -348($fp)
+label_option_at_CellularAutomaton_49:
+			lw $a0, -348($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_50
+			li $t1, num
+			li $a0, 14
+			sub $a0, $t1, $a0
+			sw $a0, -364($fp)
+			lw $a0, -364($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_52
+			li $t1, 1
+			sw $t1, -360($fp)
+			j label_option_at_CellularAutomaton_53
+label_option_at_CellularAutomaton_52:
+			li $t1, 0
+			sw $t1, -360($fp)
+label_option_at_CellularAutomaton_53:
+			lw $a0, -360($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_54
+			li $t1, num
+			li $a0, 15
+			sub $a0, $t1, $a0
+			sw $a0, -376($fp)
+			lw $a0, -376($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_56
+			li $t1, 1
+			sw $t1, -372($fp)
+			j label_option_at_CellularAutomaton_57
+label_option_at_CellularAutomaton_56:
+			li $t1, 0
+			sw $t1, -372($fp)
+label_option_at_CellularAutomaton_57:
+			lw $a0, -372($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_58
+			li $t1, num
+			li $a0, 16
+			sub $a0, $t1, $a0
+			sw $a0, -388($fp)
+			lw $a0, -388($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_60
+			li $t1, 1
+			sw $t1, -384($fp)
+			j label_option_at_CellularAutomaton_61
+label_option_at_CellularAutomaton_60:
+			li $t1, 0
+			sw $t1, -384($fp)
+label_option_at_CellularAutomaton_61:
+			lw $a0, -384($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_62
+			li $t1, num
+			li $a0, 17
+			sub $a0, $t1, $a0
+			sw $a0, -400($fp)
+			lw $a0, -400($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_64
+			li $t1, 1
+			sw $t1, -396($fp)
+			j label_option_at_CellularAutomaton_65
+label_option_at_CellularAutomaton_64:
+			li $t1, 0
+			sw $t1, -396($fp)
+label_option_at_CellularAutomaton_65:
+			lw $a0, -396($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_66
+			li $t1, num
+			li $a0, 18
+			sub $a0, $t1, $a0
+			sw $a0, -412($fp)
+			lw $a0, -412($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_68
+			li $t1, 1
+			sw $t1, -408($fp)
+			j label_option_at_CellularAutomaton_69
+label_option_at_CellularAutomaton_68:
+			li $t1, 0
+			sw $t1, -408($fp)
+label_option_at_CellularAutomaton_69:
+			lw $a0, -408($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_70
+			li $t1, num
+			li $a0, 19
+			sub $a0, $t1, $a0
+			sw $a0, -424($fp)
+			lw $a0, -424($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_72
+			li $t1, 1
+			sw $t1, -420($fp)
+			j label_option_at_CellularAutomaton_73
+label_option_at_CellularAutomaton_72:
+			li $t1, 0
+			sw $t1, -420($fp)
+label_option_at_CellularAutomaton_73:
+			lw $a0, -420($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_74
+			li $t1, num
+			li $a0, 20
+			sub $a0, $t1, $a0
+			sw $a0, -436($fp)
+			lw $a0, -436($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_76
+			li $t1, 1
+			sw $t1, -432($fp)
+			j label_option_at_CellularAutomaton_77
+label_option_at_CellularAutomaton_76:
+			li $t1, 0
+			sw $t1, -432($fp)
+label_option_at_CellularAutomaton_77:
+			lw $a0, -432($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_78
+			li $t1, num
+			li $a0, 21
+			sub $a0, $t1, $a0
+			sw $a0, -448($fp)
+			lw $a0, -448($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_80
+			li $t1, 1
+			sw $t1, -444($fp)
+			j label_option_at_CellularAutomaton_81
+label_option_at_CellularAutomaton_80:
+			li $t1, 0
+			sw $t1, -444($fp)
+label_option_at_CellularAutomaton_81:
+			lw $a0, -444($fp)
+			bne $a0, $zero, label_option_at_CellularAutomaton_82
+			la $t1, _empty
+			sw $t1, -456($fp)
+			lw $t1, -456($fp)
+			sw $t1, -452($fp)
+			j label_option_at_CellularAutomaton_83
+label_option_at_CellularAutomaton_82:
+			la $t1, _empty
+			sw $t1, -460($fp)
+			lw $t1, -460($fp)
+			sw $t1, -452($fp)
+label_option_at_CellularAutomaton_83:
+			lw $t1, -452($fp)
+			sw $t1, -440($fp)
+			j label_option_at_CellularAutomaton_79
+label_option_at_CellularAutomaton_78:
+			la $t1, _empty
+			sw $t1, -464($fp)
+			lw $t1, -464($fp)
+			sw $t1, -440($fp)
+label_option_at_CellularAutomaton_79:
+			lw $t1, -440($fp)
+			sw $t1, -428($fp)
+			j label_option_at_CellularAutomaton_75
+label_option_at_CellularAutomaton_74:
+			la $t1, _empty
+			sw $t1, -468($fp)
+			lw $t1, -468($fp)
+			sw $t1, -428($fp)
+label_option_at_CellularAutomaton_75:
+			lw $t1, -428($fp)
+			sw $t1, -416($fp)
+			j label_option_at_CellularAutomaton_71
+label_option_at_CellularAutomaton_70:
+			la $t1, _empty
+			sw $t1, -472($fp)
+			lw $t1, -472($fp)
+			sw $t1, -416($fp)
+label_option_at_CellularAutomaton_71:
+			lw $t1, -416($fp)
+			sw $t1, -404($fp)
+			j label_option_at_CellularAutomaton_67
+label_option_at_CellularAutomaton_66:
+			la $t1, _empty
+			sw $t1, -476($fp)
+			lw $t1, -476($fp)
+			sw $t1, -404($fp)
+label_option_at_CellularAutomaton_67:
+			lw $t1, -404($fp)
+			sw $t1, -392($fp)
+			j label_option_at_CellularAutomaton_63
+label_option_at_CellularAutomaton_62:
+			la $t1, _empty
+			sw $t1, -480($fp)
+			lw $t1, -480($fp)
+			sw $t1, -392($fp)
+label_option_at_CellularAutomaton_63:
+			lw $t1, -392($fp)
+			sw $t1, -380($fp)
+			j label_option_at_CellularAutomaton_59
+label_option_at_CellularAutomaton_58:
+			la $t1, _empty
+			sw $t1, -484($fp)
+			lw $t1, -484($fp)
+			sw $t1, -380($fp)
+label_option_at_CellularAutomaton_59:
+			lw $t1, -380($fp)
+			sw $t1, -368($fp)
+			j label_option_at_CellularAutomaton_55
+label_option_at_CellularAutomaton_54:
+			la $t1, _empty
+			sw $t1, -488($fp)
+			lw $t1, -488($fp)
+			sw $t1, -368($fp)
+label_option_at_CellularAutomaton_55:
+			lw $t1, -368($fp)
+			sw $t1, -356($fp)
+			j label_option_at_CellularAutomaton_51
+label_option_at_CellularAutomaton_50:
+			la $t1, _empty
+			sw $t1, -492($fp)
+			lw $t1, -492($fp)
+			sw $t1, -356($fp)
+label_option_at_CellularAutomaton_51:
+			lw $t1, -356($fp)
+			sw $t1, -344($fp)
+			j label_option_at_CellularAutomaton_47
+label_option_at_CellularAutomaton_46:
+			la $t1, _empty
+			sw $t1, -496($fp)
+			lw $t1, -496($fp)
+			sw $t1, -344($fp)
+label_option_at_CellularAutomaton_47:
+			lw $t1, -344($fp)
+			sw $t1, -332($fp)
+			j label_option_at_CellularAutomaton_43
+label_option_at_CellularAutomaton_42:
+			la $t1, _empty
+			sw $t1, -500($fp)
+			lw $t1, -500($fp)
+			sw $t1, -332($fp)
+label_option_at_CellularAutomaton_43:
+			lw $t1, -332($fp)
+			sw $t1, -320($fp)
+			j label_option_at_CellularAutomaton_39
+label_option_at_CellularAutomaton_38:
+			la $t1, _empty
+			sw $t1, -504($fp)
+			lw $t1, -504($fp)
+			sw $t1, -320($fp)
+label_option_at_CellularAutomaton_39:
+			lw $t1, -320($fp)
+			sw $t1, -308($fp)
+			j label_option_at_CellularAutomaton_35
+label_option_at_CellularAutomaton_34:
+			la $t1, _empty
+			sw $t1, -508($fp)
+			lw $t1, -508($fp)
+			sw $t1, -308($fp)
+label_option_at_CellularAutomaton_35:
+			lw $t1, -308($fp)
+			sw $t1, -296($fp)
+			j label_option_at_CellularAutomaton_31
+label_option_at_CellularAutomaton_30:
+			la $t1, _empty
+			sw $t1, -512($fp)
+			lw $t1, -512($fp)
+			sw $t1, -296($fp)
+label_option_at_CellularAutomaton_31:
+			lw $t1, -296($fp)
+			sw $t1, -284($fp)
+			j label_option_at_CellularAutomaton_27
+label_option_at_CellularAutomaton_26:
+			la $t1, _empty
+			sw $t1, -516($fp)
+			lw $t1, -516($fp)
+			sw $t1, -284($fp)
+label_option_at_CellularAutomaton_27:
+			lw $t1, -284($fp)
+			sw $t1, -272($fp)
+			j label_option_at_CellularAutomaton_23
+label_option_at_CellularAutomaton_22:
+			la $t1, _empty
+			sw $t1, -520($fp)
+			lw $t1, -520($fp)
+			sw $t1, -272($fp)
+label_option_at_CellularAutomaton_23:
+			lw $t1, -272($fp)
+			sw $t1, -260($fp)
+			j label_option_at_CellularAutomaton_19
+label_option_at_CellularAutomaton_18:
+			la $t1, _empty
+			sw $t1, -524($fp)
+			lw $t1, -524($fp)
+			sw $t1, -260($fp)
+label_option_at_CellularAutomaton_19:
+			lw $t1, -260($fp)
+			sw $t1, -248($fp)
+			j label_option_at_CellularAutomaton_15
+label_option_at_CellularAutomaton_14:
+			la $t1, _empty
+			sw $t1, -528($fp)
+			lw $t1, -528($fp)
+			sw $t1, -248($fp)
+label_option_at_CellularAutomaton_15:
+			lw $t1, -248($fp)
+			sw $t1, -236($fp)
+			j label_option_at_CellularAutomaton_11
+label_option_at_CellularAutomaton_10:
+			la $t1, _empty
+			sw $t1, -532($fp)
+			lw $t1, -532($fp)
+			sw $t1, -236($fp)
+label_option_at_CellularAutomaton_11:
+			lw $t1, -236($fp)
+			sw $t1, -224($fp)
+			j label_option_at_CellularAutomaton_7
+label_option_at_CellularAutomaton_6:
+			la $t1, _empty
+			sw $t1, -536($fp)
+			lw $t1, -536($fp)
+			sw $t1, -224($fp)
+label_option_at_CellularAutomaton_7:
+			lw $t1, -224($fp)
+			sw $t1, -212($fp)
+			j label_option_at_CellularAutomaton_3
+label_option_at_CellularAutomaton_2:
+			la $t1, _empty
+			sw $t1, -540($fp)
+			lw $t1, -540($fp)
+			sw $t1, -212($fp)
+label_option_at_CellularAutomaton_3:
+
+ #retornando el valor
+
+			lw $a0, -212($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 552
+			lw $fp, 0($sp)
+			jr $ra
+function_prompt_at_CellularAutomaton:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -48
+			la $t1, _empty
+			sw $t1, -4($fp)
+			lw $t1, -4($fp)
+			sw $t1, -8($fp)
+			la $t1, data_1
+			sw $t1, -16($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -16($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -12($fp)
+			la $t1, _empty
+			sw $t1, -24($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -24($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -20($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 24($a0)
+			jalr $a0
+			sw $a0, -28($fp)
+			lw $t1, -28($fp)
+			sw $t1, -8($fp)
+			la $t1, data_1
+			sw $t1, -36($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -36($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -32($fp)
+			la $t1, _empty
+			sw $t1, -44($fp)
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, None
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -44($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			jal function_comparer_string
+			sw $a0, -40($fp)
+			lw $a0, -40($fp)
+			bne $a0, $zero, label_prompt_at_CellularAutomaton_0
+			li $t1, 1
+			sw $t1, -48($fp)
+			j label_prompt_at_CellularAutomaton_1
+label_prompt_at_CellularAutomaton_0:
+			li $t1, 0
+			sw $t1, -48($fp)
+label_prompt_at_CellularAutomaton_1:
+
+ #retornando el valor
+
+			lw $a0, -48($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 60
+			lw $fp, 0($sp)
+			jr $ra
+function_prompt2_at_CellularAutomaton:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -48
+			la $t1, _empty
+			sw $t1, -4($fp)
+			lw $t1, -4($fp)
+			sw $t1, -8($fp)
+			la $t1, data_2
+			sw $t1, -16($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -16($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -12($fp)
+			la $t1, data_1
+			sw $t1, -24($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -24($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -20($fp)
+			la $t1, _empty
+			sw $t1, -32($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -32($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -28($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 24($a0)
+			jalr $a0
+			sw $a0, -36($fp)
+			lw $t1, -36($fp)
+			sw $t1, -8($fp)
+			la $t1, _empty
+			sw $t1, -44($fp)
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, None
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -44($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			jal function_comparer_string
+			sw $a0, -40($fp)
+			lw $a0, -40($fp)
+			bne $a0, $zero, label_prompt2_at_CellularAutomaton_0
+			li $t1, 0
+			sw $t1, -48($fp)
+			j label_prompt2_at_CellularAutomaton_1
+label_prompt2_at_CellularAutomaton_0:
+			li $t1, 1
+			sw $t1, -48($fp)
+label_prompt2_at_CellularAutomaton_1:
+
+ #retornando el valor
+
+			lw $a0, -48($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 60
+			lw $fp, 0($sp)
+			jr $ra
+function_Ctr_at_CellularAutomaton:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -4
+
+ #LOAD inicia
+
+			la $t1, CellularAutomaton_name
+			lw $t2, 4($fp)
+			sw $t1, 0($t2)
+
+ #LOAD inicia
+
+			lw $t1, CellularAutomaton_size
+			lw $t2, 4($fp)
+			sw $t1, 4($t2)
+
+ #LOAD inicia
+
+			la $t1, __virtual_table__CellularAutomaton
+			lw $t2, 4($fp)
+			sw $t1, 8($t2)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada al constructor
+
+			jal function_Init_at_CellularAutomaton
+			sw $a0, -4($fp)
+
+ #fin llamada dinamica
+
+
+ #retornando el valor
+
+			lw $a0, 4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 16
+			lw $fp, 0($sp)
+			jr $ra
+function_Init_at_CellularAutomaton:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -4
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada al constructor
+
+			jal function_Init_at_Board
+			sw $a0, -4($fp)
+
+ #fin llamada dinamica
+
+
+ #retornando el valor
+
+			lw $a0, 4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 16
+			lw $fp, 0($sp)
+			jr $ra
+function_main_at_Main:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -88
+			li $t1, 0
+			sw $t1, -4($fp)
+			la $t1, _empty
+			sw $t1, -8($fp)
+			lw $t1, -8($fp)
+			sw $t1, -12($fp)
+			la $t1, data_1
+			sw $t1, -20($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -20($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -16($fp)
+			la $t1, data_1
+			sw $t1, -28($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -28($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 12($a0)
+			jalr $a0
+			sw $a0, -24($fp)
+label_main_at_Main_0:
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 104($a0)
+			jalr $a0
+			sw $a0, -32($fp)
+			lw $a0, -32($fp)
+			bne $a0, $zero, label_main_at_Main_1
+			j label_main_at_Main_2
+label_main_at_Main_1:
+			li $t1, 1
+			sw $t1, -4($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 96($a0)
+			jalr $a0
+			sw $a0, -36($fp)
+			lw $t1, -36($fp)
+			sw $t1, -12($fp)
+
+ #init allocate
+
+			li $v0, 9
+			lw $a0, CellularAutomaton_size
+			syscall
+			sw $v0, -44($fp)
+
+ #end allocate
+
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -44($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada al constructor
+
+			jal function_Ctr_at_CellularAutomaton
+			sw $a0, -48($fp)
+
+ #fin llamada dinamica
+
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			li $a0, choice
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -44($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada dinamica
+
+			lw $a0, -44($fp)
+			lw $a0, 8($a0)
+			lw $a0, 36($a0)
+			jalr $a0
+			sw $a0, -40($fp)
+
+ #fin llamada dinamica
+
+
+ #init set attribute
+
+			lw $a0, 4($fp)
+			lw $t1, -40($fp)
+			sw $t1, 28($a0)
+
+ #end set attribute
+
+
+ #init get attribute
+
+			lw $a0, 4($fp)
+			lw $a0, 28($a0)
+			sw $a0, -56($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -56($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada dinamica
+
+			lw $a0, -56($fp)
+			lw $a0, 8($a0)
+			lw $a0, 40($a0)
+			jalr $a0
+			sw $a0, -52($fp)
+
+ #fin llamada dinamica
+
+label_main_at_Main_3:
+			li $a0, continue
+			bne $a0, $zero, label_main_at_Main_4
+			j label_main_at_Main_5
+label_main_at_Main_4:
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+			lw $a0, 4($fp)
+			lw $a0, 8($a0)
+			lw $a0, 100($a0)
+			jalr $a0
+			sw $a0, -60($fp)
+			lw $a0, -60($fp)
+			bne $a0, $zero, label_main_at_Main_6
+			li $t1, 0
+			sw $t1, -4($fp)
+			li $t1, 0
+			sw $t1, -64($fp)
+			j label_main_at_Main_7
+label_main_at_Main_6:
+
+ #init get attribute
+
+			lw $a0, 4($fp)
+			lw $a0, 28($a0)
+			sw $a0, -72($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -72($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada dinamica
+
+			lw $a0, -72($fp)
+			lw $a0, 8($a0)
+			lw $a0, 92($a0)
+			jalr $a0
+			sw $a0, -68($fp)
+
+ #fin llamada dinamica
+
+
+ #init get attribute
+
+			lw $a0, 4($fp)
+			lw $a0, 28($a0)
+			sw $a0, -80($fp)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, -80($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada dinamica
+
+			lw $a0, -80($fp)
+			lw $a0, 8($a0)
+			lw $a0, 40($a0)
+			jalr $a0
+			sw $a0, -76($fp)
+
+ #fin llamada dinamica
+
+			lw $t1, -76($fp)
+			sw $t1, -64($fp)
+label_main_at_Main_7:
+			j label_main_at_Main_3
+label_main_at_Main_5:
+			la $t1, _void
+			sw $t1, -84($fp)
+			j label_main_at_Main_0
+label_main_at_Main_2:
+			la $t1, _void
+			sw $t1, -88($fp)
+
+ #retornando el valor
+
+			lw $a0, 4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 100
+			lw $fp, 0($sp)
+			jr $ra
+function_Ctr_at_Main:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -4
+
+ #LOAD inicia
+
+			la $t1, Main_name
+			lw $t2, 4($fp)
+			sw $t1, 0($t2)
+
+ #LOAD inicia
+
+			lw $t1, Main_size
+			lw $t2, 4($fp)
+			sw $t1, 4($t2)
+
+ #LOAD inicia
+
+			la $t1, __virtual_table__Main
+			lw $t2, 4($fp)
+			sw $t1, 8($t2)
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada al constructor
+
+			jal function_Init_at_Main
+			sw $a0, -4($fp)
+
+ #fin llamada dinamica
+
+
+ #retornando el valor
+
+			lw $a0, 4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 16
+			lw $fp, 0($sp)
+			jr $ra
+function_Init_at_Main:
+
+ #muevo el fp al sp, pongo en sp ra y avanzo la pila
+
+			move $fp, $sp
+			sw $ra, 0($sp)
+			addiu $sp, $sp, -4
+
+ #muevo la pila x las variables locales
+
+			addiu $sp, $sp, -4
+
+ #guardando los parametros
+
+			sw $fp, 0($sp)
+			addiu $sp, $sp, -4
+			lw $a0, 4($fp)
+			sw $a0, 0($sp)
+			addiu $sp, $sp, -4
+
+ # fin guardando los parametros
+
+
+ #comienzo llamada al constructor
+
+			jal function_Init_at_CellularAutomaton
+			sw $a0, -4($fp)
+
+ #fin llamada dinamica
+
+
+ #retornando el valor
+
+			lw $a0, 4($fp)
+
+ #return sp, fp, ra
+
+			lw $ra, 0($fp)
+			addiu $sp, $sp, 16
+			lw $fp, 0($sp)
+			jr $ra
+
+
+function_Ctr_at_Object:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+
+            la $t1, Object_name
+			lw $t2, 4($fp)
+			sw $t1, 0($t2)
+
+			lw $t1, Object_size
+			lw $t2, 4($fp)
+			sw $t1, 4($t2)
+
+			la $t1, __virtual_table__Object
+			lw $t2, 4($fp)
+			sw $t1, 8($t2)
+
+
+            lw $a0, 4($fp)
+
+            lw $ra, 0($fp)
+            addiu $sp, $sp, 12
+            lw $fp, 0($sp)
+            jr $ra 
+
+function_Init_at_Object:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+
+            lw $a0, 4($fp)
+
+            lw $ra, 0($fp)
+            addiu $sp, $sp, 12
+            lw $fp, 0($sp)
+            jr $ra 
+
+function_Ctr_at_IO:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+
+            la $t1, IO_name
+			lw $t2, 4($fp)
+			sw $t1, 0($t2)
+
+			lw $t1, IO_size
+			lw $t2, 4($fp)
+			sw $t1, 4($t2)
+
+			la $t1, __virtual_table__IO
+			lw $t2, 4($fp)
+			sw $t1, 8($t2)
+
+
+            lw $a0, 4($fp)
+
+            lw $ra, 0($fp)
+            addiu $sp, $sp, 12
+            lw $fp, 0($sp)
+            jr $ra 
+
+function_Init_at_IO:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+
+            lw $a0, 4($fp)
+
+            lw $ra, 0($fp)
+            addiu $sp, $sp, 12
+            lw $fp, 0($sp)
+            jr $ra 
+
+function_type_name_at_Object:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+            lw $a0, 4($fp)   
+            lw  $a0 0($a0)      
+            lw $ra, 0($fp)
+            addiu $sp, $sp, 12
+            lw $fp, 0($sp)
+            jr $ra
+
+function_abort_at_Object:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+            la $a0, _error1
+            li $v0, 4
+            syscall
+            lw $a0 4($fp)
+            lw $a0 ($a0)
+            li $v0, 4
+            syscall
+            la $a0, _salto_para_abort
+            li $v0, 4
+            syscall
+            li $v0, 10
+            syscall
+
+function_copy_at_Object:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+
+            lw $a0, 4($fp)
+            lw $a0, 0($a0)
+            la $t0, Int_name
+
+            bne $a0, $t0, not_int
+            lw $a0, 4($fp)
+            lw $a0, 8($a0)
+            j end
+
+        not_int:
+            lw $a0, 4($fp)
+            lw $a0, 0($a0)
+            la $t0, Bool_name
+
+            bne $a0, $t0, not_bool
+            lw $a0, 4($fp)
+            lw $a0, 8($a0)
+            j end
+
+        not_bool:
+            lw $a0, 4($fp)
+            lw $a0, 0($a0)
+            la $t0, String_name
+
+            bne $a0, $t0, not_string
+            lw $a0, 4($fp)
+            lw $a0, 8($a0)
+            j end
+
+        not_string:
+            lw $a0, 4($fp)
+            move $t2, $a0 
+            lw $a0, 4($a0)
+            move $t1, $a0
+
+            li $v0, 9
+            syscall
+
+            move $a0, $v0
+
+        copy:
+            lw $t0, 0($t2)
+            sw $t0, 0($a0)
+            addiu $a0, $a0, 4
+            addiu $t2, $t2, 4
+            addiu $t1, $t1, -4
+            bne $t1, $zero, copy
+
+            move $a0, $v0
+
+        end:
+            lw $ra, 0($fp)
+            addiu $sp, $sp, 12
+            lw $fp, 0($sp)
+            jr $ra 
+
+function_length_at_String:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+
+            lw $s0, 4($fp)
+            li $a0, -1
+
+        length:
+            lb $t0, ($s0)
+            addiu $a0, $a0, 1
+            addiu $s0, $s0, 1
+            bne $t0, $zero, length
+
+            lw $ra, 0($fp)
+            addiu $sp, $sp, 12
+            lw $fp, 0($sp)
+            jr $ra 
+
+function_concat_at_String:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+
+            lw $s1, 4($fp)
+            sw $fp, 0($sp)
+            addiu $sp, $sp, -4
+            sw $s1, 0($sp)
+            addiu $sp, $sp, -4
+            jal function_length_at_String
+
+            sw $a0, 0($sp)
+            addiu $sp, $sp, -4
+
+            lw $s1, 8($fp)
+            sw $fp, 0($sp)
+            addiu $sp, $sp, -4
+            sw $s1, 0($sp)
+            addiu $sp, $sp, -4
+            jal function_length_at_String
+
+            lw $t7, 4($sp)
+            addiu $sp, $sp, 4
+
+            move $t6, $a0
+            add $a0, $t7, $t6
+            addiu $a0, $a0, 1
+
+            li $v0, 9
+            syscall
+
+            move $t0, $v0
+
+            lw $s1, 4($fp)
+        copy_self:
+            lb $t5, ($s1)
+            beq $t5, $zero, end_copy_self
+            sb $t5, ($t0)
+            addiu $s1, $s1, 1
+            addiu $t0, $t0, 1
+            j copy_self
+
+        end_copy_self:
+            lw $s1, 8($fp)
+
+        copy_given:
+            lb $t5, ($s1)
+            sb $t5, ($t0)
+            addiu $s1, $s1, 1
+            addiu $t0, $t0, 1
+            bne $t5, $zero, copy_given
+
+
+            move $a0, $v0
+
+            lw $ra, 0($fp)
+            addiu $sp, $sp, 16
+            lw $fp, 0($sp)
+            jr $ra 
+
+
+function_substr_at_String:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+
+            lw $a0, 12($fp)
+            addiu $a0, $a0, 1
+            li $v0, 9
+            syscall
+
+            move $t0, $v0
+
+            lw $s1, 4($fp)
+            lw $t1, 8($fp)
+            add $s1, $s1, $t1
+
+            lw $t1, 12($fp)
+
+        substr:
+            lb $t5, ($s1)
+            sb $t5, ($t0)
+            addiu $s1, $s1, 1
+            addiu $t0, $t0, 1
+            addiu $t1, $t1, -1
+            bne $t1, $zero, substr
+
+            sb $zero, ($t0)
+            move $a0, $v0
+
+            lw $ra, 0($fp)
+            addiu $sp, $sp, 20
+            lw $fp, 0($sp)
+            jr $ra 
+
+
+function_comparer_string:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+
+            lw $s1, 4($fp)
+            sw $fp, 0($sp)
+            addiu $sp, $sp, -4
+            sw $s1, 0($sp)
+            addiu $sp, $sp, -4
+            jal function_length_at_String
+
+            sw $a0, 0($sp)
+            addiu $sp, $sp, -4
+
+            lw $s1, 8($fp)
+            sw $fp, 0($sp)
+            addiu $sp, $sp, -4
+            sw $s1, 0($sp)
+            addiu $sp, $sp, -4
+            jal function_length_at_String
+
+            lw $t7, 4($sp)
+            addiu $sp, $sp, 4
+
+            bne $t7, $a0, not_equals_strings
+
+            lw $t7, 4($fp)
+            lw $a0, 8($fp)
+
+        equal_chart:
+            lb $t1, ($t7)
+            lb $t2, ($a0)
+            addiu $t7, $t7, 1
+            addiu $a0, $a0, 1
+            bne $t1, $t2, not_equals_strings
+            beq $t1, $zero, equals_strings
+            j equal_chart
+
+        not_equals_strings:
+            li $a0, 0
+            j end_equal_string
+
+        equals_strings:
+            li $a0, 1
+
+        end_equal_string:
+            lw $ra, 0($fp)
+            addiu $sp, $sp, 16
+            lw $fp, 0($sp)
+            jr $ra 
+
+
+
+function_out_string_at_IO:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+
+            lw $a0, 8($fp)
+            li $v0, 4
+            syscall
+
+            lw $a0, 4($fp)
+
+            lw $ra, 0($fp)
+            addiu $sp, $sp, 16
+            lw $fp, 0($sp)
+            jr $ra 
+
+function_out_int_at_IO:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+
+            lw $a0, 8($fp)
+            li $v0, 1
+            syscall
+
+            lw $a0, 4($fp)
+
+            lw $ra, 0($fp)
+            addiu $sp, $sp, 16
+            lw $fp, 0($sp)
+            jr $ra 
+
+function_in_int_at_IO:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+
+            lw $a0, 4($fp)
+            li $v0, 5
+            syscall
+
+            move $a0, $v0
+
+            lw $ra, 0($fp)
+            addiu $sp, $sp, 12
+            lw $fp, 0($sp)
+            jr $ra 
+
+function_in_string_at_IO:
+            move $fp, $sp
+            sw $ra, 0($sp)
+            addiu $sp, $sp, -4
+
+            la $a0, _buffer
+            li $a1, 1024
+
+            li $v0, 8
+            syscall
+
+            sw $fp, 0($sp)
+            addiu $sp, $sp, -4
+            sw $a0, 0($sp)
+            addiu $sp, $sp, -4
+            jal function_length_at_String
+
+            addiu $a0, $a0, 1
+            li $v0, 9
+            syscall
+
+            move $t0, $v0
+            la $a0, _buffer
+
+        IO_copy:
+            lb $t1, ($a0)
+            sb $t1, ($t0)
+            addiu $a0, $a0, 1
+            addiu $t0, $t0, 1
+            bne $t1, $zero, IO_copy
+
+            addiu $t0, $t0, -2
+            li $t1 10
+            lb $t2, ($t0)
+            bne $t1 , $t2 not_slash
+            sb $zero, ($t0)
+
+            not_slash:
+            move $a0, $v0
+
+            lw $ra, 0($fp)
+            addiu $sp, $sp, 12
+            lw $fp, 0($sp)
+            jr $ra 
+
+            
