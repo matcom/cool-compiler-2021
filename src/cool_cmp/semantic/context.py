@@ -1,0 +1,31 @@
+from cmp.semantic import Context as DeprecatedContext
+from semantic.type import Type, SelfType, AutoType
+from cool.errors.errors import SemanticError, TYPE_NOT_DEFINED, TYPE_ALREADY_DEFINED
+
+class Context(DeprecatedContext):
+    
+    def __init__(self, special_types:dict):
+        super().__init__()
+        self.special_types = special_types
+        for name in self.special_types:
+            self.types[name] = self.special_types[name]()
+    
+    def get_type(self, name:str,self_type=None,current_type=None):
+        if name == 'SELF_TYPE':
+            if self_type:
+                name = self_type.name
+            else:
+                return SelfType(current_type)
+                # raise TypeError('Wrong argument combination: name is "SELF_TYPE" and no self_type given')
+        elif name == 'AUTO_TYPE':
+            return AutoType(self)
+        try:
+            return self.types[name]
+        except KeyError:
+            raise SemanticError(TYPE_NOT_DEFINED, name)
+    
+    def create_type(self, name:str):
+        if name in self.types:
+            raise SemanticError(TYPE_ALREADY_DEFINED, name)
+        typex = self.types[name] = Type(name)
+        return typex

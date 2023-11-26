@@ -1,0 +1,12 @@
+SPIM Version 8.0 of January 8, 2010
+Copyright 1990-2010, James R. Larus.
+All Rights Reserved.
+See the file README for a full copyright notice.
+Loaded: /usr/lib/spim/exceptions.s
+title:      The Top 100 CD_ROMs
+author:     Ulanoff
+periodical:  PC Magazine
+- dynamic type was Article -
+title:      Compilers, Principles, Techniques, and Tools
+author:     Aho, Sethi, and Ullman
+- dynamic type was Book -
