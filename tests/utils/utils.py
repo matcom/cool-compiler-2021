@@ -15,6 +15,7 @@ ERROR_FORMAT = r'^\s*\(\s*(\d+)\s*,\s*(\d+)\s*\)\s*-\s*(\w+)\s*:(.*)$'
 
 def parse_error(error: str):
     merror = re.fullmatch(ERROR_FORMAT, error)
+    
     assert merror, BAD_ERROR_FORMAT % error
 
     return (t(x) for t, x in zip([int, int, str, str], merror.groups()))
@@ -68,6 +69,7 @@ See the file README for a full copyright notice\.
 def compare_outputs(compiler_path: str, cool_file_path: str, input_file_path: str, output_file_path: str, timeout=100):
     try:
         sp = subprocess.run(['bash', compiler_path, cool_file_path], capture_output=True, timeout=timeout)
+        print(sp)
         assert sp.returncode == 0, TEST_MUST_COMPILE % get_file_name(cool_file_path)
     except subprocess.TimeoutExpired:
         assert False, COMPILER_TIMEOUT
